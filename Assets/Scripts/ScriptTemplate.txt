@@ -1,0 +1,40 @@
+-- Properties:
+
+[Header("Name")]
+[SerializeField] private type name;
+private type _name;
+
+public type name;
+
+public type Name => {get; set;}
+
+private type _name;
+
+private Vector2 & Vector3 _name;
+
+[Header("Name2")]
+...
+
+-- Methods:
+
+private void Awake() {}
+
+private void Start() {}
+
+private void OnEnable() {}
+
+private void Update() {}
+
+private void FixedUpdate() {}
+
+public void PublicMethod() {}
+
+private void PrivateMethod() {}
+
+private void OnTriggerEnter & OnTriggerExit() {}
+
+private void OnDisable() {}
+
+private void InputStuff() {}
+
+private IEnumerator IEnumerators() {}
