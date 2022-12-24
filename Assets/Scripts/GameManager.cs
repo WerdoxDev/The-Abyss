@@ -5,15 +5,21 @@ using Unity.Netcode.Transports.UTP;
 using Unity.Netcode;
 using System;
 
+#if UNITY_EDITOR
+using ParrelSync;
+#endif
+
 public class GameManager : MonoBehaviour {
     public static GameManager Instance;
 
     [Header("Settings")]
     [SerializeField] private float pingInterval;
     [SerializeField] private float fpsInterval;
+    [SerializeField] private string tempUrl;
     private float _fpsTimer;
 
     public event Action<Player, bool> OnPlayerSpawned;
+    public event Action<ulong> OnPlayerDespawned;
     public event Action<int> OnPingChanged;
     public event Action<int> OnFpsChanged;
 
@@ -36,7 +42,26 @@ public class GameManager : MonoBehaviour {
             StopAllCoroutines();
             StartCoroutine(CheckPingEnumerator(pingInterval));
         };
+
+        OnPlayerDespawned += (ulong clientId) => {
+            if (clientId != PlayerNetworkId) return;
+            PlayerNetworkId = 0;
+            StopAllCoroutines();
+        };
     }
+
+#if UNITY_EDITOR
+    // Temporary
+    private void Start() {
+        string[] split = tempUrl.Split(":");
+        SetConnectionData(split[0], ushort.Parse(split[1]));
+        if (ClonesManager.IsClone()) {
+            TheAbyssNetworkManager.Instance.Client(new PlayerConnData(UIManager.Instance.Username));
+        } else {
+            TheAbyssNetworkManager.Instance.Host(new PlayerConnData(UIManager.Instance.Username));
+        }
+    }
+#endif
 
     private void Update() {
         if (Time.unscaledTime > _fpsTimer) {
@@ -48,6 +73,10 @@ public class GameManager : MonoBehaviour {
 
     public void PlayerSpawned(Player player, bool isOwner) {
         OnPlayerSpawned?.Invoke(player, isOwner);
+    }
+
+    public void PlayerDespawned(ulong clientId) {
+        OnPlayerDespawned?.Invoke(clientId);
     }
 
     public void SetConnectionData(string address, ushort port) {

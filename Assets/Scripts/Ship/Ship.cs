@@ -1,8 +1,7 @@
 using UnityEngine;
 using Unity.Netcode;
 
-public class Ship : NetworkBehaviour
-{
+public class Ship : NetworkBehaviour {
     [Header("Autoset Fields")]
     public Steering Steering;
     public Capstan Capstan;
@@ -16,16 +15,14 @@ public class Ship : NetworkBehaviour
 
     public float MaxSpeed { get => SailControl.ShipMaxSpeed; }
 
-    private void Awake()
-    {
+    private void Awake() {
         Rb = GetComponent<Rigidbody>();
         PlayerAnchor = GetComponent<ShipPlayerAnchor>();
         Movement = GetComponent<ShipMovement>();
         SailControl = GetComponent<SailControl>();
     }
 
-    public void SetSpawnables(Capstan Capstan, Steering Steering)
-    {
+    public void SetSpawnables(Capstan Capstan, Steering Steering) {
         this.Capstan = Capstan;
         this.Steering = Steering;
     }

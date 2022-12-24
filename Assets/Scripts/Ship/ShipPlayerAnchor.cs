@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 
-public class ShipPlayerAnchor : MonoBehaviour
-{
+public class ShipPlayerAnchor : NetworkBehaviour {
     [Header("Anchoring")]
 
     [Tooltip("Allowed distance between player and anchor position when player is grounded")]
@@ -17,19 +17,25 @@ public class ShipPlayerAnchor : MonoBehaviour
     public List<Player> Players = new List<Player>();
     private List<GameObject> dummyObjects = new List<GameObject>();
 
-    private void FixedUpdate()
-    {
-        if (dummyObjects.Count != Players.Count)
-        {
+    public override void OnNetworkSpawn() {
+        if (!IsOwner) {
+            enabled = false;
+            return;
+        }
+    }
+
+    private void FixedUpdate() {
+        if (dummyObjects.Count != Players.Count) {
             foreach (GameObject dummy in dummyObjects) Destroy(dummy);
             dummyObjects.Clear();
-            for (int i = 0; i < Players.Count; i++)
+            for (int i = 0; i < Players.Count; i++) {
+                if (Players[i] == null) Players.RemoveAt(i);
                 dummyObjects.Add(Instantiate(dummyPrefab, Vector3.zero, Quaternion.identity, dummyHolder));
+            }
         }
 
         int index = 0;
-        foreach (Player player in Players)
-        {
+        foreach (Player player in Players) {
             if (player == null) return;
             Vector3 playerSize = player.PlayerSize - sizeOffset;
             Vector3 playerPos = player.transform.position;
@@ -57,17 +63,14 @@ public class ShipPlayerAnchor : MonoBehaviour
             Debug.DrawLine(highestPoint, highestPoint + new Vector3(0, 2, 0), Color.yellow, 0.1f);
 
             float playerDistance = (playerPos.y - dummyObjects[index].transform.position.y) - player.Offset;
-            Debug.Log(playerDistance);
 
             bool canAnchor = player.IsGrounded && !player.IsOnAttachable(InteractType.Ladder);
-            if (canAnchor && playerDistance > allowedDistance)
-            {
+            if (canAnchor && playerDistance > allowedDistance) {
                 dummyObjects[index].transform.position = playerPos - new Vector3(0, (playerSize.y / 2), 0);
                 canAnchor = false;
             }
 
-            if (canAnchor && highestPoint != Vector3.zero)
-            {
+            if (canAnchor && highestPoint != Vector3.zero) {
                 playerPos.y = highestPoint.y + player.Offset;
                 player.transform.position = playerPos;
             }
@@ -76,11 +79,9 @@ public class ShipPlayerAnchor : MonoBehaviour
         }
     }
 
-    private void OnDrawGizmos()
-    {
+    private void OnDrawGizmos() {
         if (dummyObjects.Count == 0) return;
-        for (int i = 0; i < dummyObjects.Count; i++)
-        {
+        for (int i = 0; i < dummyObjects.Count; i++) {
             Gizmos.DrawRay(dummyObjects[i].transform.position + new Vector3(0, 1f, 0), Vector3.down * 2);
         }
     }

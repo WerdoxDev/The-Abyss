@@ -12814,8 +12814,7 @@ GameObject:
   - component: {fileID: 1033145926776439218}
   - component: {fileID: 5627342677291520124}
   - component: {fileID: 4439548968595532462}
-  - component: {fileID: 624658303}
-  - component: {fileID: 624658302}
+  - component: {fileID: 6159563126319089908}
   - component: {fileID: 624658304}
   m_Layer: 13
   m_Name: Ship
@@ -12978,7 +12977,7 @@ MonoBehaviour:
   sailUpSpeed: 40
   sailDownSpeed: 80
   ShipMaxSpeed: 20
---- !u!114 &624658303
+--- !u!114 &6159563126319089908
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -12987,35 +12986,30 @@ MonoBehaviour:
   m_GameObject: {fileID: 7967540920174110235}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
+  m_Script: {fileID: 11500000, guid: b49c1082f4093814d8da434ca2e9bc21, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  PositionX:
+    m_InternalValue: 0
+  PositionY:
+    m_InternalValue: 0
+  PositionZ:
+    m_InternalValue: 0
+  RotationX:
+    m_InternalValue: 0
+  RotationY:
+    m_InternalValue: 0
+  RotationZ:
+    m_InternalValue: 0
+  cycle: 0
   SyncPositionX: 1
   SyncPositionY: 1
   SyncPositionZ: 1
-  SyncRotAngleX: 1
-  SyncRotAngleY: 1
-  SyncRotAngleZ: 1
-  SyncScaleX: 0
-  SyncScaleY: 0
-  SyncScaleZ: 0
-  PositionThreshold: 0.001
-  RotAngleThreshold: 0.01
-  ScaleThreshold: 0.01
-  InLocalSpace: 0
-  Interpolate: 0
---- !u!114 &624658302
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7967540920174110235}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f6c0be61502bb534f922ebb746851216, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  SyncRotationX: 1
+  SyncRotationY: 1
+  SyncRotationZ: 1
+  IsBetterSync: 1
+  IsLocalSpace: 0
 --- !u!114 &624658304
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -73,7 +73,7 @@ GameObject:
   - component: {fileID: 5298014159586248839}
   - component: {fileID: 1222845659372369588}
   - component: {fileID: 8756732543312954451}
-  - component: {fileID: 5516505939003160986}
+  - component: {fileID: 3680043368183318937}
   m_Layer: 12
   m_Name: Indicator
   m_TagString: Untagged
@@ -146,7 +146,7 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &5516505939003160986
+--- !u!114 &3680043368183318937
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -155,23 +155,32 @@ MonoBehaviour:
   m_GameObject: {fileID: 403213513697706149}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
+  m_Script: {fileID: 11500000, guid: b49c1082f4093814d8da434ca2e9bc21, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  PositionX:
+    m_InternalValue: 0
+  PositionY:
+    m_InternalValue: 0
+  PositionZ:
+    m_InternalValue: 0
+  RotationX:
+    m_InternalValue: 0
+  RotationY:
+    m_InternalValue: 0
+  RotationZ:
+    m_InternalValue: 0
+  cycle: 0
   SyncPositionX: 0
   SyncPositionY: 1
   SyncPositionZ: 0
-  SyncRotAngleX: 0
-  SyncRotAngleY: 0
-  SyncRotAngleZ: 0
-  SyncScaleX: 0
-  SyncScaleY: 0
-  SyncScaleZ: 0
+  SyncRotationX: 0
+  SyncRotationY: 0
+  SyncRotationZ: 0
   PositionThreshold: 0.001
-  RotAngleThreshold: 0.01
-  ScaleThreshold: 0.01
-  InLocalSpace: 1
-  Interpolate: 0
+  RotationThreshold: 0.01
+  IsBetterSync: 0
+  IsLocalSpace: 1
 --- !u!1 &2551716486640257338
 GameObject:
   m_ObjectHideFlags: 0
@@ -625,7 +634,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5240592391779408754}
-  - component: {fileID: 2381757769235368197}
+  - component: {fileID: 7623683340250145580}
   m_Layer: 12
   m_Name: Capstan Top
   m_TagString: Untagged
@@ -655,7 +664,7 @@ Transform:
   m_Father: {fileID: 5140093282237482761}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2381757769235368197
+--- !u!114 &7623683340250145580
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -664,23 +673,32 @@ MonoBehaviour:
   m_GameObject: {fileID: 8618497369572354773}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
+  m_Script: {fileID: 11500000, guid: b49c1082f4093814d8da434ca2e9bc21, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  PositionX:
+    m_InternalValue: 0
+  PositionY:
+    m_InternalValue: 0
+  PositionZ:
+    m_InternalValue: 0
+  RotationX:
+    m_InternalValue: 0
+  RotationY:
+    m_InternalValue: 0
+  RotationZ:
+    m_InternalValue: 0
+  cycle: 0
   SyncPositionX: 0
   SyncPositionY: 0
   SyncPositionZ: 0
-  SyncRotAngleX: 0
-  SyncRotAngleY: 1
-  SyncRotAngleZ: 0
-  SyncScaleX: 0
-  SyncScaleY: 0
-  SyncScaleZ: 0
+  SyncRotationX: 0
+  SyncRotationY: 1
+  SyncRotationZ: 0
   PositionThreshold: 0.001
-  RotAngleThreshold: 0.01
-  ScaleThreshold: 0.01
-  InLocalSpace: 1
-  Interpolate: 0
+  RotationThreshold: 0.01
+  IsBetterSync: 0
+  IsLocalSpace: 1
 --- !u!1 &8754532553857626369
 GameObject:
   m_ObjectHideFlags: 0

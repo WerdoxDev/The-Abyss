@@ -187,7 +187,7 @@ GameObject:
   - component: {fileID: 7483731823492213728}
   - component: {fileID: 1896509363256964137}
   - component: {fileID: 4359337747061713705}
-  - component: {fileID: 8179987667867347758}
+  - component: {fileID: 6689925040094084492}
   m_Layer: 10
   m_Name: Mesh
   m_TagString: Untagged
@@ -260,7 +260,7 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &8179987667867347758
+--- !u!114 &6689925040094084492
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -269,20 +269,29 @@ MonoBehaviour:
   m_GameObject: {fileID: 6628616123298925426}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
+  m_Script: {fileID: 11500000, guid: b49c1082f4093814d8da434ca2e9bc21, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  PositionX:
+    m_InternalValue: 0
+  PositionY:
+    m_InternalValue: 0
+  PositionZ:
+    m_InternalValue: 0
+  RotationX:
+    m_InternalValue: 0
+  RotationY:
+    m_InternalValue: 0
+  RotationZ:
+    m_InternalValue: 0
+  cycle: 0
   SyncPositionX: 0
   SyncPositionY: 0
   SyncPositionZ: 0
-  SyncRotAngleX: 0
-  SyncRotAngleY: 0
-  SyncRotAngleZ: 1
-  SyncScaleX: 0
-  SyncScaleY: 0
-  SyncScaleZ: 0
+  SyncRotationX: 0
+  SyncRotationY: 0
+  SyncRotationZ: 1
   PositionThreshold: 0.001
-  RotAngleThreshold: 0.01
-  ScaleThreshold: 0.01
-  InLocalSpace: 1
-  Interpolate: 0
+  RotationThreshold: 0.01
+  IsBetterSync: 0
+  IsLocalSpace: 1
