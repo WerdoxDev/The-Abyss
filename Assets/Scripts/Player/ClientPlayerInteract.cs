@@ -55,6 +55,7 @@ public class ClientPlayerInteract : NetworkBehaviour {
 
     private void SetInputState(bool enabled) {
         void OnButtonEvent(ButtonType type, bool performed) {
+            if (!_player.CanInteract) return;
             if (type == ButtonType.Interact && performed) {
                 if (_currentHandler == null || busy) return;
                 if (!_player.Attachable.IsAttached.Value && (_currentHandler.Occupied.Value || !_currentHandler.Active)) return;

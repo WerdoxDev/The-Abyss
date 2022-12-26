@@ -8,6 +8,7 @@ public class ServerPlayerCamera : NetworkBehaviour {
 
     [Header("Settings")]
     [SerializeField] private Transform orientation;
+    [SerializeField] private Transform head;
     private Transform _lastTarget;
     private bool _newInfoConfirmed;
 
@@ -36,7 +37,10 @@ public class ServerPlayerCamera : NetworkBehaviour {
     public void SetTarget(Transform target) => Target = target;
 
     [ServerRpc]
-    public void SetOrientationServerRpc(float yRotation) => orientation.rotation = Quaternion.Euler(0, yRotation, 0);
+    public void SetOrientationServerRpc(Vector2 rotation) {
+        orientation.localRotation = Quaternion.Euler(orientation.localEulerAngles.x, rotation.y, orientation.localEulerAngles.z);
+        head.localRotation = Quaternion.Euler(rotation.x, head.localEulerAngles.y, head.localEulerAngles.z);
+    }
 
     [ServerRpc]
     public void ConfirmNewInfoServerRpc() => _newInfoConfirmed = true;

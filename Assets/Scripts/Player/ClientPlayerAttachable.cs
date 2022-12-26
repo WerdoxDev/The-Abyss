@@ -48,19 +48,15 @@ public class ClientPlayerAttachable : NetworkBehaviour {
         AttachableSetting settings = GetAttachableSetting(type, handler.Data);
 
         OnTargetArrived = () => {
+            if (settings == null) return;
             if (isAttaching) {
                 // _player.SetRotationTarget(handler.StandTransform);
-                if (settings != null) {
-                    if (settings.setDefaultRotation) _player.CLCamera.SetRotation(settings.defaultRotation);
-                    _player.CLCamera.SetClamp(settings.xClamp, settings.yClamp);
-                }
+                if (settings.setDefaultRotation) _player.CLCamera.SetRotation(settings.defaultRotation);
+                _player.CLCamera.SetClamp(settings.xClamp, settings.yClamp);
                 return;
             }
 
-            if (settings != null) {
-                if (settings.resetRotation) _player.transform.rotation = Quaternion.identity;
-                if (settings.resetRotationTarget) _player.CLCamera.SetClamp(0, 0, 0, 0);
-            }
+            if (settings.resetRotationTarget) _player.CLCamera.SetClamp(0, 0, 0, 0);
         };
     }
 
@@ -75,6 +71,12 @@ public class ClientPlayerAttachable : NetworkBehaviour {
 
     private void SetInputState(bool enabled) {
         void OnMove(Vector2 direction) {
+            if (!_player.CanUseAttachable) {
+                _server.SetMovementInputServerRpc(Vector2.zero);
+                _lastSentInput = direction;
+                return;
+            }
+
             if (direction != _lastSentInput) {
                 if (_server.IsAttached.Value)
                     _server.SetMovementInputServerRpc(direction);

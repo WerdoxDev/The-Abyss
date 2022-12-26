@@ -37,6 +37,15 @@ public class ServerTransform : NetworkBehaviour {
     private Vector3 _lastPosition;
     private Quaternion _lastRotation;
 
+    private void Awake() {
+        if (SyncPositionX) PositionX = new NetworkVariable<float>();
+        if (SyncPositionY) PositionY = new NetworkVariable<float>();
+        if (SyncPositionZ) PositionZ = new NetworkVariable<float>();
+        if (SyncRotationX) RotationX = new NetworkVariable<float>();
+        if (SyncRotationY) RotationY = new NetworkVariable<float>();
+        if (SyncRotationZ) RotationZ = new NetworkVariable<float>();
+    }
+
     public override void OnNetworkSpawn() {
         if (!IsServer) {
             enabled = false;
@@ -59,16 +68,6 @@ public class ServerTransform : NetworkBehaviour {
                 transform.rotation = Quaternion.Euler(newInfo.Rotation);
             };
         }
-    }
-
-    private void OnEnable() {
-
-        if (SyncPositionX) PositionX = new NetworkVariable<float>();
-        if (SyncPositionY) PositionY = new NetworkVariable<float>();
-        if (SyncPositionZ) PositionZ = new NetworkVariable<float>();
-        if (SyncRotationX) RotationX = new NetworkVariable<float>();
-        if (SyncRotationY) RotationY = new NetworkVariable<float>();
-        if (SyncRotationZ) RotationZ = new NetworkVariable<float>();
     }
 
     private void Update() {

@@ -22,6 +22,7 @@ public class Player : NetworkBehaviour {
     public ClientPlayerCamera CLCamera;
     public ServerPlayerMovement Movement;
     public ServerPlayerAttachable Attachable;
+    public ServerPlayerInteract Interact;
     public Rigidbody Rb;
     public Ship CurrentShip;
 
@@ -35,8 +36,12 @@ public class Player : NetworkBehaviour {
     public bool UseFloater { get => Movement.UseFloater; set => Movement.UseFloater = value; }
     public float CameraFOV { get => CLCamera.Camera.fieldOfView; set => CLCamera.Camera.fieldOfView = value; }
 
-    public bool CanMove { get => Movement.CanMove; set => Movement.CanMove = value; }
-    public bool CanJump { get => Movement.CanJump; set => Movement.CanJump = value; }
+    public bool CanMove = true;
+    public bool CanUseAttachable = true;
+    public bool CanJump = true;
+    public bool CanSprint = true;
+    public bool CanLook = true;
+    public bool CanInteract = true;
 
     public bool IsGrounded { get => Movement.IsGrounded; }
     public bool IsSprinting { get => Movement.IsSprinting.Value; }
@@ -46,6 +51,7 @@ public class Player : NetworkBehaviour {
         SRCamera = GetComponent<ServerPlayerCamera>();
         CLCamera = GetComponent<ClientPlayerCamera>();
         Attachable = GetComponent<ServerPlayerAttachable>();
+        Interact = GetComponent<ServerPlayerInteract>();
         Movement = GetComponent<ServerPlayerMovement>();
         Data = GetComponent<PlayerData>();
     }
@@ -60,13 +66,33 @@ public class Player : NetworkBehaviour {
         InputReader.Init();
         Application.targetFrameRate = 60;
 
-
         ClientRpcParams = new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new[] { OwnerClientId } } };
+
+        GameManager.Instance.OnPause += () => {
+            CanMove = false;
+            CanLook = false;
+            CanUseAttachable = false;
+            CanInteract = false;
+            CanJump = false;
+            CanSprint = false;
+        };
+
+        GameManager.Instance.OnResume += () => {
+            CanMove = true;
+            CanLook = true;
+            CanUseAttachable = true;
+            CanInteract = true;
+            CanJump = true;
+            CanSprint = true;
+        };
+
         //TODO: Change gameui stuff to work with new the approach
         // GameUIController.Instance.PlayerCamera = PCamera.Camera;
-        // if (!IsServer) return;
-        // Ship ship = ShipSpawner.Instance.SpawnShip(new Vector3(0, -25, -25), Quaternion.Euler(-10, 0, 0));
-        // ship.Rb.constraints = RigidbodyConstraints.FreezeAll;
+#if UNITY_EDITOR
+        if (!IsServer) return;
+        Ship ship = ShipSpawner.Instance.SpawnShip(new Vector3(0, -25, -25), Quaternion.Euler(-10, 0, 0));
+        ship.Rb.constraints = RigidbodyConstraints.FreezeAll;
+#endif
     }
 
     private void FixedUpdate() {
@@ -113,6 +139,7 @@ public class Player : NetworkBehaviour {
             UseFloater = true;
             CanMove = true;
             CanJump = true;
+            CanSprint = true;
             return;
         }
 
@@ -120,6 +147,7 @@ public class Player : NetworkBehaviour {
         UseFloater = false;
         CanMove = false;
         CanJump = false;
+        CanSprint = false;
     }
 
     public void ChangeFOVLerp(float startFOV, float endFOV, float duration) => StartCoroutine(ChangeFOV(startFOV, endFOV, duration));

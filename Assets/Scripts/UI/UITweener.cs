@@ -1,11 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
-public class UITweener : MonoBehaviour
-{
-    public enum UIAnimationType
-    {
+public class UITweener : MonoBehaviour {
+    public enum UIAnimationType {
         Move,
         Scale,
         Fade
@@ -22,25 +21,25 @@ public class UITweener : MonoBehaviour
     [SerializeField] private bool disableOnComplete;
     [SerializeField] private bool playOnStart = true;
 
+    public float Duration { get => duration; }
+
+    public event Action OnTweenFinished;
+
     private LTDescr _tweenObject;
 
-    private void Awake()
-    {
+    private void Awake() {
         if (objectToTween == null) objectToTween = gameObject;
     }
 
-    private void OnEnable()
-    {
+    private void OnEnable() {
         if (playOnStart) HandleTween();
     }
 
-    public void HandleTween(bool instant = false)
-    {
+    public void HandleTween(bool instant = false) {
         if (!objectToTween.activeSelf)
             objectToTween.SetActive(true);
 
-        switch (animationType)
-        {
+        switch (animationType) {
             case UIAnimationType.Scale:
                 Scale(instant);
                 break;
@@ -57,17 +56,15 @@ public class UITweener : MonoBehaviour
         if (instant) return;
         _tweenObject.setDelay(delay);
         _tweenObject.setEase(easeType);
-        _tweenObject.setOnComplete(() =>
-        {
+        _tweenObject.setOnComplete(() => {
             if (disableOnComplete) objectToTween.SetActive(false);
+            OnTweenFinished?.Invoke();
         });
     }
 
-    private void MoveAbsolute(bool instant)
-    {
+    private void MoveAbsolute(bool instant) {
         RectTransform rectTransform = objectToTween.GetComponent<RectTransform>();
-        if (instant)
-        {
+        if (instant) {
             rectTransform.anchoredPosition = to;
             return;
         }
@@ -76,11 +73,9 @@ public class UITweener : MonoBehaviour
         _tweenObject = LeanTween.move(rectTransform, to, duration);
     }
 
-    private void Scale(bool instant)
-    {
+    private void Scale(bool instant) {
         RectTransform rectTransform = objectToTween.GetComponent<RectTransform>();
-        if (instant)
-        {
+        if (instant) {
             rectTransform.localScale = to;
             return;
         }
@@ -89,13 +84,11 @@ public class UITweener : MonoBehaviour
         _tweenObject = LeanTween.scale(objectToTween, to, duration);
     }
 
-    private void Fade(bool instant)
-    {
+    private void Fade(bool instant) {
         if (!objectToTween.TryGetComponent<CanvasGroup>(out CanvasGroup canvasGroup))
             canvasGroup = objectToTween.AddComponent<CanvasGroup>();
 
-        if (instant)
-        {
+        if (instant) {
             canvasGroup.alpha = to.x;
             return;
         }

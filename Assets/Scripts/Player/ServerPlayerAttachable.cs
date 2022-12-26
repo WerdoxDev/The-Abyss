@@ -54,7 +54,7 @@ public class ServerPlayerAttachable : NetworkBehaviour {
         }
 
         if (Handler != null) {
-            if (Handler.Type != InteractType.Ladder) transform.position = _standTransform.position + _player.OffsetVector;
+            if (Handler.Type != InteractType.Ladder) transform.position = _standTransform.position + _standTransform.up * _player.Offset;
             transform.rotation = _standTransform.rotation;
         }
     }
@@ -108,7 +108,10 @@ public class ServerPlayerAttachable : NetworkBehaviour {
                 break;
         }
 
-        if (_client.GetAttachableSetting(Handler.Type, Handler.Data).resetRotationTarget) _player.ResetRotationTarget();
+        AttachableSetting settings = _client.GetAttachableSetting(Handler.Type, Handler.Data);
+        if (settings.resetRotationTarget) _player.ResetRotationTarget();
+        if (settings.resetRotation) _player.transform.rotation = Quaternion.identity;
+
         _client.SetAttachableSettingsClientRpc(Handler.interactable.NetworkObjectId, false, Handler.Type, Handler.Data, _player.ClientRpcParams);
         _player.SetMovementState(true);
         Handler.Occupied.Value = false;

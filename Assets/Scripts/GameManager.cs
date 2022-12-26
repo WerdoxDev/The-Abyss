@@ -16,14 +16,20 @@ public class GameManager : MonoBehaviour {
     [SerializeField] private float pingInterval;
     [SerializeField] private float fpsInterval;
     [SerializeField] private string tempUrl;
+    [SerializeField] private bool autoSpawn;
     private float _fpsTimer;
 
     public event Action<Player, bool> OnPlayerSpawned;
     public event Action<ulong> OnPlayerDespawned;
     public event Action<int> OnPingChanged;
     public event Action<int> OnFpsChanged;
+    public event Action OnPause;
+    public event Action OnResume;
 
     public ulong PlayerNetworkId;
+    public bool IsPlayerSpawned;
+    public bool IsPaused;
+
     public int Ping { get; private set; }
     public int Fps { get; private set; }
 
@@ -37,7 +43,7 @@ public class GameManager : MonoBehaviour {
 
         OnPlayerSpawned += (Player player, bool isOwner) => {
             if (!isOwner) return;
-            Debug.Log("all good");
+            IsPlayerSpawned = true; ;
             PlayerNetworkId = player.OwnerClientId;
             StopAllCoroutines();
             StartCoroutine(CheckPingEnumerator(pingInterval));
@@ -45,6 +51,7 @@ public class GameManager : MonoBehaviour {
 
         OnPlayerDespawned += (ulong clientId) => {
             if (clientId != PlayerNetworkId) return;
+            IsPlayerSpawned = false;
             PlayerNetworkId = 0;
             StopAllCoroutines();
         };
@@ -53,6 +60,7 @@ public class GameManager : MonoBehaviour {
 #if UNITY_EDITOR
     // Temporary
     private void Start() {
+        if (!autoSpawn) return;
         string[] split = tempUrl.Split(":");
         SetConnectionData(split[0], ushort.Parse(split[1]));
         if (ClonesManager.IsClone()) {
@@ -79,6 +87,16 @@ public class GameManager : MonoBehaviour {
         OnPlayerDespawned?.Invoke(clientId);
     }
 
+    public void PauseGame() {
+        IsPaused = true;
+        OnPause?.Invoke();
+    }
+
+    public void ResumeGame() {
+        IsPaused = false;
+        OnResume?.Invoke();
+    }
+
     public void SetConnectionData(string address, ushort port) {
         UnityTransport transport = NetworkManager.Singleton.GetComponent<UnityTransport>();
         transport.ConnectionData.Address = address;
@@ -89,7 +107,7 @@ public class GameManager : MonoBehaviour {
         // UnityTransport transport = NetworkManager.Singleton.GetComponent<UnityTransport>();
         while (true) {
             float actualPing = (NetworkManager.Singleton.LocalTime.TimeAsFloat - NetworkManager.Singleton.ServerTime.TimeAsFloat) * 100;
-            actualPing -= 1 / NetworkManager.Singleton.NetworkTickSystem.TickRate;
+            actualPing -= 1 / NetworkManager.Singleton?.NetworkTickSystem.TickRate ?? 0;
             Ping = Mathf.FloorToInt(actualPing);
             // Debug.Log();
             // Ping = NetworkManager.Singleton.LocalTime.TimeAsFloat - NetworkManager.Singleton.ServerTime.TimeAsFloat;

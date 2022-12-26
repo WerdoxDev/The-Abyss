@@ -11,8 +11,6 @@ public class ServerPlayerMovement : NetworkBehaviour {
     private bool _lockMovement = false;
     private float _currentSpeed;
 
-    public bool CanMove = true;
-
     [Header("Sprinting")]
     [SerializeField] private float sprintSpeed;
 
@@ -22,8 +20,8 @@ public class ServerPlayerMovement : NetworkBehaviour {
     [SerializeField] private float jumpAmount;
     [SerializeField] private float jumpCooldown;
     private bool _isJumping = false;
+    private bool _jumpCooldownFinished = true;
 
-    public bool CanJump = true;
     public bool IsGrounded;
 
     [Header("Gravity")]
@@ -92,13 +90,13 @@ public class ServerPlayerMovement : NetworkBehaviour {
     }
 
     private void HandleMovementState() {
-        if (IsSprinting.Value) _currentSpeed = sprintSpeed;
+        if (IsSprinting.Value && _player.CanSprint) _currentSpeed = sprintSpeed;
         else _currentSpeed = moveSpeed;
     }
 
     private void Move() {
-        if (CanMove && !_lockMovement) _moveDirection = orientation.forward * _movementInput.y + orientation.right * _movementInput.x;
-        else if (!CanMove) _moveDirection = new Vector3(0, 0, 0);
+        if (_player.CanMove && !_lockMovement) _moveDirection = orientation.forward * _movementInput.y + orientation.right * _movementInput.x;
+        else if (!_player.CanMove) _moveDirection = new Vector3(0, 0, 0);
 
         if (_player.CurrentShip != null) {
             Vector3 playerPos = transform.position - _player.OffsetVector;
@@ -140,14 +138,14 @@ public class ServerPlayerMovement : NetworkBehaviour {
                 _rb.velocity = new Vector3(_rb.velocity.x, 0, _rb.velocity.z);
             }
         }
-        IsGrounded = Physics.BoxCast(transform.position, new Vector3(0.9f, _currentSize, 0.9f), Vector3.down, Quaternion.identity, _player.PlayerSize.y * 0.5f + _currentSize, groundLayer) && (_currentSize == airSize ? _rb.velocity.y < yVelocityThreshold + (_player.CurrentShip != null ? _shipPointVelocity.y : 0) : true);
+        IsGrounded = Physics.BoxCast(transform.position, new Vector3(0.9f, _currentSize, 0.9f), -transform.up, transform.rotation, _player.PlayerSize.y * 0.5f + _currentSize, groundLayer) && (_currentSize == airSize ? _rb.velocity.y < yVelocityThreshold + (_player.CurrentShip != null ? _shipPointVelocity.y : 0) : true);
     }
 
     private void Jump() {
-        if (!CanJump || !IsGrounded) return;
+        if (!_player.CanJump || !IsGrounded || !_jumpCooldownFinished) return;
 
         IsGrounded = false;
-        CanJump = false;
+        _jumpCooldownFinished = false;
         _currentSize = airSize;
 
         _rb.velocity = new Vector3(_rb.velocity.x, 0, _rb.velocity.z);
@@ -156,7 +154,7 @@ public class ServerPlayerMovement : NetworkBehaviour {
         Invoke(nameof(ResetJump), jumpCooldown);
     }
 
-    private void ResetJump() => CanJump = true;
+    private void ResetJump() => _jumpCooldownFinished = true;
 
     private bool OnSlope() {
         if (Physics.Raycast(transform.position, _player.CurrentShip != null ? -_player.CurrentShip.transform.up : Vector3.down, out _slopeHit, _player.PlayerSize.y * 0.5f + 2, groundLayer)) {
@@ -174,7 +172,8 @@ public class ServerPlayerMovement : NetworkBehaviour {
     private void OnDrawGizmos() {
         if (!IsOwner) return;
         Gizmos.color = Color.red;
-        Gizmos.DrawWireCube(transform.position + new Vector3(0, -(_player.PlayerSize.y * 0.5f + _currentSize), 0), new Vector3(1.8f, (_currentSize) * 2, 1.8f));
+        Gizmos.matrix = transform.localToWorldMatrix;
+        Gizmos.DrawWireCube(new Vector3(0, -(_player.PlayerSize.y * 0.5f + _currentSize), 0), new Vector3(1.8f, (_currentSize) * 2, 1.8f));
     }
 
     [ServerRpc]

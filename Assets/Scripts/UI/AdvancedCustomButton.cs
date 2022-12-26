@@ -7,8 +7,8 @@ using UnityEngine.EventSystems;
 
 public class AdvancedCustomButton : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler {
     [SerializeField] private Graphic[] graphics;
+    [SerializeField] private Color[] normalColors;
     [SerializeField] private Color[] enterColors;
-    [SerializeField] private Color[] exitColors;
     [SerializeField] private Vector3 enterScale;
     [SerializeField] private LeanTweenType easeType;
     [SerializeField] private float duration;
@@ -35,7 +35,7 @@ public class AdvancedCustomButton : MonoBehaviour, IPointerClickHandler, IPointe
 
     public void OnPointerExit(PointerEventData eventData) {
         for (int i = 0; i < graphics.Length; i++)
-            LeanTween.graphicColor(graphics[i].rectTransform, exitColors[i], duration).setEase(easeType).setRecursive(false);
+            LeanTween.graphicColor(graphics[i].rectTransform, normalColors[i], duration).setEase(easeType).setRecursive(false);
 
         if (!scaleTween) return;
         RectTransform rectTransform = GetComponent<RectTransform>();

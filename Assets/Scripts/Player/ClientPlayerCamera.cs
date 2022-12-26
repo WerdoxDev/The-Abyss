@@ -16,7 +16,6 @@ public class ClientPlayerCamera : NetworkBehaviour {
     private InputReader _inputReader;
 
     public Camera Camera;
-    public bool CanLook = true;
     public bool CanSetTarget = true;
 
     private Vector2 _rotationInput;
@@ -59,6 +58,9 @@ public class ClientPlayerCamera : NetworkBehaviour {
             if (newInfo.ClearOffset || newInfo.SetOffset) _server.ConfirmNewInfoServerRpc();
 
             _player.RotationTargetChanged();
+
+            if (CanSetTarget && !IsServer) RotateCamera(_eulerAngles);
+            // _callLook = false;
         };
     }
 
@@ -67,17 +69,10 @@ public class ClientPlayerCamera : NetworkBehaviour {
     }
 
     private void FixedUpdate() {
-        if (Keyboard.current.escapeKey.wasPressedThisFrame) {
-            CanLook = !CanLook;
-            Cursor.lockState = CanLook ? CursorLockMode.Locked : CursorLockMode.None;
-            Cursor.visible = CanLook ? false : true;
-        }
-
         Look();
     }
 
     public void SetOffset() {
-        Debug.Log("Set Offset");
         float x = _eulerAngles.x;
         if (x > 180) x -= 360;
 
@@ -97,17 +92,13 @@ public class ClientPlayerCamera : NetworkBehaviour {
     }
 
     public void SetClamp(Vector2 _xClamp, Vector2 _yClamp) {
-        Debug.Log("Set Clamp");
         this._xClamp = _xClamp;
         this._yClamp = _yClamp;
     }
 
     public void SetClamp(float minX, float maxX, float minY, float maxY) => SetClamp(new Vector2(minX, maxX), new Vector2(minY, maxY));
 
-    public void SetRotation(Vector2 rotation) {
-        Debug.Log("Set Rotation");
-        _rotation = rotation;
-    }
+    public void SetRotation(Vector2 rotation) => _rotation = rotation;
 
     public void SetRotation(float x, float y) => SetRotation(new Vector2(x, y));
 
@@ -121,7 +112,7 @@ public class ClientPlayerCamera : NetworkBehaviour {
     private void Look() {
         while (_rotation.y > 360 || _rotation.y < -360) _rotation.y += _rotation.y > 360 ? -360 : 360;
 
-        if (CanLook) {
+        if (_player.CanLook) {
             float mouseX = _rotationInput.x * Time.fixedDeltaTime * sensX;
             float mouseY = _rotationInput.y * Time.fixedDeltaTime * sensY;
 
@@ -139,12 +130,16 @@ public class ClientPlayerCamera : NetworkBehaviour {
         if (_xClamp != Vector2.zero) _rotation.x = Mathf.Clamp(_rotation.x, _xClamp.x, _xClamp.y);
         if (_yClamp != Vector2.zero) _rotation.y = Mathf.Clamp(_rotation.y, _yClamp.x, _yClamp.y);
 
-        Camera.transform.rotation = Quaternion.Euler(_rotation.x + target.x, _rotation.y + target.y, 0);
+        RotateCamera(target);
 
         if (Camera.transform.localEulerAngles.y != _lastCameraRotation) {
-            _server.SetOrientationServerRpc(_rotation.y + target.y);
+            _server.SetOrientationServerRpc(Camera.transform.localEulerAngles);
             _lastCameraRotation = Camera.transform.localEulerAngles.y;
         }
+    }
+
+    private void RotateCamera(Vector2 target) {
+        Camera.transform.rotation = Quaternion.Euler(_rotation.x + target.x, _rotation.y + target.y, 0);
     }
 
     private void SetInputState(bool enabled) {
