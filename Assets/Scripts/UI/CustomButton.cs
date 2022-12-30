@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-public class CustomButton : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler {
+public class CustomButton : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler {
     [SerializeField] private Graphic graphic;
     [SerializeField] private Color normalColor;
     [SerializeField] private Color enterColor;
@@ -16,10 +16,12 @@ public class CustomButton : MonoBehaviour, IPointerClickHandler, IPointerEnterHa
     [SerializeField] private bool changeScale = true;
     [SerializeField] private bool tween = true;
     [SerializeField] private bool resetOnDisable = true;
+    [SerializeField] private bool lockIfParentExists = true;
     private UIOrder _order;
     private AdvancedCustomButton _parentButton;
 
-    public event Action<PointerEventData> OnClick;
+    public bool IsSelected;
+    public event Action<BaseEventData> OnClick;
 
     private void Awake() {
         _order = GetComponent<UIOrder>();
@@ -27,15 +29,18 @@ public class CustomButton : MonoBehaviour, IPointerClickHandler, IPointerEnterHa
     }
 
     private void OnDisable() {
-        if (resetOnDisable) Exit();
+        if (resetOnDisable) {
+            IsSelected = false;
+            Exit();
+        };
     }
 
-    public void OnPointerClick(PointerEventData eventData) => OnClick?.Invoke(eventData);
+    public void Enter(bool setSelected = false) {
+        if (setSelected) IsSelected = true;
 
-    public void OnPointerEnter(PointerEventData eventData) {
         if (graphic != null) LeanTween.cancel(graphic.rectTransform);
 
-        if (_parentButton != null) _parentButton.LockGraphic(graphic.gameObject);
+        if (_parentButton != null && lockIfParentExists) _parentButton.LockGraphic(graphic.gameObject);
 
         if (!tween) {
             if (changeColor) graphic.color = enterColor;
@@ -51,10 +56,10 @@ public class CustomButton : MonoBehaviour, IPointerClickHandler, IPointerEnterHa
         }
     }
 
-    public void OnPointerExit(PointerEventData eventData) => Exit();
+    public void Exit() {
+        if (IsSelected) return;
 
-    private void Exit() {
-        if (_parentButton != null) _parentButton.UnlockGraphic(graphic.gameObject);
+        if (_parentButton != null && lockIfParentExists) _parentButton.UnlockGraphic(graphic.gameObject);
 
         if (!tween) {
             if (changeColor) graphic.color = normalColor;
@@ -68,4 +73,15 @@ public class CustomButton : MonoBehaviour, IPointerClickHandler, IPointerEnterHa
             if (_order != null) _order.RemoveOrder();
         });
     }
+
+    public void Clicked(BaseEventData eventData) => OnClick?.Invoke(eventData);
+
+    public void OnPointerClick(PointerEventData eventData) => Clicked(eventData);
+
+    public void OnPointerEnter(PointerEventData eventData) => Enter();
+
+    public void OnPointerExit(PointerEventData eventData) => Exit();
+
+    // Selectable parent will prevent OnPointerClick if this doesn't exists
+    public void OnPointerDown(PointerEventData eventData) { }
 }

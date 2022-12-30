@@ -16,8 +16,6 @@ public class ClientPlayerInteract : NetworkBehaviour {
     private void Awake() {
         _server = GetComponent<ServerPlayerInteract>();
         _player = GetComponent<Player>();
-        _inputReader = _player.InputReader;
-        SetInputState(true);
     }
 
     public override void OnNetworkSpawn() {
@@ -25,7 +23,12 @@ public class ClientPlayerInteract : NetworkBehaviour {
             enabled = false;
             return;
         }
+
+        _inputReader = _player.InputReader;
+        SetInputState(true);
     }
+
+    public override void OnDestroy() => SetInputState(false);
 
     private void FixedUpdate() {
         //TODO: Change gameui stuff to work with new the approach
@@ -54,6 +57,8 @@ public class ClientPlayerInteract : NetworkBehaviour {
     public void UnbusyClientRpc(ClientRpcParams rpcParams = default) => busy = false;
 
     private void SetInputState(bool enabled) {
+        if (!IsOwner) return;
+
         void OnButtonEvent(ButtonType type, bool performed) {
             if (!_player.CanInteract) return;
             if (type == ButtonType.Interact && performed) {

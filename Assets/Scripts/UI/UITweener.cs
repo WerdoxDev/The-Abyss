@@ -53,13 +53,19 @@ public class UITweener : MonoBehaviour {
                 break;
         }
 
-        if (instant) return;
-        _tweenObject.setDelay(delay);
-        _tweenObject.setEase(easeType);
-        _tweenObject.setOnComplete(() => {
+        Action onComplete = () => {
             if (disableOnComplete) objectToTween.SetActive(false);
             OnTweenFinished?.Invoke();
-        });
+        };
+
+        if (instant) {
+            onComplete();
+            return;
+        };
+
+        _tweenObject.setDelay(delay);
+        _tweenObject.setEase(easeType);
+        _tweenObject.setOnComplete(onComplete);
     }
 
     private void MoveAbsolute(bool instant) {

@@ -37,6 +37,8 @@ public class ClientPlayerAttachable : NetworkBehaviour {
         };
     }
 
+    public override void OnDestroy() => SetInputState(false);
+
     [ClientRpc]
     public void SetAttachableSettingsClientRpc(ulong interactObjId, bool isAttaching, InteractType type, byte handlerData, ClientRpcParams rpcParams = default) {
         NetworkManager.SpawnManager.SpawnedObjects.TryGetValue(interactObjId, out var interactObj);
@@ -70,6 +72,8 @@ public class ClientPlayerAttachable : NetworkBehaviour {
     }
 
     private void SetInputState(bool enabled) {
+        if (!IsOwner) return;
+
         void OnMove(Vector2 direction) {
             if (!_player.CanUseAttachable) {
                 _server.SetMovementInputServerRpc(Vector2.zero);

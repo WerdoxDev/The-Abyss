@@ -64,6 +64,8 @@ public class ClientPlayerCamera : NetworkBehaviour {
         };
     }
 
+    public override void OnDestroy() => SetInputState(false);
+
     private void Update() {
         HandleFOV();
     }
@@ -143,6 +145,8 @@ public class ClientPlayerCamera : NetworkBehaviour {
     }
 
     private void SetInputState(bool enabled) {
+        if (!IsOwner) return;
+
         void OnLook(Vector2 rotation) => _rotationInput = rotation;
 
         if (enabled) _inputReader.LookEvent += OnLook;

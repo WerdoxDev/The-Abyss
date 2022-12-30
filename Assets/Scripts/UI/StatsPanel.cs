@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 using TMPro;
 
 public class StatsPanel : MonoBehaviour {
@@ -12,22 +13,24 @@ public class StatsPanel : MonoBehaviour {
     private bool _pingVisible = true;
 
     private void Awake() {
+        GameManager.Instance.OnFpsChanged += (fps) => fpsText.text = "FPS:  " + fps;
+        GameManager.Instance.OnPingChanged += (ping) => pingText.text = "LATENCY:  " + ping + " MS";
+        GameManager.Instance.OnGameStateChanged += (state) => {
+            SetPingVisibility(_pingVisible && state == GameState.InGame);
+        };
+
         fpsText.text = "FPS:  0";
         pingText.text = "LATENCY:  0 MS";
         SetPingVisibility(false);
-
-        GameManager.Instance.OnFpsChanged += (fps) => fpsText.text = "FPS:  " + fps;
-        GameManager.Instance.OnPingChanged += (ping) => pingText.text = "LATENCY:  " + ping + " MS";
-        GameManager.Instance.OnPlayerSpawned += (Player player, bool isOwner) => {
-            if (isOwner) SetPingVisibility(_pingVisible);
-        };
     }
 
     public void SetPingVisibility(bool visible) {
-        pingPanel.SetActive(visible);
+        pingPanel.SetActive(visible && GameManager.Instance.GameState == GameState.InGame);
+        _pingVisible = visible;
     }
 
     public void SetFpsVisibility(bool visible) {
         fpsPanel.SetActive(visible);
+        _fpsVisible = visible;
     }
 }

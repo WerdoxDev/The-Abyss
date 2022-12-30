@@ -63,7 +63,6 @@ public class Player : NetworkBehaviour {
             return;
         }
 
-        InputReader.Init();
         Application.targetFrameRate = 60;
 
         ClientRpcParams = new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new[] { OwnerClientId } } };
@@ -95,14 +94,20 @@ public class Player : NetworkBehaviour {
 #endif
     }
 
-    private void FixedUpdate() {
-        if (!IsServer) return;
+    public override void OnDestroy() {
+        GameManager.Instance.PlayerDespawned(OwnerClientId);
+    }
 
+    private void Update() {
         if (Keyboard.current.kKey.wasPressedThisFrame && IsOwner) {
             Vector3 spawnPosition = transform.position;
             spawnPosition.y += 20;
             ShipSpawner.Instance.SpawnShip(spawnPosition, Quaternion.Euler(0, transform.eulerAngles.y, 0));
         }
+    }
+
+    private void FixedUpdate() {
+        if (!IsServer) return;
 
         if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, Mathf.Infinity, shipLayer)) {
             if (CurrentShip == null || CurrentShip.gameObject != _lastShip.gameObject) {

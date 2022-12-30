@@ -25,7 +25,11 @@ public class ClientPlayerMovement : NetworkBehaviour {
         SetInputState(true);
     }
 
+    public override void OnDestroy() => SetInputState(false);
+
     private void SetInputState(bool enabled) {
+        if (!IsOwner) return;
+
         void OnMove(Vector2 direction) {
             if (!_player.CanMove) {
                 _server.SetMovementInputServerRpc(Vector2.zero);

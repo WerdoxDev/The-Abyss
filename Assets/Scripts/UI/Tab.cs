@@ -4,8 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-public class Tab : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
-{
+public class Tab : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler, ISelectHandler, IDeselectHandler, ICancelHandler, ISubmitHandler {
     public string Name;
     public bool DefaultTab;
     public TabGroup TabGroup;
@@ -14,19 +13,21 @@ public class Tab : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IP
     [SerializeField] private Color[] activeColors;
     [SerializeField] private Color[] inactiveColors;
     [SerializeField] private Color[] hoverColors;
+    [SerializeField] private Color[] activeHoverColors;
 
-    void Awake()
-    {
-        TabGroup.Subscribe(this);
+    private void Awake() {
+        TabGroup.AddTab(this);
     }
 
-    public void SetState(TabState state)
-    {
-        switch (state)
-        {
+    public void SetState(TabState state) {
+        switch (state) {
             case TabState.Hover:
                 for (int i = 0; i < graphics.Length; i++)
                     graphics[i].color = hoverColors[i];
+                break;
+            case TabState.ActiveHover:
+                for (int i = 0; i < graphics.Length; i++)
+                    graphics[i].color = activeHoverColors[i];
                 break;
             case TabState.Active:
                 for (int i = 0; i < graphics.Length; i++)
@@ -39,17 +40,21 @@ public class Tab : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IP
         }
     }
 
-    public void OnPointerClick(PointerEventData eventData)
-    {
-        TabGroup.OnTabSelected(this);
-    }
+    public void OnPointerClick(PointerEventData eventData) => TabGroup.OnTabSelected(this);
 
     public void OnPointerEnter(PointerEventData eventData) => TabGroup.OnTabEnter(this);
 
     public void OnPointerExit(PointerEventData eventData) => TabGroup.OnTabExit(this);
+
+    public void OnSelect(BaseEventData eventData) => TabGroup.OnTabEnter(this);
+
+    public void OnDeselect(BaseEventData eventData) => TabGroup.OnTabExit(this);
+
+    public void OnCancel(BaseEventData eventData) => TabGroup.OnTabExit(this);
+
+    public void OnSubmit(BaseEventData eventData) => TabGroup.OnTabSelected(this);
 }
 
-public enum TabState
-{
-    Hover, Active, Inactive
+public enum TabState {
+    Hover, Active, Inactive, ActiveHover
 }

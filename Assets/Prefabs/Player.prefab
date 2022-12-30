@@ -138,6 +138,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6299022033431183179}
+  - component: {fileID: 2501795316038320552}
   m_Layer: 3
   m_Name: Head
   m_TagString: Untagged
@@ -161,6 +162,41 @@ Transform:
   m_Father: {fileID: 3217660694112433193}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2501795316038320552
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2269351218719057554}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b49c1082f4093814d8da434ca2e9bc21, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  PositionX:
+    m_InternalValue: 0
+  PositionY:
+    m_InternalValue: 0
+  PositionZ:
+    m_InternalValue: 0
+  RotationX:
+    m_InternalValue: 0
+  RotationY:
+    m_InternalValue: 0
+  RotationZ:
+    m_InternalValue: 0
+  cycle: 0
+  SyncPositionX: 0
+  SyncPositionY: 0
+  SyncPositionZ: 0
+  SyncRotationX: 1
+  SyncRotationY: 0
+  SyncRotationZ: 0
+  PositionThreshold: 0.001
+  RotationThreshold: 0.01
+  IsBetterSync: 0
+  IsLocalSpace: 1
 --- !u!1 &2969385282303044985
 GameObject:
   m_ObjectHideFlags: 0
@@ -346,8 +382,15 @@ MonoBehaviour:
   CLCamera: {fileID: 0}
   Movement: {fileID: 0}
   Attachable: {fileID: 0}
+  Interact: {fileID: 0}
   Rb: {fileID: 0}
   CurrentShip: {fileID: 0}
+  CanMove: 1
+  CanUseAttachable: 1
+  CanJump: 1
+  CanSprint: 1
+  CanLook: 1
+  CanInteract: 1
 --- !u!114 &2346856012485075061
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -412,13 +455,11 @@ MonoBehaviour:
   groundDrag: 0
   airMultiplier: 0.8
   maxSlopeAngle: 50
-  CanMove: 1
   sprintSpeed: 16
   IsSprinting:
     m_InternalValue: 0
   jumpAmount: 8
   jumpCooldown: 0.5
-  CanJump: 1
   IsGrounded: 0
   yUpMultiplier: 2.5
   yDownMultiplier: 30
@@ -562,7 +603,6 @@ MonoBehaviour:
   sprintFOV: 70
   fovChangeDuration: 0.125
   Camera: {fileID: 415252595}
-  CanLook: 1
   CanSetTarget: 1
 --- !u!114 &2358588550936283245
 MonoBehaviour:
@@ -782,7 +822,7 @@ MonoBehaviour:
   SyncPositionX: 0
   SyncPositionY: 0
   SyncPositionZ: 0
-  SyncRotationX: 1
+  SyncRotationX: 0
   SyncRotationY: 1
   SyncRotationZ: 0
   PositionThreshold: 0.001
