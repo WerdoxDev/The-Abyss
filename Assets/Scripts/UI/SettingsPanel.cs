@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using System.Linq;
 using System;
 
@@ -12,6 +13,7 @@ public class SettingsPanel : MonoBehaviour {
     [SerializeField] private GameObject videoAdvancedContent;
     [SerializeField] private CustomButton videoBasicButton;
     [SerializeField] private CustomButton videoAdvancedButton;
+
     [SerializeField] private Selectable selectableOnPromptClose;
 
     [Header("Settings Options")]
@@ -19,58 +21,45 @@ public class SettingsPanel : MonoBehaviour {
     [SerializeField] private SettingsOption resolutionOption;
     [SerializeField] private SettingsOption renderResolutionOption;
     [SerializeField] private SettingsOption windowedOption;
+    [SerializeField] private SettingsOption maxFpsOption;
+    [SerializeField] private SettingsOption vsyncOption;
     [SerializeField] private SettingsOption showFpsOption;
     [SerializeField] private SettingsOption showPingOption;
     private bool _isPromptOpen;
 
     public event Action<int> OnMove;
 
+    private void OnEnable() {
+        SetOptionsFromSettings(SettingsManager.Instance.LastSettings);
+        SetInputState(true);
+        SetExternalEventsState(true);
+        SetPreventionState(true);
+    }
+
+    private void OnDisable() {
+        videoAdvancedContent.SetActive(false);
+        videoBasicContent.SetActive(true);
+        SettingsManager.Instance.RevertChanges();
+        KeybindLegend.Instance.HideApplyButton();
+
+        SetInputState(false);
+        SetExternalEventsState(false);
+        SetPreventionState(false);
+    }
+
     private void Awake() {
-        videoBasicButton.OnClick += (eventData) => {
+        videoBasicButton.OnClick += () => {
             videoAdvancedContent.SetActive(false);
             videoBasicContent.SetActive(true);
         };
 
-        videoAdvancedButton.OnClick += (eventData) => {
+        videoAdvancedButton.OnClick += () => {
             videoBasicContent.SetActive(false);
             videoAdvancedContent.SetActive(true);
         };
 
         KeybindLegend.Instance.OnApplyButtonClicked += () => {
             SettingsManager.Instance.ApplyChanges();
-        };
-
-        SettingsManager.Instance.OnSettingsChanged += (Settings newSettings, bool isDifferent) => {
-            if (isDifferent) {
-                KeybindLegend.Instance.ShowApplyButton();
-
-                Action<Action> onBeforeTabChange = (confirm) => {
-                    _isPromptOpen = true;
-                    PromptPanel promptPanel =
-                        PromptManager.Instance.CreatePrompt(null, "You have unsaved changes. Apply them?", "Cancel", "Apply", "Revert",
-                        null,
-                        () => {
-                            SettingsManager.Instance.ApplyChanges();
-                            confirm();
-                            SetBeforeTabChangeEvent(null);
-                            _isPromptOpen = false;
-                        },
-                        () => {
-                            SettingsManager.Instance.RevertChanges();
-                            confirm();
-                            SetBeforeTabChangeEvent(null);
-                        }, selectableOnPromptClose);
-                };
-
-                SetBeforeTabChangeEvent(onBeforeTabChange);
-
-            } else {
-                KeybindLegend.Instance.HideApplyButton();
-                SetBeforeTabChangeEvent(null);
-                _isPromptOpen = false;
-            }
-
-            SetOptionsFromSettings(newSettings);
         };
 
         SubscribeToChangeEvents();
@@ -100,6 +89,14 @@ public class SettingsPanel : MonoBehaviour {
             SettingsManager.Instance.SetWindowedMode(GetFullScreenModeFromValue(option.Value));
         };
 
+        maxFpsOption.OnChanged += (option) => {
+            SettingsManager.Instance.SetMaxFps(option.Value);
+        };
+
+        vsyncOption.OnChanged += (option) => {
+            SettingsManager.Instance.SetVsync(option.Value == 1);
+        };
+
         showFpsOption.OnChanged += (option) => {
             SettingsManager.Instance.SetShowFps(option.Value == 1);
         };
@@ -109,16 +106,26 @@ public class SettingsPanel : MonoBehaviour {
         };
     }
 
-    private void SetBeforeTabChangeEvent(Action<Action> onBeforeTabChange) {
-        UIManager.Instance.SetBeforeTabChange(TabGroupIndex.SettingsPanel, onBeforeTabChange);
-        UIManager.Instance.SetBeforeTabChange(TabGroupIndex.InGameSettingsPanel, onBeforeTabChange);
-        UIManager.Instance.SetBeforeTabChange(TabGroupIndex.Menu, onBeforeTabChange);
+    private void ShowWarningPrompt() {
+        PromptManager.Instance.CreatePrompt(null, "You have unsaved changes. Apply them?", "Cancel", "Apply", "Revert",
+            () => EventSystem.current.SetSelectedGameObject(selectableOnPromptClose.gameObject),
+            () => {
+                SettingsManager.Instance.ApplyChanges();
+                _isPromptOpen = false;
+                EventSystem.current.SetSelectedGameObject(selectableOnPromptClose.gameObject);
+            },
+            () => {
+                SettingsManager.Instance.RevertChanges();
+                EventSystem.current.SetSelectedGameObject(selectableOnPromptClose.gameObject);
+            });
     }
 
     private void SetOptionsFromSettings(Settings settings) {
         resolutionOption.SelectOptionByValue(GetResolutionIndex(settings.ScreenResolution));
         renderResolutionOption.SelectOptionByValue(GetResolutionIndex(settings.RenderResolution));
         windowedOption.SelectOptionByValue(GetValueFromFullscreenMode(settings.FullScreenMode));
+        maxFpsOption.SelectOptionByValue(settings.MaxFps);
+        vsyncOption.SelectOptionByValue(settings.Vsync ? 1 : 0);
         showFpsOption.SelectOptionByValue(settings.Stats.ShowFps == true ? 1 : 0);
         showPingOption.SelectOptionByValue(settings.Stats.ShowPing == true ? 1 : 0);
     }
@@ -141,17 +148,51 @@ public class SettingsPanel : MonoBehaviour {
             x.height == resolution.y);
     }
 
-    private void OnEnable() {
-        SetOptionsFromSettings(SettingsManager.Instance.LastSettings);
-        SetInputState(true);
+    private void SetExternalEventsState(bool enabled) {
+        void SettingsChanged(Settings newSettings, bool isDirty) {
+            if (isDirty) KeybindLegend.Instance.ShowApplyButton();
+            else {
+                KeybindLegend.Instance.HideApplyButton();
+                _isPromptOpen = false;
+            }
+
+            SetOptionsFromSettings(newSettings);
+        }
+
+        if (enabled) SettingsManager.Instance.OnSettingsChanged += SettingsChanged;
+        else SettingsManager.Instance.OnSettingsChanged -= SettingsChanged;
     }
 
-    private void OnDisable() {
-        videoAdvancedContent.SetActive(false);
-        videoBasicContent.SetActive(true);
-        SettingsManager.Instance.RevertChanges();
-        KeybindLegend.Instance.HideApplyButton();
-        SetInputState(false);
+    private void SetPreventionState(bool enabled) {
+        void TabAttempt(TabGroupIndex groupIndex, Tab tab, Action cancel) {
+            if (groupIndex != TabGroupIndex.SettingsPanel &&
+                groupIndex != TabGroupIndex.InGameSettingsPanel &&
+                groupIndex != TabGroupIndex.Menu) return;
+
+            if (!SettingsManager.Instance.IsDirty()) return;
+            cancel?.Invoke();
+
+            ShowWarningPrompt();
+        }
+
+        void PanelAttempt(Panel panel, bool isOpen, Action cancel) {
+            if (panel.Type != PanelType.InGameSettings && panel.Type != PanelType.InGameMenu) return;
+
+            if (!SettingsManager.Instance.IsDirty()) return;
+            cancel?.Invoke();
+            Debug.Log(panel.Type);
+
+            if (panel.Type == PanelType.InGameSettings) ShowWarningPrompt();
+        }
+
+
+        if (enabled) {
+            UIManager.Instance.OnChangeTabAttempt += TabAttempt;
+            UIManager.Instance.OnPanelChangeStateAttempt += PanelAttempt;
+        } else {
+            UIManager.Instance.OnChangeTabAttempt -= TabAttempt;
+            UIManager.Instance.OnPanelChangeStateAttempt -= PanelAttempt;
+        }
     }
 
     private void SetInputState(bool enabled) {
@@ -160,7 +201,7 @@ public class SettingsPanel : MonoBehaviour {
         }
 
         void OnUIButtonEvent(UIButtonType type, bool performed) {
-            if (!performed || _isPromptOpen) return;
+            if (!performed || _isPromptOpen || !KeybindLegend.Instance.IsApplyVisible) return;
             if (type == UIButtonType.Apply) SettingsManager.Instance.ApplyChanges();
         }
 

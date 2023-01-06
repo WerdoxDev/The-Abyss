@@ -102,7 +102,7 @@ MonoBehaviour:
   interactable: {fileID: 1631373781571436490}
   Type: 2
   StandTransform: {fileID: 4196950028421889384}
-  UiText: Climb Ladder
+  UIText: Climb Ladder
   Data: 1
   IsLongPress: 0
   Active: 1
@@ -177,7 +177,7 @@ MonoBehaviour:
   interactable: {fileID: 1631373781571436490}
   Type: 2
   StandTransform: {fileID: 1986905489772580271}
-  UiText: Climb Ladder
+  UIText: Climb Ladder
   Data: 0
   IsLongPress: 0
   Active: 1

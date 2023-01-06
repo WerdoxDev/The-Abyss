@@ -71,7 +71,7 @@ MonoBehaviour:
   interactable: {fileID: 2559237922186398795}
   Type: 3
   StandTransform: {fileID: 4980089724571029645}
-  UiText: Set Sails
+  UIText: Set Sails
   Data: 0
   IsLongPress: 0
   Active: 1

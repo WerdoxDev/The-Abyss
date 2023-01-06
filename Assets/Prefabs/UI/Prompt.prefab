@@ -1108,7 +1108,7 @@ MonoBehaviour:
   - {fileID: 7170146939866440269}
   closeButtons:
   - {fileID: 7170146941423390026}
-  submitButton: {fileID: 7170146940033942481}
+  submitButton: {fileID: 0}
   SelectableOnOpen: {fileID: 693414597143045481}
   SelectableOnClose: {fileID: 0}
   FullyOpened: 0

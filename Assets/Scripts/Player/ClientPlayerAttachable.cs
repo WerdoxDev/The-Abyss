@@ -77,6 +77,7 @@ public class ClientPlayerAttachable : NetworkBehaviour {
         void OnMove(Vector2 direction) {
             if (!_player.CanUseAttachable) {
                 _server.SetMovementInputServerRpc(Vector2.zero);
+
                 _lastSentInput = direction;
                 return;
             }

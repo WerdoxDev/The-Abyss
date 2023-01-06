@@ -17,11 +17,13 @@ public class CustomButton : MonoBehaviour, IPointerClickHandler, IPointerEnterHa
     [SerializeField] private bool tween = true;
     [SerializeField] private bool resetOnDisable = true;
     [SerializeField] private bool lockIfParentExists = true;
+    private bool _hasTweener = true;
     private UIOrder _order;
     private AdvancedCustomButton _parentButton;
+    private UITweener _tweener;
 
     public bool IsSelected;
-    public event Action<BaseEventData> OnClick;
+    public event Action OnClick;
 
     private void Awake() {
         _order = GetComponent<UIOrder>();
@@ -35,11 +37,21 @@ public class CustomButton : MonoBehaviour, IPointerClickHandler, IPointerEnterHa
         };
     }
 
+    public void Submit() => OnClick?.Invoke();
+
+    public void Cancel() {
+        IsSelected = false;
+        Exit();
+    }
+
     public void Enter(bool setSelected = false) {
+        if (_tweener == null && _hasTweener) _hasTweener = TryGetComponent<UITweener>(out _tweener);
+
         if (setSelected) IsSelected = true;
 
         if (graphic != null) LeanTween.cancel(graphic.rectTransform);
 
+        if (_tweener != null) _tweener.Lock();
         if (_parentButton != null && lockIfParentExists) _parentButton.LockGraphic(graphic.gameObject);
 
         if (!tween) {
@@ -59,6 +71,7 @@ public class CustomButton : MonoBehaviour, IPointerClickHandler, IPointerEnterHa
     public void Exit() {
         if (IsSelected) return;
 
+        if (_tweener != null) _tweener.Unlock();
         if (_parentButton != null && lockIfParentExists) _parentButton.UnlockGraphic(graphic.gameObject);
 
         if (!tween) {
@@ -74,9 +87,7 @@ public class CustomButton : MonoBehaviour, IPointerClickHandler, IPointerEnterHa
         });
     }
 
-    public void Clicked(BaseEventData eventData) => OnClick?.Invoke(eventData);
-
-    public void OnPointerClick(PointerEventData eventData) => Clicked(eventData);
+    public void OnPointerClick(PointerEventData eventData) => Submit();
 
     public void OnPointerEnter(PointerEventData eventData) => Enter();
 

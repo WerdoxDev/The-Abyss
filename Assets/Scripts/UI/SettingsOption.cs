@@ -27,8 +27,8 @@ public class SettingsOption : MonoBehaviour {
         _settingsPanel = GetComponentInParent<SettingsPanel>();
         _advancedButton = GetComponent<AdvancedCustomButton>();
 
-        nextButton.OnClick += (eventData) => NextOption();
-        previousButton.OnClick += (eventData) => PreviousOption();
+        nextButton.OnClick += () => NextOption();
+        previousButton.OnClick += () => PreviousOption();
 
         _settingsPanel.OnMove += (direction) => {
             if (!_advancedButton.IsSelected) return;

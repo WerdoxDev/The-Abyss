@@ -252,7 +252,7 @@ MonoBehaviour:
   interactable: {fileID: 211843121551048453}
   Type: 0
   StandTransform: {fileID: 211843122041320887}
-  UiText: Raise Capstan
+  UIText: Raise Capstan
   Data: 2
   IsLongPress: 0
   Active: 1
@@ -327,7 +327,7 @@ MonoBehaviour:
   interactable: {fileID: 211843121551048453}
   Type: 0
   StandTransform: {fileID: 0}
-  UiText: Lower Capstan
+  UIText: Lower Capstan
   Data: 0
   IsLongPress: 0
   Active: 1
@@ -621,7 +621,7 @@ MonoBehaviour:
   interactable: {fileID: 211843121551048453}
   Type: 0
   StandTransform: {fileID: 211843120114300917}
-  UiText: Raise Capstan
+  UIText: Raise Capstan
   Data: 1
   IsLongPress: 0
   Active: 1

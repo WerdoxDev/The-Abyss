@@ -7,21 +7,21 @@ using UnityEngine.EventSystems;
 public class SelectOnDisable : MonoBehaviour {
     [SerializeField] private Selectable objectToSelect;
 
-    private CustomButton _customButton;
+    private CustomButtonSelectable _customButton;
     private Tab _tab;
     private AdvancedCustomButton _advancedCustomButton;
 
     private void Awake() {
-        _customButton = GetComponent<CustomButton>();
         _tab = GetComponent<Tab>();
+        _customButton = GetComponent<CustomButtonSelectable>();
         _advancedCustomButton = GetComponent<AdvancedCustomButton>();
     }
 
     private void OnEnable() {
         if (EventSystem.current?.currentSelectedGameObject == gameObject) {
-            if (_customButton != null) _customButton.Enter();
-            else if (_advancedCustomButton != null) _advancedCustomButton.Enter();
-            else if (_tab != null) _tab.TabGroup.OnTabEnter(_tab);
+            if (_customButton != null) _customButton.OnSelect(new BaseEventData(EventSystem.current));
+            else if (_advancedCustomButton != null) _advancedCustomButton.OnSelect(new BaseEventData(EventSystem.current));
+            else if (_tab != null) _tab.OnSelect(new BaseEventData(EventSystem.current));
         }
     }
 

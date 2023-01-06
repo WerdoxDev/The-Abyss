@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-public class AdvancedCustomButton : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler, ISelectHandler, IDeselectHandler, ICancelHandler, ISubmitHandler {
+public class AdvancedCustomButton : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler, ISelectHandler, IDeselectHandler {
     [SerializeField] private Graphic[] graphics;
     [SerializeField] private Color[] normalColors;
     [SerializeField] private Color[] enterColors;
@@ -15,12 +15,24 @@ public class AdvancedCustomButton : MonoBehaviour, IPointerClickHandler, IPointe
     [SerializeField] private bool scaleTween = true;
     [SerializeField] private bool resetOnDisable = true;
     private List<int> _lockedIndexes = new List<int>();
+    private bool _hasTweener = true;
+    private UITweener _tweener;
 
     public bool IsSelected;
-    public Action<BaseEventData> OnClick;
+    public Action OnClick;
 
     private void OnDisable() {
-        if (resetOnDisable) Exit();
+        if (resetOnDisable) {
+            IsSelected = false;
+            Exit();
+        }
+    }
+
+    public void Submit() => OnClick?.Invoke();
+
+    public void Cancel() {
+        IsSelected = false;
+        Exit();
     }
 
     public void LockGraphic(GameObject gameObject) {
@@ -34,7 +46,11 @@ public class AdvancedCustomButton : MonoBehaviour, IPointerClickHandler, IPointe
     }
 
     public void Enter(bool setSelected = false) {
+        if (_tweener == null && _hasTweener) _hasTweener = TryGetComponent<UITweener>(out _tweener);
+
         if (setSelected) IsSelected = true;
+
+        if (_tweener != null) _tweener.Lock();
 
         for (int i = 0; i < graphics.Length; i++) {
             if (_lockedIndexes.Contains(i)) continue;
@@ -50,6 +66,8 @@ public class AdvancedCustomButton : MonoBehaviour, IPointerClickHandler, IPointe
     public void Exit() {
         if (IsSelected) return;
 
+        if (_tweener != null) _tweener.Unlock();
+
         for (int i = 0; i < graphics.Length; i++)
             LeanTween.graphicColor(graphics[i].rectTransform, normalColors[i], duration).setEase(easeType).setRecursive(false);
 
@@ -58,25 +76,20 @@ public class AdvancedCustomButton : MonoBehaviour, IPointerClickHandler, IPointe
         LeanTween.scale(rectTransform, Vector3.one, duration).setEase(easeType);
     }
 
-    public void OnPointerClick(PointerEventData eventData) => OnClick?.Invoke(eventData);
+    public void OnPointerClick(PointerEventData eventData) => Submit();
 
     public void OnPointerEnter(PointerEventData eventData) => Enter();
 
     public void OnPointerExit(PointerEventData eventData) => Exit();
 
-    public void OnSelect(BaseEventData eventData) => Enter(true);
+    public void OnSelect(BaseEventData eventData) {
+        Enter(true);
+        UIManager.Instance.SetEnteredAdvCustomButton(this);
+    }
 
     public void OnDeselect(BaseEventData eventData) {
         IsSelected = false;
         Exit();
-        Debug.Log(eventData.selectedObject.name);
+        UIManager.Instance.SetEnteredAdvCustomButton(null);
     }
-
-    public void OnCancel(BaseEventData eventData) {
-        IsSelected = false;
-        Exit();
-        Debug.Log("adv cancel");
-    }
-
-    public void OnSubmit(BaseEventData eventData) => OnClick?.Invoke(eventData);
 }

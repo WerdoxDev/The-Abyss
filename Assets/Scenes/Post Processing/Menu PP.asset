@@ -421,7 +421,7 @@ MonoBehaviour:
     m_OverrideState: 0
     m_Value: {r: 0.71132076, g: 0.9100618, b: 1, a: 1}
   balance:
-    m_OverrideState: 1
+    m_OverrideState: 0
     m_Value: 0
 --- !u!114 &2872319637074495327
 MonoBehaviour:
@@ -566,7 +566,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c01700fd266d6914ababb731e09af2eb, type: 3}
   m_Name: DepthOfField
   m_EditorClassIdentifier: 
-  active: 1
+  active: 0
   mode:
     m_OverrideState: 1
     m_Value: 2
@@ -615,13 +615,13 @@ MonoBehaviour:
   active: 0
   shadows:
     m_OverrideState: 1
-    m_Value: {x: 0.9033744, y: 1, z: 0.988757, w: 0}
+    m_Value: {x: 0.59078956, y: 0.97027713, z: 1, w: 0}
   midtones:
-    m_OverrideState: 0
-    m_Value: {x: 0.8018613, y: 0.9811142, z: 1, w: 0}
+    m_OverrideState: 1
+    m_Value: {x: 0.90631855, y: 0.9421283, z: 1, w: 0}
   highlights:
-    m_OverrideState: 0
-    m_Value: {x: 0.6888724, y: 0.8133123, z: 1, w: 1}
+    m_OverrideState: 1
+    m_Value: {x: 0.32307243, y: 1, z: 0, w: 1}
   shadowsStart:
     m_OverrideState: 0
     m_Value: 0

@@ -23,12 +23,11 @@ public class ReselectLastSelected : MonoBehaviour {
     }
 
     private void Update() {
-        if (CacheLastSelectedObject())
-            return;
+        if (!GameManager.Instance.IsPaused && GameManager.Instance.GameState == GameState.InGame) return;
 
-        if (_inputModule.move.action.WasPressedThisFrame() ||
-                _inputModule.submit.action.WasPressedThisFrame() ||
-                _inputModule.cancel.action.WasPressedThisFrame()) {
+        if (CacheLastSelectedObject()) return;
+
+        if (_inputModule.move.action.WasPressedThisFrame()) {
 
             ReselectLastObject();
             return;
@@ -43,8 +42,7 @@ public class ReselectLastSelected : MonoBehaviour {
     }
 
     private bool CacheLastSelectedObject() {
-        if (EventSystem.current.currentSelectedGameObject == null)
-            return false;
+        if (EventSystem.current.currentSelectedGameObject == null) return false;
         LastSelectedObject = EventSystem.current.currentSelectedGameObject.gameObject;
         return true;
     }

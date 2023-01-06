@@ -7,46 +7,36 @@ public class PausePanel : MonoBehaviour {
 
     [Header("Settings")]
     [SerializeField] private CustomButton settingsButton;
-    [SerializeField] private CustomButton backButton;
-    [SerializeField] private CustomButton levaeButton;
-    [SerializeField] private GameObject menuPanel;
-    [SerializeField] private GameObject settingsPanel;
-    private Panel _panel;
-    private bool menuPanelVisible = false;
-    private bool settingsPanelVisible = false;
+    [SerializeField] private CustomButton leaveButton;
+    [SerializeField] private Panel menuPanel;
+    [SerializeField] private Panel settingsPanel;
+
+    public Panel Panel;
 
     private void Awake() {
-        _panel = GetComponent<Panel>();
+        Panel.OnClosed += () => HideMenuPanel();
+        Panel.OnOpened += () => ShowMenuPanel();
 
-        _panel.OnClosed += () => GameManager.Instance.ResumeGame();
+        Panel.OnClosedWithButton += () => GameManager.Instance.ResumeGame();
 
-        settingsButton.OnClick += (eventData) => ShowSettingsPanel();
-        backButton.OnClick += (eventData) => ShowMenuPanel();
-        levaeButton.OnClick += (eventData) => TheAbyssNetworkManager.Instance.Disconnect();
-
-        ShowMenuPanel();
+        settingsButton.OnClick += () => ShowSettingsPanel();
+        leaveButton.OnClick += () => TheAbyssNetworkManager.Instance.Disconnect();
     }
 
-    private void OnDisable() => ShowMenuPanel();
+    public bool IsMenuVisible() => menuPanel.IsOpen;
 
-    private void FixedUpdate() {
-        if (Keyboard.current.escapeKey.wasPressedThisFrame && _panel.FullyOpened) {
-            if (menuPanelVisible) _panel.Close();
-            else if (settingsPanelVisible) ShowMenuPanel();
-        }
+    public void HideMenuPanel() {
+        menuPanel.Close();
+        settingsPanel.Close();
     }
 
     public void ShowMenuPanel() {
-        settingsPanel.SetActive(false);
-        menuPanel.SetActive(true);
-        menuPanelVisible = true;
-        settingsPanelVisible = false;
+        settingsPanel.Close();
+        menuPanel.Open();
     }
 
     public void ShowSettingsPanel() {
-        menuPanel.SetActive(false);
-        settingsPanel.SetActive(true);
-        settingsPanelVisible = true;
-        menuPanelVisible = false;
+        menuPanel.Close();
+        settingsPanel.Open();
     }
 }

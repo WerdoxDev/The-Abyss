@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 using System;
 
 public class KeybindLegend : MonoBehaviour {
@@ -8,6 +10,9 @@ public class KeybindLegend : MonoBehaviour {
 
     [SerializeField] private CustomButton backButton;
     [SerializeField] private CustomButton applyButton;
+
+    public bool IsApplyVisible;
+    public bool IsBackVisible;
 
     public event Action OnApplyButtonClicked;
     public event Action OnBackButtonClicked;
@@ -19,12 +24,19 @@ public class KeybindLegend : MonoBehaviour {
             Destroy(this);
         }
 
-        applyButton.OnClick += (eventData) => OnApplyButtonClicked?.Invoke();
-        backButton.OnClick += (eventData) => OnBackButtonClicked?.Invoke();
+        applyButton.OnClick += () => OnApplyButtonClicked?.Invoke();
+        backButton.OnClick += () => OnBackButtonClicked?.Invoke();
 
         HideApplyButton();
     }
 
-    public void ShowApplyButton() => applyButton.gameObject.SetActive(true);
-    public void HideApplyButton() => applyButton.gameObject.SetActive(false);
+    public void ShowApplyButton() {
+        applyButton.gameObject.SetActive(true);
+        IsApplyVisible = true;
+    }
+
+    public void HideApplyButton() {
+        applyButton.gameObject.SetActive(false);
+        IsApplyVisible = false;
+    }
 }

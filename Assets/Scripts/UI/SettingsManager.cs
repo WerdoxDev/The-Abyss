@@ -32,6 +32,8 @@ public class SettingsManager : MonoBehaviour {
         ApplyDefaultSettings();
     }
 
+    public bool IsDirty() => !CurrentSettings.Equals(LastSettings);
+
     public void SetPreset(int value) {
         Debug.Log(value);
     }
@@ -48,6 +50,16 @@ public class SettingsManager : MonoBehaviour {
 
     public void SetWindowedMode(FullScreenMode mode) {
         CurrentSettings.FullScreenMode = mode;
+        SettingsChanged();
+    }
+
+    public void SetMaxFps(int maxFps) {
+        CurrentSettings.MaxFps = maxFps;
+        SettingsChanged();
+    }
+
+    public void SetVsync(bool vsync) {
+        CurrentSettings.Vsync = vsync;
         SettingsChanged();
     }
 
@@ -78,6 +90,12 @@ public class SettingsManager : MonoBehaviour {
             UIManager.Instance?.SetRenderTexure(renderTexture);
         }
 
+
+        if (CurrentSettings.Vsync) CurrentSettings.MaxFps = -1;
+        QualitySettings.vSyncCount = CurrentSettings.Vsync ? 1 : 0;
+        // Max fps option has a off that feeds -1 which is basically no fps limit
+        Application.targetFrameRate = CurrentSettings.MaxFps;
+
         UIManager.Instance.StatsPanel.SetFpsVisibility(CurrentSettings.Stats.ShowFps);
         UIManager.Instance.StatsPanel.SetPingVisibility(CurrentSettings.Stats.ShowPing);
 
@@ -99,8 +117,9 @@ public class SettingsManager : MonoBehaviour {
         CurrentSettings.ScreenResolution = new Vector2Int(highestResolution.width, highestResolution.height);
         CurrentSettings.RenderResolution = new Vector2Int(highestResolution.width, highestResolution.height);
         CurrentSettings.FullScreenMode = FullScreenMode.Windowed;
-        CurrentSettings.Stats.ShowFps = false;
-        CurrentSettings.Stats.ShowPing = false;
+        CurrentSettings.Vsync = true;
+        CurrentSettings.MaxFps = -1;
+        CurrentSettings.Stats = new StatSettings(false, false);
         ApplyChanges();
     }
 }
@@ -110,14 +129,28 @@ public struct Settings : IEquatable<Settings> {
     public Vector2Int ScreenResolution;
     public Vector2Int RenderResolution;
     public FullScreenMode FullScreenMode;
+    public int MaxFps;
+    public bool Vsync;
     public StatSettings Stats;
 
-    public bool Equals(Settings other) {
-        return other.ScreenResolution == ScreenResolution && other.RenderResolution == RenderResolution && other.FullScreenMode == FullScreenMode;
-    }
+    public bool Equals(Settings other) =>
+        other.ScreenResolution == ScreenResolution &&
+        other.RenderResolution == RenderResolution &&
+        other.FullScreenMode == FullScreenMode &&
+        other.MaxFps == MaxFps &&
+        other.Vsync == Vsync &&
+        other.Stats.Equals(Stats);
 }
 
-public struct StatSettings {
+public struct StatSettings : IEquatable<StatSettings> {
     public bool ShowFps;
     public bool ShowPing;
+
+    public StatSettings(bool showFps, bool showPing) {
+        ShowFps = showFps;
+        ShowPing = showPing;
+    }
+
+    public bool Equals(StatSettings other) =>
+        other.ShowFps == ShowFps && other.ShowPing == ShowPing;
 }

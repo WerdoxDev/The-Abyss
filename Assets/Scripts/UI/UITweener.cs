@@ -20,7 +20,9 @@ public class UITweener : MonoBehaviour {
     [SerializeField] private bool startOffset;
     [SerializeField] private bool disableOnComplete;
     [SerializeField] private bool playOnStart = true;
+    private bool _onceStartOffset;
 
+    public bool IsLocked { get; private set; }
     public float Duration { get => duration; }
 
     public event Action OnTweenFinished;
@@ -29,6 +31,7 @@ public class UITweener : MonoBehaviour {
 
     private void Awake() {
         if (objectToTween == null) objectToTween = gameObject;
+        _onceStartOffset = startOffset;
     }
 
     private void OnEnable() {
@@ -36,6 +39,8 @@ public class UITweener : MonoBehaviour {
     }
 
     public void HandleTween(bool instant = false) {
+        if (IsLocked) return;
+
         if (!objectToTween.activeSelf)
             objectToTween.SetActive(true);
 
@@ -68,6 +73,15 @@ public class UITweener : MonoBehaviour {
         _tweenObject.setOnComplete(onComplete);
     }
 
+    public void Lock() => IsLocked = true;
+    public void Unlock() => IsLocked = false;
+
+    public void SetFrom(Vector3 from) => this.from = from;
+    public void SetTo(Vector3 to) => this.to = to;
+    public void SetOnceStartOffset(bool startOffset) => _onceStartOffset = startOffset;
+
+    public float GetDuration() => duration;
+
     private void MoveAbsolute(bool instant) {
         RectTransform rectTransform = objectToTween.GetComponent<RectTransform>();
         if (instant) {
@@ -99,8 +113,10 @@ public class UITweener : MonoBehaviour {
             return;
         }
 
-        if (startOffset) canvasGroup.alpha = from.x;
+        if (startOffset == _onceStartOffset) canvasGroup.alpha = from.x;
 
         _tweenObject = LeanTween.alphaCanvas(canvasGroup, to.x, duration);
+
+        _onceStartOffset = startOffset;
     }
 }

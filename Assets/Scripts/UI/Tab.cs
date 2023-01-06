@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-public class Tab : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler, ISelectHandler, IDeselectHandler, ICancelHandler, ISubmitHandler {
+public class Tab : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler, ISelectHandler, IDeselectHandler {
     public string Name;
     public bool DefaultTab;
     public TabGroup TabGroup;
@@ -40,7 +40,9 @@ public class Tab : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IP
         }
     }
 
-    public void OnPointerClick(PointerEventData eventData) => TabGroup.OnTabSelected(this);
+    public void Submit() => TabGroup.OnTabSelected(this);
+
+    public void OnPointerClick(PointerEventData eventData) => Submit();
 
     public void OnPointerEnter(PointerEventData eventData) => TabGroup.OnTabEnter(this);
 
@@ -50,9 +52,9 @@ public class Tab : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IP
 
     public void OnDeselect(BaseEventData eventData) => TabGroup.OnTabExit(this);
 
-    public void OnCancel(BaseEventData eventData) => TabGroup.OnTabExit(this);
+    // public void OnCancel(BaseEventData eventData) => TabGroup.OnTabExit(this);
 
-    public void OnSubmit(BaseEventData eventData) => TabGroup.OnTabSelected(this);
+    // public void OnSubmit(BaseEventData eventData) => TabGroup.OnTabSelected(this);
 }
 
 public enum TabState {

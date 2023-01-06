@@ -26,6 +26,7 @@ public class InputReader : ScriptableObject, InputControls.IPlayerActions {
         _controls.UI.Navigate.performed += (context) => UIMoveEvent?.Invoke(context.ReadValue<Vector2>());
         _controls.UI.ChangeTab.performed += (context) => UIChangeTabEvent?.Invoke((int)context.ReadValue<float>());
         _controls.UI.Apply.performed += (context) => SendUIButtonEvent(context, UIButtonType.Apply);
+        _controls.UI.Cancel.performed += (context) => SendUIButtonEvent(context, UIButtonType.Cancel);
         _controls.UI.Submit.performed += (context) => SendUIButtonEvent(context, UIButtonType.Submit);
     }
 
@@ -36,6 +37,7 @@ public class InputReader : ScriptableObject, InputControls.IPlayerActions {
     public void OnInteract(InputAction.CallbackContext context) => SendButtonEvent(context, ButtonType.Interact);
     public void OnSprint(InputAction.CallbackContext context) => SendButtonEvent(context, ButtonType.Sprint);
     public void OnPause(InputAction.CallbackContext context) => SendButtonEvent(context, ButtonType.Pause);
+    public void OnChat(InputAction.CallbackContext context) => SendButtonEvent(context, ButtonType.Chat);
 
     // public void OnNavigate(InputAction.CallbackContext context) => UIMoveEvent?.Invoke(context.ReadValue<Vector2>());
     // public void OnPoint(InputAction.CallbackContext context) { }
@@ -56,6 +58,8 @@ public class InputReader : ScriptableObject, InputControls.IPlayerActions {
         else if (context.canceled) UIButtonEvent?.Invoke(type, false);
     }
 
+    public void SendUIButtonEvent(UIButtonType type) => UIButtonEvent?.Invoke(type, true);
+
     public void EnablePlayerControls() {
         _controls.Player.Enable();
     }
@@ -69,11 +73,12 @@ public enum ButtonType {
     Jump,
     Interact,
     Sprint,
-    Pause
+    Pause,
+    Chat
 }
 
 public enum UIButtonType {
     Submit,
+    Cancel,
     Apply,
-    Back
 }

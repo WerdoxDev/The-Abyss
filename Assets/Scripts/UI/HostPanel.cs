@@ -5,20 +5,17 @@ using UnityEngine.UI;
 using TMPro;
 using Unity.Netcode;
 
-public class HostPanel : MonoBehaviour
-{
+public class HostPanel : MonoBehaviour {
     [SerializeField] private CustomButton createButton;
     [SerializeField] private TMP_InputField lobbyNameInputField;
     [SerializeField] private TMP_InputField hostIpInputField;
-
-    private void Awake()
-    {
-        createButton.OnClick += (eventData) =>
-        {
+    private void Awake() {
+        createButton.OnClick += () => {
             string[] split = hostIpInputField.text.Split(":");
             if (split.Length != 2) return;
             GameManager.Instance.SetConnectionData(split[0], ushort.Parse(split[1]));
-            TheAbyssNetworkManager.Instance.Host(new PlayerConnData(UIManager.Instance.Username));
+            TheAbyssNetworkManager.Instance.Host(
+                new PlayerConnData(UIManager.Instance.PlayerName, UIManager.Instance.CustomizePanel.PlayerCustomization));
         };
     }
 }

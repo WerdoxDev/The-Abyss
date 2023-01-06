@@ -151,10 +151,10 @@ public class ServerPlayerMovement : NetworkBehaviour {
         _rb.velocity = new Vector3(_rb.velocity.x, 0, _rb.velocity.z);
         _yVelocity = (transform.up * jumpAmount).y;
 
-        Invoke(nameof(ResetJump), jumpCooldown);
+        Invoke(nameof(ResetJumpCooldown), jumpCooldown);
     }
 
-    private void ResetJump() => _jumpCooldownFinished = true;
+    private void ResetJumpCooldown() => _jumpCooldownFinished = true;
 
     private bool OnSlope() {
         if (Physics.Raycast(transform.position, _player.CurrentShip != null ? -_player.CurrentShip.transform.up : Vector3.down, out _slopeHit, _player.PlayerSize.y * 0.5f + 2, groundLayer)) {

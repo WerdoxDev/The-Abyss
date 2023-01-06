@@ -36,7 +36,7 @@ public class ClientPlayerCamera : NetworkBehaviour {
         if (!IsOwner) {
             enabled = false;
             Camera.gameObject.GetComponent<AudioListener>().enabled = false;
-            Camera.enabled = false;
+            Camera.gameObject.SetActive(false);
             return;
         }
 

@@ -11,12 +11,12 @@ public class TabGroup : MonoBehaviour {
     public TabGroupIndex GroupIndex;
     [SerializeField] private bool resetOnDisable;
 
-    private event Action OnConfirmTabChange;
-    public event Action<Action> OnBeforeTabChange;
+    public Tab ActiveTab { get; private set; }
+    public Tab EnteredTab { get; private set; }
 
     private List<Tab> _tabs;
-    private Tab _activeTab;
     private int _activeTabIndex;
+    private bool _cancelled;
 
     private void OnDisable() {
         if (resetOnDisable) OnTabSelected(_tabs.FirstOrDefault(x => x.DefaultTab));
@@ -33,36 +33,42 @@ public class TabGroup : MonoBehaviour {
     public void AddTab(Tab tab) {
         if (_tabs == null) _tabs = new List<Tab>();
 
-        if (tab.DefaultTab) OnTabSelected(tab);
+        if (tab.DefaultTab) OnTabSelected(tab, true, false);
         _tabs.Add(tab);
     }
 
     public void OnTabEnter(Tab tab) {
-        if (tab.name == _activeTab?.name) {
+        if (tab.name == ActiveTab?.name) {
             tab.SetState(TabState.ActiveHover);
             return;
         }
 
+        EnteredTab = tab;
         ResetTabs();
         tab.SetState(TabState.Hover);
     }
 
     public void OnTabExit(Tab tab) {
+        if (EnteredTab == tab) EnteredTab = null;
         ResetTabs();
     }
 
-    public void OnTabSelected(Tab tab, bool setPanel = true) {
-        if (_activeTab == tab) return;
-        OnConfirmTabChange = () => {
-            _activeTab = tab;
-            _activeTabIndex = GetTabIndex(tab);
-            ResetTabs();
-            _activeTab.SetState(TabState.ActiveHover);
-            UIManager.Instance.TabChanged(GroupIndex, tab);
-        };
+    public void OnTabSelected(Tab tab, bool setPanel = true, bool selectTab = true) {
+        if (ActiveTab == tab) return;
 
-        if (OnBeforeTabChange == null) OnConfirmTabChange?.Invoke();
-        else OnBeforeTabChange?.Invoke(OnConfirmTabChange);
+        UIManager.Instance.ChangeTabAttempt(GroupIndex, tab, () => _cancelled = true);
+
+        if (_cancelled) {
+            _cancelled = false;
+            return;
+        }
+
+        ActiveTab = tab;
+        _activeTabIndex = GetTabIndex(tab);
+        ResetTabs();
+        if (selectTab) EventSystem.current?.SetSelectedGameObject(tab.gameObject);
+        ActiveTab.SetState(TabState.ActiveHover);
+        UIManager.Instance.TabChanged(GroupIndex, tab);
     }
 
     public void SelectNextTab() {
@@ -79,29 +85,28 @@ public class TabGroup : MonoBehaviour {
         SelectTabByIndex(_activeTabIndex);
     }
 
-    public void SetBeforeTabChange(Action<Action> onBeforeTabChange) => OnBeforeTabChange = onBeforeTabChange;
-
-    public void SelectTabByName(string name) {
+    public Tab SelectTabByName(string name) {
         Tab tab = _tabs.FirstOrDefault(x => x.name == name);
-        if (tab == null) return;
+        if (tab == null) return null;
 
         OnTabSelected(tab, false);
+        return tab;
     }
 
     public void SelectTabByIndex(int index) {
         Tab tab = _tabs.FirstOrDefault(x => x.name == transform.GetChild(index).name);
         if (tab == null) return;
 
-        _activeTab = tab;
+        ActiveTab = tab;
         ResetTabs();
         EventSystem.current.SetSelectedGameObject(tab.gameObject);
-        _activeTab.SetState(TabState.ActiveHover);
+        ActiveTab.SetState(TabState.ActiveHover);
         UIManager.Instance.TabChanged(GroupIndex, tab);
     }
 
     public void ResetTabs() {
         foreach (Tab tab in _tabs)
-            if (tab.name != _activeTab?.name)
+            if (tab.name != ActiveTab?.name)
                 tab.SetState(TabState.Inactive);
             else
                 tab.SetState(TabState.Active);

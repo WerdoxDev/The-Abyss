@@ -18,10 +18,12 @@ public class GameManager : MonoBehaviour {
     [SerializeField] private InputReader inputReader;
     [SerializeField] private string tempUrl;
     [SerializeField] private bool autoSpawn;
+    [SerializeField]
+    private Color systemMessageColor;
     private float _fpsTimer;
 
     public event Action<Player, bool> OnPlayerSpawned;
-    public event Action<ulong, bool> OnPlayerDespawned;
+    public event Action<Player, bool> OnPlayerDespawned;
     public event Action<int> OnPingChanged;
     public event Action<int> OnFpsChanged;
     public event Action<string> OnSceneChanged;
@@ -31,11 +33,16 @@ public class GameManager : MonoBehaviour {
 
     public GameState GameState;
     public ulong PlayerNetworkId;
+    public Player PlayerObject;
     public bool IsPlayerSpawned;
     public bool IsPaused;
 
     public int Ping { get; private set; }
     public int Fps { get; private set; }
+
+    private void OnDestroy() {
+        SetInternalEventsState(false);
+    }
 
     private void Awake() {
         if (Instance == null) Instance = this;
@@ -49,24 +56,7 @@ public class GameManager : MonoBehaviour {
 
         inputReader.Init();
 
-        OnPlayerSpawned += (Player player, bool isOwner) => {
-            if (!isOwner) return;
-            IsPlayerSpawned = true;
-            PlayerNetworkId = player.OwnerClientId;
-            StopAllCoroutines();
-            StartCoroutine(CheckPingEnumerator(pingInterval));
-
-            // We need player object so do this on player spawn
-            SettingsManager.Instance.CurrentCamera = player.CLCamera.Camera;
-            SettingsManager.Instance.ApplyChanges();
-        };
-
-        OnPlayerDespawned += (ulong clientId, bool isOwner) => {
-            if (!isOwner) return;
-            IsPlayerSpawned = false;
-            PlayerNetworkId = 0;
-            if (gameObject != null) StopAllCoroutines();
-        };
+        SetInternalEventsState(true);
 
         OnSceneChanged += (name) => {
             if (name == "Water") {
@@ -91,9 +81,11 @@ public class GameManager : MonoBehaviour {
         string[] split = tempUrl.Split(":");
         SetConnectionData(split[0], ushort.Parse(split[1]));
         if (ClonesManager.IsClone()) {
-            TheAbyssNetworkManager.Instance.Client(new PlayerConnData(UIManager.Instance.Username));
+            TheAbyssNetworkManager.Instance.Client(
+                new PlayerConnData(UIManager.Instance.PlayerName, UIManager.Instance.CustomizePanel.PlayerCustomization));
         } else {
-            TheAbyssNetworkManager.Instance.Host(new PlayerConnData(UIManager.Instance.Username));
+            TheAbyssNetworkManager.Instance.Host(
+                new PlayerConnData(UIManager.Instance.PlayerName, UIManager.Instance.CustomizePanel.PlayerCustomization));
         }
     }
 #endif
@@ -106,12 +98,22 @@ public class GameManager : MonoBehaviour {
         }
     }
 
+    public void LockCursor() {
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+    }
+
+    public void FreeCursor() {
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+    }
+
     public void PlayerSpawned(Player player, bool isOwner) {
         OnPlayerSpawned?.Invoke(player, isOwner);
     }
 
-    public void PlayerDespawned(ulong clientId) {
-        OnPlayerDespawned?.Invoke(clientId, clientId == PlayerNetworkId);
+    public void PlayerDespawned(Player player) {
+        OnPlayerDespawned?.Invoke(player, player.OwnerClientId == PlayerNetworkId);
     }
 
     public void PauseGame() {
@@ -137,6 +139,8 @@ public class GameManager : MonoBehaviour {
         transport.ConnectionData.Port = port;
     }
 
+    public PlayerDataInfo GetPlayerDataInfo() => PlayerObject.Data.PlayerDataInfo.Value;
+
     private IEnumerator CheckPingEnumerator(float intervalSeconds) {
         // UnityTransport transport = NetworkManager.Singleton.GetComponent<UnityTransport>();
         while (true) {
@@ -147,6 +151,48 @@ public class GameManager : MonoBehaviour {
                 OnPingChanged?.Invoke(Ping);
             }
             yield return new WaitForSeconds(intervalSeconds);
+        }
+    }
+
+    private void SetInternalEventsState(bool enabled) {
+        void PlayerSpawned(Player player, bool isOwner) {
+            if (NetworkManager.Singleton.IsServer) {
+                PlayerDataInfo dataInfo = player.Data.PlayerDataInfo.Value;
+                ChatManager.Instance.SendSystemMessageServerRpc(new ChatMessageInfo("[System]", dataInfo.DisplayName + " Joined the game", systemMessageColor));
+            }
+
+            if (!isOwner) return;
+            PlayerObject = player;
+            IsPlayerSpawned = true;
+            PlayerNetworkId = player.OwnerClientId;
+            StopAllCoroutines();
+            StartCoroutine(CheckPingEnumerator(pingInterval));
+
+            // We need player object so do this on player spawn
+            SettingsManager.Instance.CurrentCamera = player.CLCamera.Camera;
+            SettingsManager.Instance.ApplyChanges();
+        }
+
+        void PlayerDespawned(Player player, bool isOwner) {
+            if (NetworkManager.Singleton.IsServer && !isOwner) {
+                if (player.Data == null) return;
+                PlayerDataInfo dataInfo = player.Data.PlayerDataInfo.Value;
+                ChatManager.Instance.SendSystemMessageServerRpc(new ChatMessageInfo("[System]", dataInfo.DisplayName + " Left the game", systemMessageColor));
+            }
+
+            if (!isOwner) return;
+            IsPlayerSpawned = false;
+            PlayerNetworkId = 0;
+            PlayerObject = null;
+            if (gameObject != null) StopAllCoroutines();
+        }
+
+        if (enabled) {
+            OnPlayerSpawned += PlayerSpawned;
+            OnPlayerDespawned += PlayerDespawned;
+        } else {
+            OnPlayerSpawned -= PlayerSpawned;
+            OnPlayerDespawned -= PlayerDespawned;
         }
     }
 }

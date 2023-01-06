@@ -57,36 +57,19 @@ public class Player : NetworkBehaviour {
     }
 
     public override void OnNetworkSpawn() {
-        GameManager.Instance.PlayerSpawned(this, IsOwner);
         if (!IsOwner) {
             SetLayerRecursively(transform, LayerMask.NameToLayer(playerLayer));
             return;
         }
 
-        Application.targetFrameRate = 60;
-
         ClientRpcParams = new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new[] { OwnerClientId } } };
 
-        GameManager.Instance.OnPause += () => {
-            CanMove = false;
-            CanLook = false;
-            CanUseAttachable = false;
-            CanInteract = false;
-            CanJump = false;
-            CanSprint = false;
-        };
+        GameManager.Instance.OnPause += () => DisableKeybinds();
+        GameManager.Instance.OnResume += () => EnableKeybinds();
 
-        GameManager.Instance.OnResume += () => {
-            CanMove = true;
-            CanLook = true;
-            CanUseAttachable = true;
-            CanInteract = true;
-            CanJump = true;
-            CanSprint = true;
-        };
+        // ChatManager.Instance.OnOpened += () => DisableKeybinds();
+        // ChatManager.Instance.OnClosed += () => EnableKeybinds();
 
-        //TODO: Change gameui stuff to work with new the approach
-        // GameUIController.Instance.PlayerCamera = PCamera.Camera;
 #if UNITY_EDITOR
         if (!IsServer) return;
         Ship ship = ShipSpawner.Instance.SpawnShip(new Vector3(0, -25, -25), Quaternion.Euler(-10, 0, 0));
@@ -95,19 +78,17 @@ public class Player : NetworkBehaviour {
     }
 
     public override void OnDestroy() {
-        GameManager.Instance.PlayerDespawned(OwnerClientId);
-    }
-
-    private void Update() {
-        if (Keyboard.current.kKey.wasPressedThisFrame && IsOwner) {
-            Vector3 spawnPosition = transform.position;
-            spawnPosition.y += 20;
-            ShipSpawner.Instance.SpawnShip(spawnPosition, Quaternion.Euler(0, transform.eulerAngles.y, 0));
-        }
+        GameManager.Instance.PlayerDespawned(this);
     }
 
     private void FixedUpdate() {
         if (!IsServer) return;
+
+        if (Keyboard.current.kKey.wasPressedThisFrame && IsOwner && !ChatManager.Instance.IsOpen) {
+            Vector3 spawnPosition = transform.position;
+            spawnPosition.y += 20;
+            ShipSpawner.Instance.SpawnShip(spawnPosition, Quaternion.Euler(0, transform.eulerAngles.y, 0));
+        }
 
         if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, Mathf.Infinity, shipLayer)) {
             if (CurrentShip == null || CurrentShip.gameObject != _lastShip.gameObject) {
@@ -121,6 +102,10 @@ public class Player : NetworkBehaviour {
             CurrentShip = null;
             SetRotationTarget(null);
         }
+    }
+
+    public void FullySpawned() {
+        GameManager.Instance.PlayerSpawned(this, IsOwner);
     }
 
     public bool IsOnAttachable(InteractType type) {
@@ -153,6 +138,24 @@ public class Player : NetworkBehaviour {
         CanMove = false;
         CanJump = false;
         CanSprint = false;
+    }
+
+    public void DisableKeybinds() {
+        CanMove = false;
+        CanLook = false;
+        CanUseAttachable = false;
+        CanInteract = false;
+        CanJump = false;
+        CanSprint = false;
+    }
+
+    public void EnableKeybinds() {
+        CanMove = true;
+        CanLook = true;
+        CanUseAttachable = true;
+        CanInteract = true;
+        CanJump = true;
+        CanSprint = true;
     }
 
     public void ChangeFOVLerp(float startFOV, float endFOV, float duration) => StartCoroutine(ChangeFOV(startFOV, endFOV, duration));

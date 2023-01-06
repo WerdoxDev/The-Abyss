@@ -1,7 +1,6 @@
 using UnityEngine;
 
-public class Floater : MonoBehaviour
-{
+public class Floater : MonoBehaviour {
     [SerializeField] private Rigidbody rb;
     [SerializeField] private float depthBeforeSubmerged = 1f;
     [SerializeField] private float displacementAmount = 3f;
@@ -13,18 +12,17 @@ public class Floater : MonoBehaviour
     public bool InWater = false;
     public bool Enable = true;
 
-    private void FixedUpdate()
-    {
+    private void FixedUpdate() {
         if (!Enable) return;
 
         if (ApplyGravity)
             rb.AddForceAtPosition(Physics.gravity / floaterCount, transform.position, ForceMode.Acceleration);
 
+        if (WaveManager.Instance == null) return;
         float waveHeight = WaveManager.Instance.GetWaveHeight(transform.position.x, transform.position.z);
         InWater = transform.position.y <= waveHeight;
 
-        if (InWater)
-        {
+        if (InWater) {
             float displacementMultiplier = Mathf.Clamp01((waveHeight - transform.position.y) / depthBeforeSubmerged) * displacementAmount;
             rb.AddForceAtPosition(new Vector3(0f, Mathf.Abs(Physics.gravity.y / floaterCount) * displacementMultiplier, 0f), transform.position, ForceMode.Acceleration);
             rb.AddForce(displacementMultiplier * -rb.velocity * waterDrag * Time.fixedDeltaTime, ForceMode.VelocityChange);

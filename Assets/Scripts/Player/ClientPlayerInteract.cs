@@ -4,7 +4,9 @@ using Unity.Netcode;
 public class ClientPlayerInteract : NetworkBehaviour {
     [Header("Intercation")]
     [SerializeField] private float interactRange;
+    [SerializeField] private float interactCooldown;
     [SerializeField] private LayerMask intercatableLayer;
+    private bool _interactCooldownFinished = true;
 
     private Player _player;
     private InputReader _inputReader;
@@ -31,7 +33,6 @@ public class ClientPlayerInteract : NetworkBehaviour {
     public override void OnDestroy() => SetInputState(false);
 
     private void FixedUpdate() {
-        //TODO: Change gameui stuff to work with new the approach
         if (busy) return;
         Transform camTransform = _player.CLCamera.Camera.transform;
         if (Physics.Raycast(camTransform.position, camTransform.forward, out RaycastHit interactHit, interactRange, intercatableLayer)) {
@@ -39,22 +40,23 @@ public class ClientPlayerInteract : NetworkBehaviour {
                 _currentHandler = interactHit.collider.gameObject.GetComponent<InteractHandler>();
 
             if (_currentHandler.Occupied.Value || !_currentHandler.Active) {
-                // GameUIController.Instance.ClearInteractTarget();
+                UIManager.Instance.InteractionPanel.ClearTarget();
                 return;
             };
 
-            // if (!_player.Attachable.IsAttached.Value || _player.Attachable.Handler == null)
-            //     GameUIController.Instance.SetInteractTarget(_currentHandler.transform.position, _currentHandler.UiText);
+            if (!_player.Attachable.IsAttached.Value || _player.Attachable.Handler == null)
+                UIManager.Instance.InteractionPanel.SetTarget(_currentHandler.transform.position, "F", _currentHandler.UIText);
         } else if (!_player.Attachable.IsAttached.Value && _currentHandler != null) {
             _currentHandler = null;
-            // GameUIController.Instance.ClearInteractTarget();
-        }
-        // else if (_player.Attachable.IsAttached.Value && _currentHandler != null)
-        //     GameUIController.Instance.ClearInteractTarget();
+            UIManager.Instance.InteractionPanel.ClearTarget();
+        } else if (_player.Attachable.IsAttached.Value && _currentHandler != null)
+            UIManager.Instance.InteractionPanel.ClearTarget();
     }
 
     [ClientRpc]
     public void UnbusyClientRpc(ClientRpcParams rpcParams = default) => busy = false;
+
+    private void ResetInteractCooldown() => _interactCooldownFinished = true;
 
     private void SetInputState(bool enabled) {
         if (!IsOwner) return;
@@ -64,8 +66,13 @@ public class ClientPlayerInteract : NetworkBehaviour {
             if (type == ButtonType.Interact && performed) {
                 if (_currentHandler == null || busy) return;
                 if (!_player.Attachable.IsAttached.Value && (_currentHandler.Occupied.Value || !_currentHandler.Active)) return;
+                if (!_interactCooldownFinished) return;
+
                 busy = true;
                 _server.InteractServerRpc(_currentHandler.interactable.NetworkObjectId, _currentHandler.Type, _currentHandler.Data);
+
+                _interactCooldownFinished = false;
+                Invoke(nameof(ResetInteractCooldown), interactCooldown);
             }
         }
         if (enabled) _inputReader.ButtonEvent += OnButtonEvent;

@@ -20,17 +20,21 @@ public class PromptPanel : MonoBehaviour {
 
     private void Awake() {
         Panel = GetComponent<Panel>();
-        cancelButton.OnClick += (eventData) => {
+
+        Panel.OnClosed += () => {
             OnCancel?.Invoke();
+        };
+
+        cancelButton.OnClick += () => {
             Panel.Close();
         };
 
-        confirmButton.OnClick += (eventData) => {
+        confirmButton.OnClick += () => {
             OnConfirm?.Invoke();
             Panel.Close();
         };
 
-        alternateButton.OnClick += (eventData) => {
+        alternateButton.OnClick += () => {
             OnAlternative?.Invoke();
             Panel.Close();
         };

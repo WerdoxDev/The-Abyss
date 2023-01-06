@@ -18,13 +18,12 @@ public class PromptManager : MonoBehaviour {
         }
     }
 
-    public PromptPanel CreatePrompt(string title, string body, string cancelText, string confirmText, string alternateText, Action onCancel, Action onConfirm, Action onAlternate, Selectable selectableOnClose) {
+    public PromptPanel CreatePrompt(string title, string body, string cancelText, string confirmText, string alternateText, Action onCancel, Action onConfirm, Action onAlternate) {
         GameObject promptGo = Instantiate(promptPrefab, transform);
         PromptPanel prompt = promptGo.GetComponent<PromptPanel>();
         prompt.SetTexts(title, body);
         prompt.SetButtons(cancelText, confirmText, alternateText);
         prompt.SetButtonsAction(onCancel, onConfirm, onAlternate);
-        prompt.Panel.SelectableOnClose = selectableOnClose;
         prompt.Panel.Open();
         return prompt;
     }

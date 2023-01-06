@@ -4,76 +4,95 @@ using UnityEngine;
 using System;
 using UnityEngine.UI;
 using TMPro;
+using Unity.Netcode;
 
-public class ProfileCustomizePanel : MonoBehaviour
-{
-    [SerializeField] private CustomizationColor faceColor;
+public class ProfileCustomizePanel : MonoBehaviour {
+
+    [Header("Color Settings")]
     [SerializeField] private CustomizationColor bodyColor;
+    [SerializeField] private CustomizationColor headColor;
+    [SerializeField] private CustomizationColor leftEyeColor;
+    [SerializeField] private CustomizationColor rightEyeColor;
 
-    [SerializeField] private MeshRenderer playerFace;
-    [SerializeField] private MeshRenderer playerBody;
+    [Header("Settings")]
+    public RectTransform RawImageTransform;
 
-    public PlayerCustomization PlayerCustomization;
+    public PlayerCustomizationInfo PlayerCustomization;
 
-    private void Awake()
-    {
-        faceColor.OnSetRgb += (isOn) => SetRgb(CustomizationType.Face, isOn);
-        faceColor.OnChooseColor += (color) => ChooseColor(CustomizationType.Face, color);
+    private void Awake() {
+        PlayerCustomization = PlayerCustomizationInfo.Default;
 
         bodyColor.OnSetRgb += (isOn) => SetRgb(CustomizationType.Body, isOn);
         bodyColor.OnChooseColor += (color) => ChooseColor(CustomizationType.Body, color);
 
-        ChooseColor(CustomizationType.Face, Color.white);
+        headColor.OnSetRgb += (isOn) => SetRgb(CustomizationType.Head, isOn);
+        headColor.OnChooseColor += (color) => ChooseColor(CustomizationType.Head, color);
+
+        leftEyeColor.OnSetRgb += (isOn) => SetRgb(CustomizationType.LeftEye, isOn);
+        leftEyeColor.OnChooseColor += (color) => ChooseColor(CustomizationType.LeftEye, color);
+
+        rightEyeColor.OnSetRgb += (isOn) => SetRgb(CustomizationType.RightEye, isOn);
+        rightEyeColor.OnChooseColor += (color) => ChooseColor(CustomizationType.RightEye, color);
+
+        ChooseColor(CustomizationType.Head, Color.white);
         ChooseColor(CustomizationType.Body, Color.white);
+        ChooseColor(CustomizationType.LeftEye, Color.white);
+        ChooseColor(CustomizationType.RightEye, Color.white);
     }
 
-    private void ChooseColor(CustomizationType type, Color color)
-    {
-        if (type == CustomizationType.Face)
-        {
-            playerFace.material.color = color;
-            PlayerCustomization.FaceColor = color;
-        }
-        if (type == CustomizationType.Body)
-        {
-            playerBody.material.color = color;
-            PlayerCustomization.BodyColor = color;
-        }
+    private void ChooseColor(CustomizationType type, Color color) {
+        if (type == CustomizationType.Body) PlayerCustomization.BodyColor = color;
+        else if (type == CustomizationType.Head) PlayerCustomization.HeadColor = color;
+        else if (type == CustomizationType.LeftEye) PlayerCustomization.LeftEyeColor = color;
+        else if (type == CustomizationType.RightEye) PlayerCustomization.RightEyeColor = color;
+        UIManager.Instance.PlayerCustomization.UpdatePlayer(UIManager.Instance.PlayerName, PlayerCustomization);
     }
 
-    private void SetRgb(CustomizationType type, bool isOn)
-    {
-        if (type == CustomizationType.Face)
-        {
-            PlayerCustomization.IsFaceRgb = isOn;
-            if (!isOn) playerFace.material.color = PlayerCustomization.FaceColor;
-        }
-        else if (type == CustomizationType.Body)
-        {
-            PlayerCustomization.IsBodyRgb = isOn;
-            if (!isOn) playerBody.material.color = PlayerCustomization.BodyColor;
-        }
-    }
-
-    private void Update()
-    {
-        if (PlayerCustomization.IsBodyRgb)
-            playerBody.material.color = Color.HSVToRGB(Mathf.PingPong(Time.time * 0.5f, 1), 1, 1);
-        if (PlayerCustomization.IsFaceRgb)
-            playerFace.material.color = Color.HSVToRGB(Mathf.PingPong(Time.time * 0.5f, 1), 1, 1);
-
+    private void SetRgb(CustomizationType type, bool isOn) {
+        if (type == CustomizationType.Body) PlayerCustomization.IsBodyRgb = isOn;
+        else if (type == CustomizationType.Head) PlayerCustomization.IsHeadRgb = isOn;
+        else if (type == CustomizationType.LeftEye) PlayerCustomization.IsLeftEyeRgb = isOn;
+        else if (type == CustomizationType.RightEye) PlayerCustomization.IsRightEyeRgb = isOn;
+        UIManager.Instance.PlayerCustomization.UpdatePlayer(UIManager.Instance.PlayerName, PlayerCustomization);
     }
 }
 
-public struct PlayerCustomization
-{
-    public Color FaceColor;
+[System.Serializable]
+public struct PlayerCustomizationInfo : IEquatable<PlayerCustomizationInfo>, INetworkSerializable {
+    public static PlayerCustomizationInfo Default = new PlayerCustomizationInfo() {
+        BodyColor = Color.white,
+        HeadColor = Color.white,
+        LeftEyeColor = Color.white,
+        RightEyeColor = Color.white
+    };
+
     public Color BodyColor;
-    public bool IsFaceRgb;
+    public Color HeadColor;
+    public Color LeftEyeColor;
+    public Color RightEyeColor;
     public bool IsBodyRgb;
+    public bool IsHeadRgb;
+    public bool IsLeftEyeRgb;
+    public bool IsRightEyeRgb;
+
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter {
+        serializer.SerializeValue(ref BodyColor);
+        serializer.SerializeValue(ref HeadColor);
+        serializer.SerializeValue(ref LeftEyeColor);
+        serializer.SerializeValue(ref RightEyeColor);
+        serializer.SerializeValue(ref IsBodyRgb);
+        serializer.SerializeValue(ref IsHeadRgb);
+        serializer.SerializeValue(ref IsLeftEyeRgb);
+        serializer.SerializeValue(ref IsRightEyeRgb);
+    }
+
+    public bool Equals(PlayerCustomizationInfo other) =>
+        other.BodyColor == BodyColor && other.HeadColor == HeadColor &&
+        other.LeftEyeColor == LeftEyeColor && other.RightEyeColor == RightEyeColor &&
+        other.IsBodyRgb == IsBodyRgb && other.IsHeadRgb == IsHeadRgb &&
+        other.IsLeftEyeRgb == IsLeftEyeRgb && other.IsRightEyeRgb == IsRightEyeRgb;
 }
 
-public enum CustomizationType
-{
-    Face, Body
+public enum CustomizationType {
+    Body, Head, LeftEye, RightEye
 }

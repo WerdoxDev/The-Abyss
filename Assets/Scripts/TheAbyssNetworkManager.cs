@@ -34,6 +34,9 @@ public class TheAbyssNetworkManager : MonoBehaviour {
     public void Host(PlayerConnData playerData) {
         clientData = new Dictionary<ulong, PlayerConnData>();
 
+        if (playerData.PlayerCustomization.Equals(default(PlayerCustomizationInfo)))
+            playerData.PlayerCustomization = PlayerCustomizationInfo.Default;
+
         NetworkManager.Singleton.NetworkConfig.ConnectionData = GetConnectionData(playerData);
         NetworkManager.Singleton.StartHost();
         NetworkManager.Singleton.SceneManager.OnLoadComplete += HandleSceneLoadComplete;
@@ -41,6 +44,9 @@ public class TheAbyssNetworkManager : MonoBehaviour {
     }
 
     public void Client(PlayerConnData playerData) {
+        if (playerData.PlayerCustomization.Equals(default(PlayerCustomizationInfo)))
+            playerData.PlayerCustomization = PlayerCustomizationInfo.Default;
+
         NetworkManager.Singleton.NetworkConfig.ConnectionData = GetConnectionData(playerData);
         NetworkManager.Singleton.StartClient();
     }
@@ -56,14 +62,6 @@ public class TheAbyssNetworkManager : MonoBehaviour {
         GameManager.Instance.SceneChanged(scene.name);
     }
 
-    private byte[] GetConnectionData(PlayerConnData playerData) {
-        string payload = JsonUtility.ToJson(new ConnectionPayload() {
-            playerName = playerData.PlayerName
-        });
-
-        return Encoding.ASCII.GetBytes(payload);
-    }
-
     private void HandleClientConnected(ulong clientId) {
         // Are we the client?
         if (clientId == NetworkManager.Singleton.LocalClientId) {
@@ -73,12 +71,7 @@ public class TheAbyssNetworkManager : MonoBehaviour {
 
     private void HandleClientDisconnected(ulong clientId) {
         if (NetworkManager.Singleton.IsServer) clientData.Remove(clientId);
-        if (NetworkManager.Singleton.IsClient) Disconnect();
-    }
-
-    public PlayerConnData? GetPlayerData(ulong clientId) {
-        if (clientData.TryGetValue(clientId, out PlayerConnData playerData)) return playerData;
-        return null;
+        else if (!NetworkManager.Singleton.IsHost) Disconnect();
     }
 
     private void HandleSceneLoadComplete(ulong clientId, string sceneName, LoadSceneMode loadSceneMode) {
@@ -97,8 +90,8 @@ public class TheAbyssNetworkManager : MonoBehaviour {
         Vector3 spawnPos = Vector3.zero;
 
         if (approveConnection) {
-            spawnPos = new Vector3(NetworkManager.Singleton.ConnectedClients.Count * 2, 0, 0);
-            clientData.Add(request.ClientNetworkId, new PlayerConnData(connectionPayload.playerName));
+            spawnPos = new Vector3(0, 0, 0);
+            clientData.Add(request.ClientNetworkId, new PlayerConnData(connectionPayload.PlayerName, connectionPayload.PlayerCustomization));
         }
 
         response.CreatePlayerObject = false;
@@ -106,17 +99,34 @@ public class TheAbyssNetworkManager : MonoBehaviour {
         response.Position = spawnPos;
         response.Rotation = Quaternion.identity;
     }
+
+    private byte[] GetConnectionData(PlayerConnData playerData) {
+        string payload = JsonUtility.ToJson(new ConnectionPayload() {
+            PlayerName = playerData.PlayerName,
+            PlayerCustomization = playerData.PlayerCustomization
+        });
+
+        return Encoding.ASCII.GetBytes(payload);
+    }
+
+    public PlayerConnData? GetPlayerData(ulong clientId) {
+        if (clientData.TryGetValue(clientId, out PlayerConnData playerData)) return playerData;
+        return null;
+    }
 }
 
 public struct PlayerConnData {
     public string PlayerName { get; private set; }
+    public PlayerCustomizationInfo PlayerCustomization;
 
-    public PlayerConnData(string playerName) {
+    public PlayerConnData(string playerName, PlayerCustomizationInfo playerCustomization) {
         PlayerName = playerName;
+        PlayerCustomization = playerCustomization;
     }
 }
 
 [System.Serializable]
 public class ConnectionPayload {
-    public string playerName;
+    public string PlayerName;
+    public PlayerCustomizationInfo PlayerCustomization;
 }

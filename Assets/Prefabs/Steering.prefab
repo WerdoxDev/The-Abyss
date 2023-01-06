@@ -71,7 +71,7 @@ MonoBehaviour:
   interactable: {fileID: 5802619725308693574}
   Type: 1
   StandTransform: {fileID: 3951785038770567855}
-  UiText: Use Steering
+  UIText: Use Steering
   Data: 0
   IsLongPress: 0
   Active: 1

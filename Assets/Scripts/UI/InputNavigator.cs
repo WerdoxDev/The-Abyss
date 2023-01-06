@@ -14,7 +14,7 @@ public class InputNavigator : MonoBehaviour {
         _inputField = GetComponent<TMP_InputField>();
     }
 
-    private void Update() {
+    private void FixedUpdate() {
         if (Keyboard.current.tabKey.wasPressedThisFrame) {
             Selectable next = _inputField.FindSelectableOnDown();
             if (next != null) EventSystem.current.SetSelectedGameObject(next.gameObject);

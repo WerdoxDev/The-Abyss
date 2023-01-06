@@ -9,6 +9,8 @@ TagManager:
   - Streering
   - SailControl
   - Capstan
+  - PreviewCamera
+  - PreviewPlayer
   layers:
   - Default
   - TransparentFX
