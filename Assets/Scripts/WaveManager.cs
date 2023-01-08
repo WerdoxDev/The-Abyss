@@ -2,8 +2,8 @@ using UnityEngine;
 using System;
 using Unity.Netcode;
 
-// [ExecuteAlways]
-public class WaveManager : NetworkBehaviour {
+[ExecuteAlways]
+public class WaveManager : MonoBehaviour {
     public static WaveManager Instance;
 
     [Header("Wave Settings")]
@@ -15,7 +15,12 @@ public class WaveManager : NetworkBehaviour {
     [SerializeField] private bool networkTime;
     private float _time;
 
-    public NetworkVariable<WavesInfo> WavesInfo = new NetworkVariable<WavesInfo>();
+    public GerstnerWave WaveA { get => waveA; set => waveA = value; }
+    public GerstnerWave WaveB { get => waveB; set => waveB = value; }
+    public GerstnerWave WaveC { get => waveC; set => waveC = value; }
+
+    public float Gravity { get => gravity; set => gravity = value; }
+    public float Multiplier { get => multiplier; set => multiplier = value; }
 
     [Header("Settings")]
     [SerializeField] private Material waterShader;
@@ -23,19 +28,6 @@ public class WaveManager : NetworkBehaviour {
     [Header("Tests")]
     [SerializeField] private GameObject testObject;
     [SerializeField] private Vector2 testPosition;
-
-    public override void OnNetworkSpawn() {
-        if (IsServer) return;
-
-        WavesInfo.OnValueChanged += (WavesInfo oldInfo, WavesInfo newInfo) => {
-            waveA = new GerstnerWave(newInfo.Wave1Direction, newInfo.Wave1Steepness, newInfo.Wave1Length);
-            waveB = new GerstnerWave(newInfo.Wave2Direction, newInfo.Wave2Steepness, newInfo.Wave2Length);
-            waveC = new GerstnerWave(newInfo.Wave3Direction, newInfo.Wave3Steepness, newInfo.Wave3Length);
-            gravity = newInfo.Gravity;
-            multiplier = newInfo.Multiplier;
-            Debug.Log("change");
-        };
-    }
 
     private void Awake() {
         if (Instance == null) Instance = this;
@@ -60,20 +52,6 @@ public class WaveManager : NetworkBehaviour {
         waterShader.SetVector("_WaveC", new Vector4(waveC.Direction.x, waveC.Direction.y, waveC.Steepness, waveC.Wavelength));
         waterShader.SetFloat("_Gravity", gravity);
         waterShader.SetFloat("_CustomTime", _time);
-
-        if (NetworkManager.Singleton == null || !NetworkManager.Singleton.IsServer) return;
-
-        WavesInfo.Value = new WavesInfo() {
-            Wave1Direction = waveA.Direction,
-            Wave2Direction = waveB.Direction,
-            Wave3Direction = waveC.Direction,
-            Wave1Length = waveA.Wavelength,
-            Wave2Length = waveB.Wavelength,
-            Wave3Length = waveC.Wavelength,
-            Wave1Steepness = waveA.Steepness,
-            Wave2Steepness = waveB.Steepness,
-            Wave3Steepness = waveC.Steepness
-        };
     }
 
     public float GetWaveHeight(float _x, float _z) {
@@ -111,37 +89,4 @@ public class GerstnerWave {
 
         return y;
     }
-}
-
-public struct WavesInfo : IEquatable<WavesInfo>, INetworkSerializable {
-    public Vector2 Wave1Direction;
-    public float Wave1Steepness;
-    public float Wave1Length;
-    public Vector2 Wave2Direction;
-    public float Wave2Steepness;
-    public float Wave2Length;
-    public Vector2 Wave3Direction;
-    public float Wave3Steepness;
-    public float Wave3Length;
-    public float Gravity;
-    public float Multiplier;
-
-    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter {
-        serializer.SerializeValue(ref Wave1Direction);
-        serializer.SerializeValue(ref Wave2Direction);
-        serializer.SerializeValue(ref Wave3Direction);
-        serializer.SerializeValue(ref Wave1Steepness);
-        serializer.SerializeValue(ref Wave2Steepness);
-        serializer.SerializeValue(ref Wave3Steepness);
-        serializer.SerializeValue(ref Wave1Length);
-        serializer.SerializeValue(ref Wave2Length);
-        serializer.SerializeValue(ref Wave3Length);
-        serializer.SerializeValue(ref Gravity);
-        serializer.SerializeValue(ref Multiplier);
-    }
-
-    public bool Equals(WavesInfo other) =>
-        other.Wave1Direction == Wave1Direction && other.Wave2Direction == Wave2Direction && other.Wave3Direction == Wave3Direction &&
-        other.Wave1Length == Wave1Length && other.Wave2Length == Wave2Length && other.Wave3Length == Wave3Length &&
-        other.Wave1Steepness == Wave1Steepness && other.Wave2Steepness == Wave2Steepness && other.Wave3Steepness == Wave3Steepness;
 }
