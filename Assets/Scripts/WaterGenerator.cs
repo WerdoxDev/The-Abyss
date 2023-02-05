@@ -17,7 +17,7 @@ public class WaterGenerator : MonoBehaviour
             DestroyImmediate(transform.GetChild(i).gameObject);
         }
 
-        transform.position = new Vector3(-(gridSize.x * size.x) / 2, 0, -(gridSize.y * size.y) / 2);
+        transform.localPosition = new Vector3(-(gridSize.x * size.x) / 2, 0, -(gridSize.y * size.y) / 2);
 
         for (int x = 0; x < gridSize.x; x++)
         {
@@ -37,7 +37,7 @@ public class WaterGenerator : MonoBehaviour
                     go.transform.localPosition = Vector3.zero;
 
                     MeshFilter _meshFilter = go.GetComponent<MeshFilter>();
-                    _meshFilter.mesh = waterMeshes[i].GenerateMesh(size, transform.position.y);
+                    _meshFilter.mesh = waterMeshes[i].GenerateMesh(size, 0);
 
                     Renderer[] renderers = new Renderer[1] { go.GetComponent<Renderer>() };
                     renderers[0].material = waterMaterial;

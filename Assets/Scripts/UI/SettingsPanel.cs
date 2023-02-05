@@ -13,10 +13,10 @@ public class SettingsPanel : MonoBehaviour {
     [SerializeField] private GameObject videoAdvancedContent;
     [SerializeField] private CustomButton videoBasicButton;
     [SerializeField] private CustomButton videoAdvancedButton;
-
     [SerializeField] private Selectable selectableOnPromptClose;
+    [SerializeField] private ScrollRect scrollRect;
 
-    [Header("Settings Options")]
+    [Header("Basic Settings Options")]
     [SerializeField] private SettingsOption presetOption;
     [SerializeField] private SettingsOption resolutionOption;
     [SerializeField] private SettingsOption renderResolutionOption;
@@ -25,6 +25,11 @@ public class SettingsPanel : MonoBehaviour {
     [SerializeField] private SettingsOption vsyncOption;
     [SerializeField] private SettingsOption showFpsOption;
     [SerializeField] private SettingsOption showPingOption;
+
+    [Header("Advanced Settings Options")]
+    [SerializeField] private SettingsOption raytracing;
+    [SerializeField] private GameObject raytracingSettings;
+
     private bool _isPromptOpen;
 
     public event Action<int> OnMove;
@@ -70,6 +75,8 @@ public class SettingsPanel : MonoBehaviour {
 
         resolutionOption.SetOptions(options.ToArray());
         renderResolutionOption.SetOptions(options.ToArray());
+
+        raytracingSettings.SetActive(raytracing.options[raytracing.CurrentIndex].Value == 0);
     }
 
     private void SubscribeToChangeEvents() {
@@ -104,6 +111,11 @@ public class SettingsPanel : MonoBehaviour {
         showPingOption.OnChanged += (option) => {
             SettingsManager.Instance.SetShowPing(option.Value == 1);
         };
+
+        raytracing.OnChanged += (option) => {
+            SettingsManager.Instance.SetRaytracing(option.Value == 1);
+            raytracingSettings.SetActive(option.Value == 1);
+        };
     }
 
     private void ShowWarningPrompt() {
@@ -128,6 +140,8 @@ public class SettingsPanel : MonoBehaviour {
         vsyncOption.SelectOptionByValue(settings.Vsync ? 1 : 0);
         showFpsOption.SelectOptionByValue(settings.Stats.ShowFps == true ? 1 : 0);
         showPingOption.SelectOptionByValue(settings.Stats.ShowPing == true ? 1 : 0);
+        raytracing.SelectOptionByValue(settings.Raytracing == true ? 1 : 0);
+        if (settings.Raytracing == true) scrollRect.verticalNormalizedPosition = 1;
     }
 
     private int GetValueFromFullscreenMode(FullScreenMode mode) {
@@ -189,7 +203,8 @@ public class SettingsPanel : MonoBehaviour {
         if (enabled) {
             UIManager.Instance.OnChangeTabAttempt += TabAttempt;
             UIManager.Instance.OnPanelChangeStateAttempt += PanelAttempt;
-        } else {
+        }
+        else {
             UIManager.Instance.OnChangeTabAttempt -= TabAttempt;
             UIManager.Instance.OnPanelChangeStateAttempt -= PanelAttempt;
         }
@@ -208,14 +223,15 @@ public class SettingsPanel : MonoBehaviour {
         if (enabled) {
             UIManager.Instance.InputReader.UIMoveEvent += OnUIMove;
             UIManager.Instance.InputReader.UIButtonEvent += OnUIButtonEvent;
-        } else {
+        }
+        else {
             UIManager.Instance.InputReader.UIMoveEvent -= OnUIMove;
             UIManager.Instance.InputReader.UIButtonEvent -= OnUIButtonEvent;
         }
     }
 }
 
-[System.Serializable]
+[Serializable]
 public struct Option {
     public string Text;
     public int Value;

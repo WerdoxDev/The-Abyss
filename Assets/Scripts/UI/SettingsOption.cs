@@ -19,7 +19,7 @@ public class SettingsOption : MonoBehaviour {
     private List<Image> indicatorImages = new List<Image>();
     private SettingsPanel _settingsPanel;
     private AdvancedCustomButton _advancedButton;
-    private int _currentIndex;
+    public int CurrentIndex { get; private set; }
 
     public event Action<Option> OnChanged;
 
@@ -45,7 +45,7 @@ public class SettingsOption : MonoBehaviour {
     }
 
     public void SelectOptionByValue(int value) {
-        _currentIndex = options.TakeWhile(x => x.Value != value).Count();
+        CurrentIndex = options.TakeWhile(x => x.Value != value).Count();
         ShowSelectedOption();
     }
 
@@ -65,25 +65,25 @@ public class SettingsOption : MonoBehaviour {
     }
 
     private void NextOption() {
-        _currentIndex++;
-        if (_currentIndex == options.Length) _currentIndex = 0;
+        CurrentIndex++;
+        if (CurrentIndex == options.Length) CurrentIndex = 0;
         // ShowSelectedOption();
-        OnChanged?.Invoke(options[_currentIndex]);
+        OnChanged?.Invoke(options[CurrentIndex]);
     }
 
     private void PreviousOption() {
-        _currentIndex--;
-        if (_currentIndex < 0) _currentIndex = options.Length - 1;
+        CurrentIndex--;
+        if (CurrentIndex < 0) CurrentIndex = options.Length - 1;
 
         // ShowSelectedOption();
-        OnChanged?.Invoke(options[_currentIndex]);
+        OnChanged?.Invoke(options[CurrentIndex]);
     }
 
     private void ShowSelectedOption() {
-        optionText.text = options[_currentIndex].Text;
+        optionText.text = options[CurrentIndex].Text;
 
         for (int i = 0; i < indicatorImages.Count; i++) {
-            if (_currentIndex != i) indicatorImages[i].color = normalColor;
+            if (CurrentIndex != i) indicatorImages[i].color = normalColor;
             else indicatorImages[i].color = selectedColor;
         }
     }

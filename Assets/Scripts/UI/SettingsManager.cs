@@ -1,8 +1,8 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
 using System.Linq;
+using UnityEngine.Rendering.HighDefinition;
 
 public class SettingsManager : MonoBehaviour {
     public static SettingsManager Instance;
@@ -78,6 +78,11 @@ public class SettingsManager : MonoBehaviour {
         SettingsChanged();
     }
 
+    public void SetRaytracing(bool raytracing) {
+        CurrentSettings.Raytracing = raytracing;
+        SettingsChanged();
+    }
+
     public void ApplyChanges() {
         Screen.SetResolution(CurrentSettings.ScreenResolution.x, CurrentSettings.ScreenResolution.y, CurrentSettings.FullScreenMode);
 
@@ -131,6 +136,7 @@ public struct Settings : IEquatable<Settings> {
     public FullScreenMode FullScreenMode;
     public int MaxFps;
     public bool Vsync;
+    public bool Raytracing;
     public StatSettings Stats;
 
     public bool Equals(Settings other) =>
@@ -139,6 +145,7 @@ public struct Settings : IEquatable<Settings> {
         other.FullScreenMode == FullScreenMode &&
         other.MaxFps == MaxFps &&
         other.Vsync == Vsync &&
+        other.Raytracing == Raytracing &&
         other.Stats.Equals(Stats);
 }
 

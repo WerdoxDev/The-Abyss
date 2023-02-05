@@ -18,8 +18,7 @@ public class GameManager : MonoBehaviour {
     [SerializeField] private InputReader inputReader;
     [SerializeField] private string tempUrl;
     [SerializeField] private bool autoSpawn;
-    [SerializeField]
-    private Color systemMessageColor;
+    [SerializeField] private Color systemMessageColor;
     private float _fpsTimer;
 
     public event Action<Player, bool> OnPlayerSpawned;
@@ -83,7 +82,8 @@ public class GameManager : MonoBehaviour {
         if (ClonesManager.IsClone()) {
             TheAbyssNetworkManager.Instance.Client(
                 new PlayerConnData(UIManager.Instance.PlayerName, UIManager.Instance.CustomizePanel.PlayerCustomization));
-        } else {
+        }
+        else {
             TheAbyssNetworkManager.Instance.Host(
                 new PlayerConnData(UIManager.Instance.PlayerName, UIManager.Instance.CustomizePanel.PlayerCustomization));
         }
@@ -174,7 +174,7 @@ public class GameManager : MonoBehaviour {
         }
 
         void PlayerDespawned(Player player, bool isOwner) {
-            if (NetworkManager.Singleton.IsServer && !isOwner) {
+            if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsServer && !isOwner) {
                 if (player.Data == null) return;
                 PlayerDataInfo dataInfo = player.Data.PlayerDataInfo.Value;
                 ChatManager.Instance.SendSystemMessageServerRpc(new ChatMessageInfo("[System]", dataInfo.DisplayName + " Left the game", systemMessageColor));
@@ -190,7 +190,8 @@ public class GameManager : MonoBehaviour {
         if (enabled) {
             OnPlayerSpawned += PlayerSpawned;
             OnPlayerDespawned += PlayerDespawned;
-        } else {
+        }
+        else {
             OnPlayerSpawned -= PlayerSpawned;
             OnPlayerDespawned -= PlayerDespawned;
         }

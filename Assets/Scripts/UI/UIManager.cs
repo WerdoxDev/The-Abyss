@@ -215,8 +215,7 @@ public class UIManager : MonoBehaviour {
             } else
             if (type == ButtonType.Chat) {
                 if (GameManager.Instance.PlayerObject == null) return;
-                if (_openedPanels.Count != 0) return;
-                Debug.Log("here???");
+                if (_openedPanels.Count != 0) return;                
 
                 if (!ChatManager.Instance.IsOpen) {
                     ChatManager.Instance.Open(true, false);
