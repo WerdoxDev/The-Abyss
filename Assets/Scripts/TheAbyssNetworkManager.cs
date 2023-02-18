@@ -34,7 +34,7 @@ public class TheAbyssNetworkManager : MonoBehaviour {
     public void Host(PlayerConnData playerData) {
         clientData = new Dictionary<ulong, PlayerConnData>();
 
-        if (playerData.PlayerCustomization.Equals(default(PlayerCustomizationInfo)))
+        if (playerData.PlayerCustomization.Equals(default))
             playerData.PlayerCustomization = PlayerCustomizationInfo.Default;
 
         NetworkManager.Singleton.NetworkConfig.ConnectionData = GetConnectionData(playerData);
@@ -44,7 +44,7 @@ public class TheAbyssNetworkManager : MonoBehaviour {
     }
 
     public void Client(PlayerConnData playerData) {
-        if (playerData.PlayerCustomization.Equals(default(PlayerCustomizationInfo)))
+        if (playerData.PlayerCustomization.Equals(default))
             playerData.PlayerCustomization = PlayerCustomizationInfo.Default;
 
         NetworkManager.Singleton.NetworkConfig.ConnectionData = GetConnectionData(playerData);

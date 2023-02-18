@@ -1,10 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.InputSystem;
-using UnityEngine.EventSystems;
 using System;
+using System.Linq;
+using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class Panel : MonoBehaviour {
     public PanelType Type = PanelType.Untyped;
@@ -12,7 +10,7 @@ public class Panel : MonoBehaviour {
     [SerializeField] private UITweener[] openTweeners;
     [SerializeField] private UITweener[] closeTweeners;
     [SerializeField] private CustomButton[] closeButtons;
-    [SerializeField] private CustomButton submitButton;
+    [SerializeField] private CustomButton[] submitButtons;
 
     public Selectable SelectableOnOpen;
     public Selectable SelectableOnClose;
@@ -69,7 +67,7 @@ public class Panel : MonoBehaviour {
             };
     }
 
-    public void Submit() => submitButton?.Submit();
+    public void Submit() => submitButtons.FirstOrDefault(x => x.gameObject.activeInHierarchy)?.Submit();
 
     public void Toggle() {
         if (IsOpen) Close();

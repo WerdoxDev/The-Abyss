@@ -1,9 +1,8 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.EventSystems;
-using System;
-using System.Linq;
-using System.Collections.Generic;
 
 public class UIManager : MonoBehaviour {
     public static UIManager Instance;
@@ -39,10 +38,10 @@ public class UIManager : MonoBehaviour {
     public event Action<string> OnPlayerNameChanged;
 
     private List<TabGroup> _tabGroups;
-    private List<Panel> _openedPanels = new List<Panel>();
     private CustomButton _enteredCustomButton;
     private AdvancedCustomButton _enteredAdvCustomButton;
-    private Dictionary<string, PlayerNamePanel> _playerNames = new Dictionary<string, PlayerNamePanel>();
+    private readonly List<Panel> _openedPanels = new();
+    private readonly Dictionary<string, PlayerNamePanel> _playerNames = new();
 
     private void Awake() {
         if (Instance == null) Instance = this;
@@ -68,7 +67,8 @@ public class UIManager : MonoBehaviour {
             if (profileTabGroup != null) {
                 _previewCamera.gameObject.SetActive(true);
                 // AddPlayerName(PlayerCustomization.transform, PlayerName, PlayerCustomization.NameOffset, true, _previewCamera, CustomizePanel.RawImageTransform);
-            } else {
+            }
+            else {
                 _previewCamera.gameObject.SetActive(false);
                 RemovePlayerName(PlayerName);
             }
@@ -86,7 +86,7 @@ public class UIManager : MonoBehaviour {
             GameManager.Instance.LockCursor();
         };
 
-        Action onMainMenuState = () => {
+        void OnMainMenuState() {
             MainFrame.SetActive(true);
             KeybindLegendGO.SetActive(true);
             StatsPanel.gameObject.SetActive(true);
@@ -105,9 +105,9 @@ public class UIManager : MonoBehaviour {
             ChangeTab(TabGroupIndex.Menu, "Home");
 
             GameManager.Instance.FreeCursor();
-        };
+        }
 
-        onMainMenuState();
+        OnMainMenuState();
 
         KeybindLegend.Instance.OnBackButtonClicked += () => InputReader.SendUIButtonEvent(UIButtonType.Cancel);
 
@@ -118,9 +118,10 @@ public class UIManager : MonoBehaviour {
                 JoinPanel.Close(true);
                 HostPanel.Close(true);
                 PausePanel.Panel.Close(true);
+                ChatManager.Instance.ClearChat();
             }
             if (state == GameState.InMainMenu) {
-                onMainMenuState();
+                OnMainMenuState();
             };
         };
 
@@ -177,7 +178,7 @@ public class UIManager : MonoBehaviour {
         if (rect == null) rect = RenderImage.rectTransform;
 
         Vector2 viewPos = camera.WorldToViewportPoint(worldPosition);
-        Vector2 localPos = new Vector2(viewPos.x * rect.sizeDelta.x, viewPos.y * rect.sizeDelta.y);
+        Vector2 localPos = new(viewPos.x * rect.sizeDelta.x, viewPos.y * rect.sizeDelta.y);
         Vector3 worldPos = rect.TransformPoint(localPos);
         float scalerRatio = (1 / this.transform.lossyScale.x) * 2;
 
@@ -212,15 +213,17 @@ public class UIManager : MonoBehaviour {
                 buttonPauseInvoked = true;
                 if (!GameManager.Instance.IsPlayerSpawned || GameManager.Instance.IsPaused || !PausePanel.Panel.FullyClosed) return;
                 GameManager.Instance.PauseGame();
-            } else
+            }
+            else
             if (type == ButtonType.Chat) {
                 if (GameManager.Instance.PlayerObject == null) return;
-                if (_openedPanels.Count != 0) return;                
+                if (_openedPanels.Count != 0) return;
 
                 if (!ChatManager.Instance.IsOpen) {
                     ChatManager.Instance.Open(true, false);
                     GameManager.Instance.FreeCursor();
-                } else {
+                }
+                else {
                     ChatManager.Instance.TrySendMessage();
                 }
             }
@@ -236,7 +239,7 @@ public class UIManager : MonoBehaviour {
                     return;
                 }
 
-                Panel openPanelOnTop = _openedPanels.Count == 0 ? null : _openedPanels[_openedPanels.Count - 1];
+                Panel openPanelOnTop = _openedPanels.Count == 0 ? null : _openedPanels[^1];
                 if (openPanelOnTop != null && openPanelOnTop.CloseOnCancel) {
                     if (openPanelOnTop == PausePanel.Panel) {
                         if (!PausePanel.IsMenuVisible()) PausePanel.ShowMenuPanel();
@@ -260,7 +263,7 @@ public class UIManager : MonoBehaviour {
                     return;
                 }
 
-                if (GetTabGroupByIndex(TabGroupIndex.Menu)?.ActiveTab?.name == "Home") { return; } // Prompt a exit confirm
+                if (GetTabGroupByIndex(TabGroupIndex.Menu).ActiveTab.name == "Home") { return; } // Prompt a exit confirm
                 ChangeTab(TabGroupIndex.Menu, "Home");
             }
             if (type == UIButtonType.Submit) {
@@ -280,7 +283,7 @@ public class UIManager : MonoBehaviour {
                     return;
                 }
 
-                Panel openPanelOnTop = _openedPanels.Count == 0 ? null : _openedPanels[_openedPanels.Count - 1];
+                Panel openPanelOnTop = _openedPanels.Count == 0 ? null : _openedPanels[^1];
                 if (openPanelOnTop != null) {
                     openPanelOnTop.Submit();
                     return;
@@ -289,18 +292,23 @@ public class UIManager : MonoBehaviour {
         }
 
         void OnChangeTab(int direction) {
+            if (InputNavigator.IsAnyInputSelected()) return;
             if (!GameManager.Instance.IsPaused && GameManager.Instance.GameState == GameState.InGame) return;
-            if (_openedPanels.Count != 0 && !JoinPanel.IsOpen) return;
-            TabGroupIndex groupIndex = JoinPanel.IsOpen ? TabGroupIndex.JoinPanel : TabGroupIndex.Menu;
-            if (direction == 1) GetTabGroupByIndex(groupIndex)?.SelectNextTab();
-            else if (direction == -1) GetTabGroupByIndex(groupIndex)?.SelectPreviousTab();
+            if (_openedPanels.Count != 0 && (!JoinPanel.IsOpen && !HostPanel.IsOpen)) return;
+
+            TabGroupIndex groupIndex = TabGroupIndex.Menu;
+            if (JoinPanel.IsOpen) groupIndex = TabGroupIndex.JoinPanel;
+            else if (HostPanel.IsOpen) groupIndex = TabGroupIndex.HostPanel;
+            if (direction == 1) GetTabGroupByIndex(groupIndex).SelectNextTab();
+            else if (direction == -1) GetTabGroupByIndex(groupIndex).SelectPreviousTab();
         }
 
         if (enabled) {
             InputReader.ButtonEvent += OnButtonEvent;
             InputReader.UIButtonEvent += OnUIButtonEvent;
             InputReader.UIChangeTabEvent += OnChangeTab;
-        } else {
+        }
+        else {
             InputReader.ButtonEvent -= OnButtonEvent;
             InputReader.UIButtonEvent -= OnUIButtonEvent;
             InputReader.UIChangeTabEvent -= OnChangeTab;
@@ -309,5 +317,5 @@ public class UIManager : MonoBehaviour {
 }
 
 public enum TabGroupIndex {
-    Menu, SettingsPanel, InGameSettingsPanel, JoinPanel, CustomizationPanel, ProfilePanel
+    Menu, SettingsPanel, InGameSettingsPanel, JoinPanel, HostPanel, CustomizationPanel, ProfilePanel
 }

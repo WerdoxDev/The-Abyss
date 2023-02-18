@@ -19,8 +19,8 @@ public class ChatManager : NetworkBehaviour {
     [SerializeField] private ScrollRect scrollRect;
     [SerializeField] private GameObject messagePrefab;
     [SerializeField] private float chatKeepAliveTime;
-    private List<ChatMessageInfo> _chatMessages = new List<ChatMessageInfo>();
-    private Dictionary<ulong, Color> _playersChatColor = new Dictionary<ulong, Color>();
+    private readonly List<ChatMessageInfo> _chatMessages = new();
+    private readonly Dictionary<ulong, Color> _playersChatColor = new();
     private float _timeSinceUnselected = -1;
 
     public bool IsOpen;
@@ -39,7 +39,7 @@ public class ChatManager : NetworkBehaviour {
             return;
         }
 
-        System.Random random = new System.Random();
+        System.Random random = new();
 
         GameManager.Instance.OnPlayerSpawned += (player, isOwner) => {
             Color[] availableColors = chatColors.ToList().FindAll(x => !_playersChatColor.Values.Contains(x)).ToArray();
@@ -68,7 +68,8 @@ public class ChatManager : NetworkBehaviour {
             panelOpenFadeTweener.SetOnceStartOffset(false);
             panelOpenFadeTweener.HandleTween();
             _timeSinceUnselected = -1;
-        } else {
+        }
+        else {
             panelOpenMoveTweener.HandleTween();
             panelOpenFadeTweener.HandleTween();
         }
@@ -76,7 +77,8 @@ public class ChatManager : NetworkBehaviour {
         if (selectInput) {
             EventSystem.current.SetSelectedGameObject(messageInputField.gameObject);
             GameManager.Instance.PlayerObject.DisableKeybinds();
-        } else _timeSinceUnselected = 0;
+        }
+        else _timeSinceUnselected = 0;
     }
 
     public void Close() {
@@ -110,10 +112,17 @@ public class ChatManager : NetworkBehaviour {
             GameManager.Instance.PlayerObject.EnableKeybinds();
             GameManager.Instance.LockCursor();
             _timeSinceUnselected = 0;
-        } else if (_chatMessages.Count == 0) Close();
+        }
+        else if (_chatMessages.Count == 0) Close();
         else Open(true, true);
 
         // Close();
+    }
+
+    public void ClearChat() {
+        foreach (Transform child in messageHolder) Destroy(child.gameObject);
+        _chatMessages.Clear();
+        _playersChatColor.Clear();
     }
 
     private void AddNewMessage(ChatMessageInfo messageInfo) {

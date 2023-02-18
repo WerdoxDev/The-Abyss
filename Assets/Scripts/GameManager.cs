@@ -18,7 +18,6 @@ public class GameManager : MonoBehaviour {
     [SerializeField] private InputReader inputReader;
     [SerializeField] private string tempUrl;
     [SerializeField] private bool autoSpawn;
-    [SerializeField] private Color systemMessageColor;
     private float _fpsTimer;
 
     public event Action<Player, bool> OnPlayerSpawned;
@@ -30,6 +29,7 @@ public class GameManager : MonoBehaviour {
     public event Action OnPause;
     public event Action OnResume;
 
+    public Color SystemMessageColor;
     public GameState GameState;
     public ulong PlayerNetworkId;
     public Player PlayerObject;
@@ -81,20 +81,22 @@ public class GameManager : MonoBehaviour {
         SetConnectionData(split[0], ushort.Parse(split[1]));
         if (ClonesManager.IsClone()) {
             TheAbyssNetworkManager.Instance.Client(
-                new PlayerConnData(UIManager.Instance.PlayerName, UIManager.Instance.CustomizePanel.PlayerCustomization));
+                new(UIManager.Instance.PlayerName, UIManager.Instance.CustomizePanel.PlayerCustomization));
         }
         else {
             TheAbyssNetworkManager.Instance.Host(
-                new PlayerConnData(UIManager.Instance.PlayerName, UIManager.Instance.CustomizePanel.PlayerCustomization));
+                new(UIManager.Instance.PlayerName, UIManager.Instance.CustomizePanel.PlayerCustomization));
         }
     }
 #endif
 
     private void Update() {
-        if (Time.unscaledTime > _fpsTimer) {
+        float timelapse = Time.smoothDeltaTime;
+        _fpsTimer = _fpsTimer <= 0 ? fpsInterval : _fpsTimer - timelapse;
+
+        if (_fpsTimer <= 0) {
             Fps = (int)(1f / Time.unscaledDeltaTime);
             OnFpsChanged?.Invoke(Fps);
-            _fpsTimer = Time.unscaledTime + fpsInterval;
         }
     }
 
@@ -158,7 +160,7 @@ public class GameManager : MonoBehaviour {
         void PlayerSpawned(Player player, bool isOwner) {
             if (NetworkManager.Singleton.IsServer) {
                 PlayerDataInfo dataInfo = player.Data.PlayerDataInfo.Value;
-                ChatManager.Instance.SendSystemMessageServerRpc(new ChatMessageInfo("[System]", dataInfo.DisplayName + " Joined the game", systemMessageColor));
+                ChatManager.Instance.SendSystemMessageServerRpc(new("[System]", dataInfo.DisplayName + " Joined the game", SystemMessageColor));
             }
 
             if (!isOwner) return;
@@ -177,7 +179,7 @@ public class GameManager : MonoBehaviour {
             if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsServer && !isOwner) {
                 if (player.Data == null) return;
                 PlayerDataInfo dataInfo = player.Data.PlayerDataInfo.Value;
-                ChatManager.Instance.SendSystemMessageServerRpc(new ChatMessageInfo("[System]", dataInfo.DisplayName + " Left the game", systemMessageColor));
+                ChatManager.Instance.SendSystemMessageServerRpc(new("[System]", dataInfo.DisplayName + " Left the game", SystemMessageColor));
             }
 
             if (!isOwner) return;

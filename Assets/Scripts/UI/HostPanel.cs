@@ -1,21 +1,48 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
 using TMPro;
-using Unity.Netcode;
+using Unity.Services.Relay.Models;
+using UnityEngine;
 
 public class HostPanel : MonoBehaviour {
-    [SerializeField] private CustomButton createButton;
+    [Header("Lobby Panel")]
+    [SerializeField] private CustomButton lobbyCreateButton;
     [SerializeField] private TMP_InputField lobbyNameInputField;
-    [SerializeField] private TMP_InputField hostIpInputField;
+    [SerializeField] private CustomButton maxPlayersIncrease;
+    [SerializeField] private CustomButton maxPlayersDecrease;
+    [SerializeField] private TMP_Text maxPlayersText;
+    private int maxPlayers = 4;
+
+    [Header("Custom Panel")]
+    [SerializeField] private CustomButton customCreateButton;
+    [SerializeField] private TMP_InputField ipAddressInputField;
+
     private void Awake() {
-        createButton.OnClick += () => {
-            string[] split = hostIpInputField.text.Split(":");
+        maxPlayersText.text = maxPlayers.ToString();
+        lobbyCreateButton.OnClick += async () => {
+            if (lobbyNameInputField.text == "") return;
+            (Allocation, string) relay = await Services.Instance.CreateRelay();
+
+            await Services.Instance.CreateLobby(lobbyNameInputField.text, maxPlayers, relay.Item1.Region, relay.Item2);
+        };
+
+        customCreateButton.OnClick += () => {
+            string[] split = ipAddressInputField.text.Split(":");
             if (split.Length != 2) return;
+
             GameManager.Instance.SetConnectionData(split[0], ushort.Parse(split[1]));
             TheAbyssNetworkManager.Instance.Host(
                 new PlayerConnData(UIManager.Instance.PlayerName, UIManager.Instance.CustomizePanel.PlayerCustomization));
+        };
+
+        maxPlayersIncrease.OnClick += () => {
+            if (maxPlayers >= 8) return;
+            maxPlayers++;
+            maxPlayersText.text = maxPlayers.ToString();
+        };
+
+        maxPlayersDecrease.OnClick += () => {
+            if (maxPlayers <= 2) return;
+            maxPlayers--;
+            maxPlayersText.text = maxPlayers.ToString();
         };
     }
 }
