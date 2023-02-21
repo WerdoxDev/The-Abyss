@@ -5,6 +5,8 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System.Linq;
 using System;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.HighDefinition;
 
 public class SettingsPanel : MonoBehaviour {
 
@@ -15,6 +17,7 @@ public class SettingsPanel : MonoBehaviour {
     [SerializeField] private CustomButton videoAdvancedButton;
     [SerializeField] private Selectable selectableOnPromptClose;
     [SerializeField] private ScrollRect scrollRect;
+    [SerializeField] private Volume volume;
 
     [Header("Basic Settings Options")]
     [SerializeField] private SettingsOption presetOption;
@@ -70,13 +73,13 @@ public class SettingsPanel : MonoBehaviour {
         SubscribeToChangeEvents();
 
         List<Resolution> resolutions = SettingsManager.Instance.SupportedResolutions;
-        List<Option> options = new List<Option>();
+        List<Option> options = new();
         for (int i = 0; i < resolutions.Count; i++) options.Add(new Option($"{resolutions[i].width}x{resolutions[i].height}", i));
 
         resolutionOption.SetOptions(options.ToArray());
         renderResolutionOption.SetOptions(options.ToArray());
 
-        raytracingSettings.SetActive(raytracing.options[raytracing.CurrentIndex].Value == 0);
+        raytracingSettings.SetActive(raytracing.options[raytracing.CurrentIndex].Value == 1);
     }
 
     private void SubscribeToChangeEvents() {
@@ -115,6 +118,11 @@ public class SettingsPanel : MonoBehaviour {
         raytracing.OnChanged += (option) => {
             SettingsManager.Instance.SetRaytracing(option.Value == 1);
             raytracingSettings.SetActive(option.Value == 1);
+            //VolumeProfile profile = volume.sharedProfile;
+            //if(profile.TryGet<VisualEnvironment>(out var visualEnv)) {
+            //    visualEnv.enabled
+            //    visualEnv.skyType = new NoInterpIntParameter(1);
+            //}
         };
     }
 
