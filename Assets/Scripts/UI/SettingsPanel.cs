@@ -1,12 +1,12 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.EventSystems;
-using System.Linq;
 using System;
-using UnityEngine.Rendering;
-using UnityEngine.Rendering.HighDefinition;
+using System.Collections.Generic;
+using TMPro;
+using Unity.Loading;
+using UnityEngine;
+using UnityEngine.Diagnostics;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
+using UUtils = UnityEngine.Diagnostics.Utils;
 
 public class SettingsPanel : MonoBehaviour {
 
@@ -17,7 +17,8 @@ public class SettingsPanel : MonoBehaviour {
     [SerializeField] private CustomButton videoAdvancedButton;
     [SerializeField] private Selectable selectableOnPromptClose;
     [SerializeField] private ScrollRect scrollRect;
-    [SerializeField] private Volume volume;
+    [SerializeField] private TMP_Text descriptionText;
+    //[SerializeField] private Volume volume;
 
     [Header("Basic Settings Options")]
     [SerializeField] private SettingsOption presetOption;
@@ -30,8 +31,25 @@ public class SettingsPanel : MonoBehaviour {
     [SerializeField] private SettingsOption showPingOption;
 
     [Header("Advanced Settings Options")]
-    [SerializeField] private SettingsOption raytracing;
+    [SerializeField] private SettingsOption bloomOption;
+    [SerializeField] private SettingsOption antiAliasingOption;
+    [SerializeField] private SettingsOption dlssOption;
+    [SerializeField] private SettingsOption waterOption;
+    [SerializeField] private SettingsOption shadowsOption;
+    [SerializeField] private SettingsOption volumetricFogOption;
+    [SerializeField] private SettingsOption volumetricCloudOption;
+    [SerializeField] private SettingsOption globalIlluminationOption;
+    [SerializeField] private SettingsOption ambientOcclusionOption;
+    [SerializeField] private SettingsOption reflectionOption;
+    [SerializeField] private SettingsOption raytracingGlobalIlluminationOption;
+    [SerializeField] private SettingsOption raytracingAmbientOcclusionOption;
+    [SerializeField] private SettingsOption raytracingReflectionOption;
+    [SerializeField] private SettingsOption raytracingOption;
+    [SerializeField] private SettingsOption raytracingShadowsOption;
     [SerializeField] private GameObject raytracingSettings;
+
+    private readonly List<RectTransform> _options = new();
+    private RectTransform _lastRect;
 
     private bool _isPromptOpen;
 
@@ -70,6 +88,9 @@ public class SettingsPanel : MonoBehaviour {
             SettingsManager.Instance.ApplyChanges();
         };
 
+        _options.Add(videoBasicButton.GetComponent<RectTransform>());
+        _options.Add(videoAdvancedButton.GetComponent<RectTransform>());
+
         SubscribeToChangeEvents();
 
         List<Resolution> resolutions = SettingsManager.Instance.SupportedResolutions;
@@ -79,7 +100,30 @@ public class SettingsPanel : MonoBehaviour {
         resolutionOption.SetOptions(options.ToArray());
         renderResolutionOption.SetOptions(options.ToArray());
 
-        raytracingSettings.SetActive(raytracing.options[raytracing.CurrentIndex].Value == 1);
+        raytracingSettings.SetActive(raytracingOption.Options[raytracingOption.CurrentIndex].Value == 1);
+    }
+
+    private void Update() {
+        foreach (RectTransform rect in _options) {
+            if (EventSystem.current.currentSelectedGameObject != rect.gameObject) continue;
+
+            float offset = ((rect.rect.height * rect.localScale.y));
+
+            float topPoint = scrollRect.viewport.position.y + (scrollRect.viewport.rect.height);
+            float bottomPoint = scrollRect.viewport.position.y - (scrollRect.viewport.rect.height);
+            if (rect.position.y > topPoint)
+                scrollRect.content.anchoredPosition += new Vector2(0, topPoint - (rect.position.y + offset)) / 2;
+            else if (rect.position.y < bottomPoint)
+                scrollRect.content.anchoredPosition -= new Vector2(0, (rect.position.y - offset) - bottomPoint) / 2;
+        }
+    }
+
+    public void AddOption(SettingsOption option) {
+        _options.Add(option.GetComponent<RectTransform>());
+    }
+
+    public void ShowSettingDescription(SettingsOption setting) {
+        descriptionText.text = setting.Description;
     }
 
     private void SubscribeToChangeEvents() {
@@ -95,35 +139,43 @@ public class SettingsPanel : MonoBehaviour {
             SettingsManager.Instance.SetRenderResolution(resolution.width, resolution.height);
         };
 
-        windowedOption.OnChanged += (option) => {
-            SettingsManager.Instance.SetWindowedMode(GetFullScreenModeFromValue(option.Value));
-        };
+        windowedOption.OnChanged += (option) => SettingsManager.Instance.SetWindowedMode(GetFullScreenModeFromValue(option.Value));
+        maxFpsOption.OnChanged += (option) => SettingsManager.Instance.SetMaxFps(option.Value);
+        vsyncOption.OnChanged += (option) => SettingsManager.Instance.SetVsync(option.Value == 1);
+        showFpsOption.OnChanged += (option) => SettingsManager.Instance.SetShowFps(option.Value == 1);
+        showPingOption.OnChanged += (option) => SettingsManager.Instance.SetShowPing(option.Value == 1);
+        bloomOption.OnChanged += (option) => SettingsManager.Instance.SetBloomQuality(option.Value);
+        antiAliasingOption.OnChanged += (option) => SettingsManager.Instance.SetAntiAliasingQuality(option.Value);
+        dlssOption.OnChanged += (option) => SettingsManager.Instance.SetDLSSQuality(option.Value);
+        waterOption.OnChanged += (option) => SettingsManager.Instance.SetWaterQuality(option.Value);
+        volumetricFogOption.OnChanged += (option) => SettingsManager.Instance.SetVolumetricFogQuality(option.Value);
+        volumetricCloudOption.OnChanged += (option) => SettingsManager.Instance.SetVolumetricCloudQuality(option.Value);
 
-        maxFpsOption.OnChanged += (option) => {
-            SettingsManager.Instance.SetMaxFps(option.Value);
-        };
-
-        vsyncOption.OnChanged += (option) => {
-            SettingsManager.Instance.SetVsync(option.Value == 1);
-        };
-
-        showFpsOption.OnChanged += (option) => {
-            SettingsManager.Instance.SetShowFps(option.Value == 1);
-        };
-
-        showPingOption.OnChanged += (option) => {
-            SettingsManager.Instance.SetShowPing(option.Value == 1);
-        };
-
-        raytracing.OnChanged += (option) => {
-            SettingsManager.Instance.SetRaytracing(option.Value == 1);
+        raytracingOption.OnChanged += (option) => {
+            SettingsManager.Instance.SetRaytracingEnabled(option.Value == 1);
             raytracingSettings.SetActive(option.Value == 1);
-            //VolumeProfile profile = volume.sharedProfile;
-            //if(profile.TryGet<VisualEnvironment>(out var visualEnv)) {
-            //    visualEnv.enabled
-            //    visualEnv.skyType = new NoInterpIntParameter(1);
-            //}
         };
+
+        Settings settings = SettingsManager.Instance.CurrentSettings;
+
+        shadowsOption.OnChanged += (option) =>
+           SettingsManager.Instance.SetShadowsQuality(option.Value, settings.RaytracingSettings.Shadows);
+        globalIlluminationOption.OnChanged += (option) =>
+            SettingsManager.Instance.SetGlobalIlluminationQuality(option.Value, settings.RaytracingSettings.GlobalIllumination);
+        ambientOcclusionOption.OnChanged += (option) =>
+            SettingsManager.Instance.SetAmbientOcclusionQuality(option.Value, settings.RaytracingSettings.AmbientOcclusion);
+        reflectionOption.OnChanged += (option) =>
+            SettingsManager.Instance.SetReflectionQuality(option.Value, settings.RaytracingSettings.Reflection);
+
+        raytracingShadowsOption.OnChanged += (option) =>
+           SettingsManager.Instance.SetShadowsQuality(settings.ShadowsQuality, option.Value == 1);
+        raytracingGlobalIlluminationOption.OnChanged += (option) =>
+            SettingsManager.Instance.SetGlobalIlluminationQuality(settings.GlobalIlluminationQuality, option.Value == 1);
+        raytracingAmbientOcclusionOption.OnChanged += (option) =>
+            SettingsManager.Instance.SetAmbientOcclusionQuality(settings.AmbientOcclusionQuality, option.Value == 1);
+        raytracingReflectionOption.OnChanged += (option) =>
+            SettingsManager.Instance.SetReflectionQuality(settings.ReflectionQuality, option.Value == 1);
+
     }
 
     private void ShowWarningPrompt() {
@@ -148,8 +200,22 @@ public class SettingsPanel : MonoBehaviour {
         vsyncOption.SelectOptionByValue(settings.Vsync ? 1 : 0);
         showFpsOption.SelectOptionByValue(settings.Stats.ShowFps == true ? 1 : 0);
         showPingOption.SelectOptionByValue(settings.Stats.ShowPing == true ? 1 : 0);
-        raytracing.SelectOptionByValue(settings.Raytracing == true ? 1 : 0);
-        if (settings.Raytracing == true) scrollRect.verticalNormalizedPosition = 1;
+        bloomOption.SelectOptionByValue(settings.BloomQuality);
+        antiAliasingOption.SelectOptionByValue(settings.AntiAliasingQuality);
+        dlssOption.SelectOptionByValue(settings.DLSSQuality);
+        waterOption.SelectOptionByValue(settings.WaterQuality);
+        shadowsOption.SelectOptionByValue(settings.ShadowsQuality);
+        volumetricFogOption.SelectOptionByValue(settings.VolumetricFogQuality);
+        volumetricCloudOption.SelectOptionByValue(settings.VolumetricCloudQuality);
+        globalIlluminationOption.SelectOptionByValue(settings.GlobalIlluminationQuality);
+        ambientOcclusionOption.SelectOptionByValue(settings.AmbientOcclusionQuality);
+        raytracingOption.SelectOptionByValue(settings.RaytracingSettings.Enabled == true ? 1 : 0);
+        reflectionOption.SelectOptionByValue(settings.ReflectionQuality);
+        raytracingGlobalIlluminationOption.SelectOptionByValue(settings.RaytracingSettings.GlobalIllumination == true ? 1 : 0);
+        raytracingAmbientOcclusionOption.SelectOptionByValue(settings.RaytracingSettings.AmbientOcclusion == true ? 1 : 0);
+        raytracingReflectionOption.SelectOptionByValue(settings.RaytracingSettings.Reflection == true ? 1 : 0);
+        raytracingShadowsOption.SelectOptionByValue(settings.RaytracingSettings.Shadows == true ? 1 : 0);
+        //if (settings.RaytracingSettings.Enabled == true) scrollRect.verticalNormalizedPosition = 1;
     }
 
     private int GetValueFromFullscreenMode(FullScreenMode mode) {
@@ -202,7 +268,6 @@ public class SettingsPanel : MonoBehaviour {
 
             if (!SettingsManager.Instance.IsDirty()) return;
             cancel?.Invoke();
-            Debug.Log(panel.Type);
 
             if (panel.Type == PanelType.InGameSettings) ShowWarningPrompt();
         }

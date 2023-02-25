@@ -19,7 +19,9 @@ public class AdvancedCustomButton : MonoBehaviour, IPointerClickHandler, IPointe
     private UITweener _tweener;
 
     public bool IsSelected;
-    public Action OnClick;
+
+    public event Action OnClick;
+    public event Action OnEnter;
 
     private void OnDisable() {
         if (resetOnDisable) {
@@ -51,6 +53,8 @@ public class AdvancedCustomButton : MonoBehaviour, IPointerClickHandler, IPointe
         if (setSelected) IsSelected = true;
 
         if (_tweener != null) _tweener.Lock();
+
+        OnEnter?.Invoke();
 
         for (int i = 0; i < graphics.Length; i++) {
             if (_lockedIndexes.Contains(i)) continue;

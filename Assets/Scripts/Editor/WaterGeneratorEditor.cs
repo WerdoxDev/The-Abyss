@@ -12,7 +12,7 @@ public class WaterGeneratorEditor : Editor
 
     private void OnEnable()
     {
-        _waterMeshes = serializedObject.FindProperty("waterMeshes");
+        _waterMeshes = serializedObject.FindProperty("WaterMeshes");
         _waterMaterial = serializedObject.FindProperty("waterMaterial");
         _size = serializedObject.FindProperty("size");
         _gridSize = serializedObject.FindProperty("gridSize");
@@ -29,7 +29,7 @@ public class WaterGeneratorEditor : Editor
         EditorGUILayout.PropertyField(_gridSize);
         serializedObject.ApplyModifiedProperties();
 
-        if (GUILayout.Button("Generate")) generator.GenerateWaters();
+        if (GUILayout.Button("Generate")) generator.GenerateWater();
     }
 }
 #endif

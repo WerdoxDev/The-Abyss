@@ -8,7 +8,9 @@ using TMPro;
 
 public class SettingsOption : MonoBehaviour {
     [Header("Settings")]
-    public Option[] options;
+    public Option[] Options;
+    [TextArea(3, 0)] public string Description;
+
     [SerializeField] private CustomButton nextButton;
     [SerializeField] private CustomButton previousButton;
     [SerializeField] private TMP_Text optionText;
@@ -16,9 +18,10 @@ public class SettingsOption : MonoBehaviour {
     [SerializeField] private GameObject indicatorPrefab;
     [SerializeField] private Color normalColor;
     [SerializeField] private Color selectedColor;
-    private List<Image> indicatorImages = new List<Image>();
+    private readonly List<Image> _indicatorImages = new();
     private SettingsPanel _settingsPanel;
     private AdvancedCustomButton _advancedButton;
+
     public int CurrentIndex { get; private set; }
 
     public event Action<Option> OnChanged;
@@ -26,6 +29,8 @@ public class SettingsOption : MonoBehaviour {
     private void Awake() {
         _settingsPanel = GetComponentInParent<SettingsPanel>();
         _advancedButton = GetComponent<AdvancedCustomButton>();
+
+        _settingsPanel.AddOption(this);
 
         nextButton.OnClick += () => NextOption();
         previousButton.OnClick += () => PreviousOption();
@@ -36,29 +41,33 @@ public class SettingsOption : MonoBehaviour {
             else if (direction == -1) PreviousOption();
         };
 
+        _advancedButton.OnEnter += () => {
+            _settingsPanel.ShowSettingDescription(this);
+        };
+
         CreateOptionIndicator();
     }
 
     public void SetOptions(Option[] options) {
-        this.options = options;
+        this.Options = options;
         CreateOptionIndicator();
     }
 
     public void SelectOptionByValue(int value) {
-        CurrentIndex = options.TakeWhile(x => x.Value != value).Count();
+        CurrentIndex = Options.TakeWhile(x => x.Value != value).Count();
         ShowSelectedOption();
     }
 
     private void CreateOptionIndicator() {
-        if (options.Length == 0) return;
+        if (Options.Length == 0) return;
 
         for (int i = 0; i < indicatorWrapper.childCount; i++)
             Destroy(indicatorWrapper.GetChild(i).gameObject);
 
-        indicatorImages.Clear();
-        for (int i = 0; i < options.Length; i++) {
+        _indicatorImages.Clear();
+        for (int i = 0; i < Options.Length; i++) {
             GameObject go = Instantiate(indicatorPrefab, Vector3.zero, Quaternion.identity, indicatorWrapper);
-            indicatorImages.Add(go.GetComponent<Image>());
+            _indicatorImages.Add(go.GetComponent<Image>());
         }
 
         ShowSelectedOption();
@@ -66,25 +75,24 @@ public class SettingsOption : MonoBehaviour {
 
     private void NextOption() {
         CurrentIndex++;
-        if (CurrentIndex == options.Length) CurrentIndex = 0;
-        // ShowSelectedOption();
-        OnChanged?.Invoke(options[CurrentIndex]);
+        if (CurrentIndex == Options.Length) CurrentIndex = 0;
+
+        OnChanged?.Invoke(Options[CurrentIndex]);
     }
 
     private void PreviousOption() {
         CurrentIndex--;
-        if (CurrentIndex < 0) CurrentIndex = options.Length - 1;
+        if (CurrentIndex < 0) CurrentIndex = Options.Length - 1;
 
-        // ShowSelectedOption();
-        OnChanged?.Invoke(options[CurrentIndex]);
+        OnChanged?.Invoke(Options[CurrentIndex]);
     }
 
     private void ShowSelectedOption() {
-        optionText.text = options[CurrentIndex].Text;
+        optionText.text = Options[CurrentIndex].Text;
 
-        for (int i = 0; i < indicatorImages.Count; i++) {
-            if (CurrentIndex != i) indicatorImages[i].color = normalColor;
-            else indicatorImages[i].color = selectedColor;
+        for (int i = 0; i < _indicatorImages.Count; i++) {
+            if (CurrentIndex != i) _indicatorImages[i].color = normalColor;
+            else _indicatorImages[i].color = selectedColor;
         }
     }
 }

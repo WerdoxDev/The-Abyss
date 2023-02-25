@@ -66,6 +66,7 @@ public class GameManager : MonoBehaviour {
             else if (name == "MainMenu") {
                 GameStateChanged(GameState.InMainMenu);
                 SettingsManager.Instance.CurrentCamera = Camera.main;
+                SettingsManager.Instance.CurrentWaterGenerator = FindObjectOfType<WaterGenerator>();
                 SettingsManager.Instance.ApplyChanges();
             }
         };
@@ -91,7 +92,7 @@ public class GameManager : MonoBehaviour {
 #endif
 
     private void Update() {
-        float timelapse = Time.smoothDeltaTime;
+        float timelapse = Time.deltaTime;
         _fpsTimer = _fpsTimer <= 0 ? fpsInterval : _fpsTimer - timelapse;
 
         if (_fpsTimer <= 0) {
@@ -172,6 +173,7 @@ public class GameManager : MonoBehaviour {
 
             // We need player object so do this on player spawn
             SettingsManager.Instance.CurrentCamera = player.CLCamera.Camera;
+            SettingsManager.Instance.CurrentWaterGenerator = FindObjectOfType<WaterGenerator>();
             SettingsManager.Instance.ApplyChanges();
         }
 
