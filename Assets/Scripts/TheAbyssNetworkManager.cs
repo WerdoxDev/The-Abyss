@@ -90,7 +90,7 @@ public class TheAbyssNetworkManager : MonoBehaviour {
         Vector3 spawnPos = Vector3.zero;
 
         if (approveConnection) {
-            spawnPos = new Vector3(0, 0, 0);
+            spawnPos = new Vector3(0, 3, 0);
             clientData.Add(request.ClientNetworkId, new PlayerConnData(connectionPayload.PlayerName, connectionPayload.PlayerCustomization));
         }
 

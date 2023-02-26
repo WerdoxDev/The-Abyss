@@ -13775,7 +13775,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2511092821557085914, guid: 4308f84f6deb89240a38a5af8c73e4fc, type: 3}
       propertyPath: Options.Array.size
-      value: 3
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 2511092821557085914, guid: 4308f84f6deb89240a38a5af8c73e4fc, type: 3}
       propertyPath: Options.Array.data[0].Text
@@ -13790,12 +13790,20 @@ PrefabInstance:
       value: HIGH
       objectReference: {fileID: 0}
     - target: {fileID: 2511092821557085914, guid: 4308f84f6deb89240a38a5af8c73e4fc, type: 3}
+      propertyPath: Options.Array.data[3].Text
+      value: ULTRA
+      objectReference: {fileID: 0}
+    - target: {fileID: 2511092821557085914, guid: 4308f84f6deb89240a38a5af8c73e4fc, type: 3}
       propertyPath: Options.Array.data[1].Value
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2511092821557085914, guid: 4308f84f6deb89240a38a5af8c73e4fc, type: 3}
       propertyPath: Options.Array.data[2].Value
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2511092821557085914, guid: 4308f84f6deb89240a38a5af8c73e4fc, type: 3}
+      propertyPath: Options.Array.data[3].Value
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 4305959657454065510, guid: 4308f84f6deb89240a38a5af8c73e4fc, type: 3}
       propertyPath: m_AnchorMax.y

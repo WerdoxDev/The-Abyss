@@ -156,25 +156,23 @@ public class SettingsPanel : MonoBehaviour {
             raytracingSettings.SetActive(option.Value == 1);
         };
 
-        Settings settings = SettingsManager.Instance.CurrentSettings;
+        shadowsOption.OnChanged += (option) => SettingsManager.Instance.
+           SetShadowsQuality(option.Value, SettingsManager.Instance.CurrentSettings.RaytracingSettings.Shadows);
+        globalIlluminationOption.OnChanged += (option) => SettingsManager.Instance.
+            SetGlobalIlluminationQuality(option.Value, SettingsManager.Instance.CurrentSettings.RaytracingSettings.GlobalIllumination);
+        ambientOcclusionOption.OnChanged += (option) => SettingsManager.Instance.
+            SetAmbientOcclusionQuality(option.Value, SettingsManager.Instance.CurrentSettings.RaytracingSettings.AmbientOcclusion);
+        reflectionOption.OnChanged += (option) => SettingsManager.Instance.
+            SetReflectionQuality(option.Value, SettingsManager.Instance.CurrentSettings.RaytracingSettings.Reflection);
 
-        shadowsOption.OnChanged += (option) =>
-           SettingsManager.Instance.SetShadowsQuality(option.Value, settings.RaytracingSettings.Shadows);
-        globalIlluminationOption.OnChanged += (option) =>
-            SettingsManager.Instance.SetGlobalIlluminationQuality(option.Value, settings.RaytracingSettings.GlobalIllumination);
-        ambientOcclusionOption.OnChanged += (option) =>
-            SettingsManager.Instance.SetAmbientOcclusionQuality(option.Value, settings.RaytracingSettings.AmbientOcclusion);
-        reflectionOption.OnChanged += (option) =>
-            SettingsManager.Instance.SetReflectionQuality(option.Value, settings.RaytracingSettings.Reflection);
-
-        raytracingShadowsOption.OnChanged += (option) =>
-           SettingsManager.Instance.SetShadowsQuality(settings.ShadowsQuality, option.Value == 1);
-        raytracingGlobalIlluminationOption.OnChanged += (option) =>
-            SettingsManager.Instance.SetGlobalIlluminationQuality(settings.GlobalIlluminationQuality, option.Value == 1);
-        raytracingAmbientOcclusionOption.OnChanged += (option) =>
-            SettingsManager.Instance.SetAmbientOcclusionQuality(settings.AmbientOcclusionQuality, option.Value == 1);
-        raytracingReflectionOption.OnChanged += (option) =>
-            SettingsManager.Instance.SetReflectionQuality(settings.ReflectionQuality, option.Value == 1);
+        raytracingShadowsOption.OnChanged += (option) => SettingsManager.Instance.
+           SetShadowsQuality(SettingsManager.Instance.CurrentSettings.ShadowsQuality, option.Value == 1);
+        raytracingGlobalIlluminationOption.OnChanged += (option) => SettingsManager.Instance.
+            SetGlobalIlluminationQuality(SettingsManager.Instance.CurrentSettings.GlobalIlluminationQuality, option.Value == 1);
+        raytracingAmbientOcclusionOption.OnChanged += (option) => SettingsManager.Instance.
+            SetAmbientOcclusionQuality(SettingsManager.Instance.CurrentSettings.AmbientOcclusionQuality, option.Value == 1);
+        raytracingReflectionOption.OnChanged += (option) => SettingsManager.Instance.
+            SetReflectionQuality(SettingsManager.Instance.CurrentSettings.ReflectionQuality, option.Value == 1);
 
     }
 
@@ -193,6 +191,7 @@ public class SettingsPanel : MonoBehaviour {
     }
 
     private void SetOptionsFromSettings(Settings settings) {
+        presetOption.SelectOptionByValue(settings.Preset);
         resolutionOption.SelectOptionByValue(GetResolutionIndex(settings.ScreenResolution));
         renderResolutionOption.SelectOptionByValue(GetResolutionIndex(settings.RenderResolution));
         windowedOption.SelectOptionByValue(GetValueFromFullscreenMode(settings.FullScreenMode));

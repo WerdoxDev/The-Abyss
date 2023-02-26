@@ -4,6 +4,7 @@ using System;
 using System.Linq;
 using UnityEngine.Rendering.HighDefinition;
 using UnityEngine.Rendering;
+using JetBrains.Annotations;
 
 public class SettingsManager : MonoBehaviour {
     public static SettingsManager Instance;
@@ -41,8 +42,55 @@ public class SettingsManager : MonoBehaviour {
 
     public bool IsDirty() => !CurrentSettings.Equals(LastSettings);
 
-    public void SetPreset(int value) {
-        //
+    public void SetPreset(int preset) {
+        CurrentSettings.Preset = preset;
+
+        if (preset == 0) {
+            CurrentSettings.BloomQuality = 0;
+            CurrentSettings.AntiAliasingQuality = 0;
+            CurrentSettings.WaterQuality = 0;
+            CurrentSettings.ShadowsQuality = 0;
+            CurrentSettings.VolumetricFogQuality = 0;
+            CurrentSettings.VolumetricCloudQuality = 0;
+            CurrentSettings.GlobalIlluminationQuality = 0;
+            CurrentSettings.AmbientOcclusionQuality = 0;
+            CurrentSettings.ReflectionQuality = 0;
+        }
+        else if (preset == 1) {
+            CurrentSettings.BloomQuality = 2;
+            CurrentSettings.AntiAliasingQuality = 2;
+            CurrentSettings.WaterQuality = 2;
+            CurrentSettings.ShadowsQuality = 2;
+            CurrentSettings.VolumetricFogQuality = 1;
+            CurrentSettings.VolumetricCloudQuality = 2;
+            CurrentSettings.GlobalIlluminationQuality = 1;
+            CurrentSettings.AmbientOcclusionQuality = 1;
+            CurrentSettings.ReflectionQuality = 2;
+        }
+        else if (preset == 2) {
+            CurrentSettings.BloomQuality = 3;
+            CurrentSettings.AntiAliasingQuality = 3;
+            CurrentSettings.WaterQuality = 2;
+            CurrentSettings.ShadowsQuality = 3;
+            CurrentSettings.VolumetricFogQuality = 2;
+            CurrentSettings.VolumetricCloudQuality = 3;
+            CurrentSettings.GlobalIlluminationQuality = 2;
+            CurrentSettings.AmbientOcclusionQuality = 2;
+            CurrentSettings.ReflectionQuality = 3;
+        }
+        else if (preset == 3) {
+            CurrentSettings.BloomQuality = 3;
+            CurrentSettings.AntiAliasingQuality = 3;
+            CurrentSettings.WaterQuality = 2;
+            CurrentSettings.ShadowsQuality = 3;
+            CurrentSettings.VolumetricFogQuality = 3;
+            CurrentSettings.VolumetricCloudQuality = 3;
+            CurrentSettings.GlobalIlluminationQuality = 3;
+            CurrentSettings.AmbientOcclusionQuality = 3;
+            CurrentSettings.ReflectionQuality = 3;
+        }
+
+        SettingsChanged();
     }
 
     public void SetResolution(int width, int height) {
@@ -310,16 +358,8 @@ public class SettingsManager : MonoBehaviour {
         CurrentSettings.FullScreenMode = FullScreenMode.Windowed;
         CurrentSettings.Vsync = true;
         CurrentSettings.MaxFps = 0;
-        CurrentSettings.BloomQuality = 3;
-        CurrentSettings.AntiAliasingQuality = 3;
         CurrentSettings.DLSSQuality = 0;
-        CurrentSettings.WaterQuality = 2;
-        CurrentSettings.ShadowsQuality = 3;
-        CurrentSettings.VolumetricFogQuality = 3;
-        CurrentSettings.VolumetricCloudQuality = 3;
-        CurrentSettings.GlobalIlluminationQuality = 3;
-        CurrentSettings.AmbientOcclusionQuality = 3;
-        CurrentSettings.ReflectionQuality = 3;
+        SetPreset(1);
         CurrentSettings.RaytracingSettings = new(false, false, false, false, false);
         CurrentSettings.Stats = new(false, false);
 
@@ -329,6 +369,7 @@ public class SettingsManager : MonoBehaviour {
 
 [Serializable]
 public struct Settings : IEquatable<Settings> {
+    public int Preset;
     public Vector2Int ScreenResolution;
     public Vector2Int RenderResolution;
     public FullScreenMode FullScreenMode;
@@ -348,6 +389,7 @@ public struct Settings : IEquatable<Settings> {
     public StatSettings Stats;
 
     public bool Equals(Settings other) =>
+        other.Preset == Preset &&
         other.ScreenResolution == ScreenResolution &&
         other.RenderResolution == RenderResolution &&
         other.FullScreenMode == FullScreenMode &&
