@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Netcode;
+using Unity.Services.Authentication;
+using Unity.Services.Core;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -9,16 +12,18 @@ public class UIManager : MonoBehaviour {
     public static UIManager Instance;
 
     [Header("UI")]
+    public StartPanel StartPanel;
     public Panel JoinPanel;
     public Panel HostPanel;
     public PausePanel PausePanel;
-    public Panel ChangeNamePanel;
+    public ChangeNamePanel ChangeNamePanel;
+    public LoadingPanel LoadingPanel;
     public StatsPanel StatsPanel;
     public ProfileCustomizePanel CustomizePanel;
     public InteractionPanel InteractionPanel;
     public GameObject ChatPanel;
     public GameObject KeybindLegendGO;
-    public GameObject MainFrame;
+    public GameObject MainPanel;
 
     [Header("Settings")]
     [SerializeField] private GameObject eventSystem;
@@ -57,6 +62,9 @@ public class UIManager : MonoBehaviour {
 
         SetInputState(true);
 
+        PlayerCustomization = GameObject.FindGameObjectWithTag("PreviewPlayer").GetComponent<PlayerCustomization>();
+        _previewCamera = GameObject.FindGameObjectWithTag("PreviewCamera").GetComponent<Camera>();
+
         OnTabChanged += (groupIndex, tab) => {
             if (PlayerCustomization == null) return;
 
@@ -87,20 +95,26 @@ public class UIManager : MonoBehaviour {
             GameManager.Instance.LockCursor();
         };
 
+        void OnStartState() {
+            StartPanel.Panel.Open();
+            MainPanel.SetActive(false);
+            ChatPanel.SetActive(false);
+            KeybindLegendGO.SetActive(false);
+        }
+
         void OnMainMenuState() {
-            MainFrame.SetActive(true);
+            MainPanel.SetActive(true);
             KeybindLegendGO.SetActive(true);
             StatsPanel.gameObject.SetActive(true);
             JoinPanel.Close(true);
             HostPanel.Close(true);
             PausePanel.Panel.Close(true);
             ChatPanel.SetActive(false);
+            LoadingPanel.Panel.Close(true);
 
             InteractionPanel.ClearTarget();
 
-            _previewCamera = GameObject.FindGameObjectWithTag("PreviewCamera").GetComponent<Camera>();
             _previewCamera.gameObject.SetActive(false);
-            PlayerCustomization = GameObject.FindGameObjectWithTag("PreviewPlayer").GetComponent<PlayerCustomization>();
 
             GameManager.Instance.IsPaused = false;
             ChangeTab(TabGroupIndex.Menu, "Home");
@@ -108,13 +122,14 @@ public class UIManager : MonoBehaviour {
             GameManager.Instance.FreeCursor();
         }
 
-        OnMainMenuState();
+        if (UnityServices.State == ServicesInitializationState.Initialized) OnMainMenuState();
+        else OnStartState();
 
         KeybindLegend.Instance.OnBackButtonClicked += () => InputReader.SendUIButtonEvent(UIButtonType.Cancel);
 
         GameManager.Instance.OnGameStateChanged += (state) => {
             if (state == GameState.InGame) {
-                MainFrame.SetActive(false);
+                MainPanel.SetActive(false);
                 KeybindLegendGO.SetActive(false);
                 JoinPanel.Close(true);
                 HostPanel.Close(true);

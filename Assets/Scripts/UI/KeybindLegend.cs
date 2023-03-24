@@ -25,7 +25,10 @@ public class KeybindLegend : MonoBehaviour {
         }
 
         applyButton.OnClick += () => OnApplyButtonClicked?.Invoke();
-        backButton.OnClick += () => OnBackButtonClicked?.Invoke();
+        backButton.OnClick += () => {
+            Debug.Log("Click");
+            OnBackButtonClicked?.Invoke();
+        };
 
         HideApplyButton();
     }

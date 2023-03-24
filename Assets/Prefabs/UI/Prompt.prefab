@@ -1100,19 +1100,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3ff1aa0afff4a146bed34641a32d6d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  closeOnDisable: 0
-  closeOnEscape: 1
+  Type: 0
   openTweeners:
   - {fileID: 7170146941171061736}
   closeTweeners:
   - {fileID: 7170146939866440269}
   closeButtons:
   - {fileID: 7170146941423390026}
-  submitButton: {fileID: 0}
+  submitButtons: []
   SelectableOnOpen: {fileID: 693414597143045481}
   SelectableOnClose: {fileID: 0}
-  FullyOpened: 0
-  IsOpen: 0
+  addPanelToManager: 1
+  disableTweenCheck: 1
+  CloseOnDisable: 0
+  CloseOnCancel: 1
 --- !u!114 &7170146940892268218
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1125,7 +1126,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c051c1c9d9d0610429e96fe7b1af74ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  order: 2
+  order: 3
 --- !u!114 &7170146940892268198
 MonoBehaviour:
   m_ObjectHideFlags: 0

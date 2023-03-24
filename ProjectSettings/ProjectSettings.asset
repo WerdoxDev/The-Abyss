@@ -134,7 +134,8 @@ PlayerSettings:
   vulkanEnableCommandBufferRecycling: 1
   loadStoreDebugModeEnabled: 0
   bundleVersion: 0.1.0
-  preloadedAssets: []
+  preloadedAssets:
+  - {fileID: 11400000, guid: c930f02053e2f054c89a022f6f637d7a, type: 2}
   metroInputSource: 0
   wsaTransparentSwapchain: 0
   m_HolographicPauseOnTrackingLoss: 1
@@ -244,6 +245,7 @@ PlayerSettings:
   useCustomLauncherGradleManifest: 0
   useCustomBaseGradleTemplate: 0
   useCustomGradlePropertiesTemplate: 0
+  useCustomGradleSettingsTemplate: 0
   useCustomProguardFile: 0
   AndroidTargetArchitectures: 1
   AndroidTargetDevices: 0
@@ -795,7 +797,23 @@ PlayerSettings:
   webGLMemoryGeometricGrowthStep: 0.2
   webGLMemoryGeometricGrowthCap: 96
   webGLPowerPreference: 2
-  scriptingDefineSymbols: {}
+  scriptingDefineSymbols:
+    Android: UNITY_MP_TOOLS_NETSIM_ENABLED_IN_RELEASE
+    EmbeddedLinux: UNITY_MP_TOOLS_NETSIM_ENABLED_IN_RELEASE
+    GameCoreScarlett: UNITY_MP_TOOLS_NETSIM_ENABLED_IN_RELEASE
+    GameCoreXboxOne: UNITY_MP_TOOLS_NETSIM_ENABLED_IN_RELEASE
+    LinuxHeadlessSimulation: UNITY_MP_TOOLS_NETSIM_ENABLED_IN_RELEASE
+    Nintendo Switch: UNITY_MP_TOOLS_NETSIM_ENABLED_IN_RELEASE
+    PS4: UNITY_MP_TOOLS_NETSIM_ENABLED_IN_RELEASE
+    PS5: UNITY_MP_TOOLS_NETSIM_ENABLED_IN_RELEASE
+    QNX: UNITY_MP_TOOLS_NETSIM_ENABLED_IN_RELEASE
+    Stadia: UNITY_MP_TOOLS_NETSIM_ENABLED_IN_RELEASE
+    Standalone: UNITY_MP_TOOLS_NETSIM_ENABLED_IN_RELEASE
+    WebGL: UNITY_MP_TOOLS_NETSIM_ENABLED_IN_RELEASE
+    Windows Store Apps: UNITY_MP_TOOLS_NETSIM_ENABLED_IN_RELEASE
+    XboxOne: UNITY_MP_TOOLS_NETSIM_ENABLED_IN_RELEASE
+    iPhone: UNITY_MP_TOOLS_NETSIM_ENABLED_IN_RELEASE
+    tvOS: UNITY_MP_TOOLS_NETSIM_ENABLED_IN_RELEASE
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend:

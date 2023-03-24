@@ -1,12 +1,9 @@
 using System;
 using System.Collections.Generic;
 using TMPro;
-using Unity.Loading;
 using UnityEngine;
-using UnityEngine.Diagnostics;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using UUtils = UnityEngine.Diagnostics.Utils;
 
 public class SettingsPanel : MonoBehaviour {
 
@@ -18,7 +15,7 @@ public class SettingsPanel : MonoBehaviour {
     [SerializeField] private Selectable selectableOnPromptClose;
     [SerializeField] private ScrollRect scrollRect;
     [SerializeField] private TMP_Text descriptionText;
-    //[SerializeField] private Volume volume;
+    [SerializeField] private int extraNavigationOffset = 0;
 
     [Header("Basic Settings Options")]
     [SerializeField] private SettingsOption presetOption;
@@ -34,7 +31,6 @@ public class SettingsPanel : MonoBehaviour {
     [SerializeField] private SettingsOption bloomOption;
     [SerializeField] private SettingsOption antiAliasingOption;
     [SerializeField] private SettingsOption dlssOption;
-    [SerializeField] private SettingsOption waterOption;
     [SerializeField] private SettingsOption shadowsOption;
     [SerializeField] private SettingsOption volumetricFogOption;
     [SerializeField] private SettingsOption volumetricCloudOption;
@@ -49,7 +45,6 @@ public class SettingsPanel : MonoBehaviour {
     [SerializeField] private GameObject raytracingSettings;
 
     private readonly List<RectTransform> _options = new();
-    private RectTransform _lastRect;
 
     private bool _isPromptOpen;
 
@@ -107,7 +102,7 @@ public class SettingsPanel : MonoBehaviour {
         foreach (RectTransform rect in _options) {
             if (EventSystem.current.currentSelectedGameObject != rect.gameObject) continue;
 
-            float offset = ((rect.rect.height * rect.localScale.y));
+            float offset = ((rect.rect.height * rect.localScale.y)) + extraNavigationOffset;
 
             float topPoint = scrollRect.viewport.position.y + (scrollRect.viewport.rect.height);
             float bottomPoint = scrollRect.viewport.position.y - (scrollRect.viewport.rect.height);
@@ -147,14 +142,9 @@ public class SettingsPanel : MonoBehaviour {
         bloomOption.OnChanged += (option) => SettingsManager.Instance.SetBloomQuality(option.Value);
         antiAliasingOption.OnChanged += (option) => SettingsManager.Instance.SetAntiAliasingQuality(option.Value);
         dlssOption.OnChanged += (option) => SettingsManager.Instance.SetDLSSQuality(option.Value);
-        waterOption.OnChanged += (option) => SettingsManager.Instance.SetWaterQuality(option.Value);
         volumetricFogOption.OnChanged += (option) => SettingsManager.Instance.SetVolumetricFogQuality(option.Value);
         volumetricCloudOption.OnChanged += (option) => SettingsManager.Instance.SetVolumetricCloudQuality(option.Value);
-
-        raytracingOption.OnChanged += (option) => {
-            SettingsManager.Instance.SetRaytracingEnabled(option.Value == 1);
-            raytracingSettings.SetActive(option.Value == 1);
-        };
+        raytracingOption.OnChanged += (option) => SettingsManager.Instance.SetRaytracingState(option.Value);
 
         shadowsOption.OnChanged += (option) => SettingsManager.Instance.
            SetShadowsQuality(option.Value, SettingsManager.Instance.CurrentSettings.RaytracingSettings.Shadows);
@@ -173,7 +163,6 @@ public class SettingsPanel : MonoBehaviour {
             SetAmbientOcclusionQuality(SettingsManager.Instance.CurrentSettings.AmbientOcclusionQuality, option.Value == 1);
         raytracingReflectionOption.OnChanged += (option) => SettingsManager.Instance.
             SetReflectionQuality(SettingsManager.Instance.CurrentSettings.ReflectionQuality, option.Value == 1);
-
     }
 
     private void ShowWarningPrompt() {
@@ -202,31 +191,30 @@ public class SettingsPanel : MonoBehaviour {
         bloomOption.SelectOptionByValue(settings.BloomQuality);
         antiAliasingOption.SelectOptionByValue(settings.AntiAliasingQuality);
         dlssOption.SelectOptionByValue(settings.DLSSQuality);
-        waterOption.SelectOptionByValue(settings.WaterQuality);
         shadowsOption.SelectOptionByValue(settings.ShadowsQuality);
         volumetricFogOption.SelectOptionByValue(settings.VolumetricFogQuality);
         volumetricCloudOption.SelectOptionByValue(settings.VolumetricCloudQuality);
         globalIlluminationOption.SelectOptionByValue(settings.GlobalIlluminationQuality);
         ambientOcclusionOption.SelectOptionByValue(settings.AmbientOcclusionQuality);
-        raytracingOption.SelectOptionByValue(settings.RaytracingSettings.Enabled == true ? 1 : 0);
+        raytracingOption.SelectOptionByValue(settings.RaytracingSettings.State);
         reflectionOption.SelectOptionByValue(settings.ReflectionQuality);
         raytracingGlobalIlluminationOption.SelectOptionByValue(settings.RaytracingSettings.GlobalIllumination == true ? 1 : 0);
         raytracingAmbientOcclusionOption.SelectOptionByValue(settings.RaytracingSettings.AmbientOcclusion == true ? 1 : 0);
         raytracingReflectionOption.SelectOptionByValue(settings.RaytracingSettings.Reflection == true ? 1 : 0);
         raytracingShadowsOption.SelectOptionByValue(settings.RaytracingSettings.Shadows == true ? 1 : 0);
-        //if (settings.RaytracingSettings.Enabled == true) scrollRect.verticalNormalizedPosition = 1;
+        raytracingSettings.SetActive(settings.RaytracingSettings.State == 1);
     }
 
     private int GetValueFromFullscreenMode(FullScreenMode mode) {
         return mode == FullScreenMode.ExclusiveFullScreen ? 0 :
             mode == FullScreenMode.FullScreenWindow ? 1 :
-            mode == FullScreenMode.MaximizedWindow ? 2 : 2;
+            mode == FullScreenMode.Windowed ? 2 : 2;
     }
 
     private FullScreenMode GetFullScreenModeFromValue(int value) {
         return value == 0 ? FullScreenMode.ExclusiveFullScreen :
             value == 1 ? FullScreenMode.FullScreenWindow :
-            value == 2 ? FullScreenMode.MaximizedWindow : FullScreenMode.MaximizedWindow;
+            value == 2 ? FullScreenMode.Windowed : FullScreenMode.Windowed;
     }
 
     private int GetResolutionIndex(Vector2 resolution) {
@@ -270,7 +258,6 @@ public class SettingsPanel : MonoBehaviour {
 
             if (panel.Type == PanelType.InGameSettings) ShowWarningPrompt();
         }
-
 
         if (enabled) {
             UIManager.Instance.OnChangeTabAttempt += TabAttempt;

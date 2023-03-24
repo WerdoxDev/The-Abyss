@@ -27,7 +27,7 @@ public class Services : MonoBehaviour {
         }
     }
 
-    private async void Start() {
+    public async Task<bool> Initialize() {
         await UnityServices.InitializeAsync();
 
         AuthenticationService.Instance.SignedIn += () => {
@@ -42,6 +42,8 @@ public class Services : MonoBehaviour {
 #endif
 
         await AuthenticationService.Instance.SignInAnonymouslyAsync();
+
+        return AuthenticationService.Instance.IsAuthorized;
     }
 
     public async Task<Lobby> CreateLobby(string lobbyName, int maxPlayers, string region, string relayCode) {
@@ -122,14 +124,14 @@ public class Services : MonoBehaviour {
     }
 
     public async Task<Lobby[]> GetLobbies() {
-        try {
-            QueryResponse queryResponse = await Lobbies.Instance.QueryLobbiesAsync();
+        //try {
+        QueryResponse queryResponse = await Lobbies.Instance.QueryLobbiesAsync();
 
-            return queryResponse.Results.ToArray();
-        }
-        catch (LobbyServiceException e) {
-            Debug.Log(e);
-            return null;
-        }
+        return queryResponse.Results.ToArray();
+        //}
+        //catch (LobbyServiceException e) {
+        //    Debug.Log(e);
+        //    return null;
+        //}
     }
 }

@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Rendering.HighDefinition;
 
 public class Floater : MonoBehaviour {
     [SerializeField] private Rigidbody rb;
@@ -18,15 +19,15 @@ public class Floater : MonoBehaviour {
         if (ApplyGravity)
             rb.AddForceAtPosition(Physics.gravity / floaterCount, transform.position, ForceMode.Acceleration);
 
-        if (WaveManager.Instance == null) return;
-        float waveHeight = WaveManager.Instance.GetWaveHeight(transform.position.x, transform.position.z);
+        if (WaterManager.Instance == null) return;
+        float waveHeight = WaterManager.Instance.GetWaveHeight(transform.position);
         InWater = transform.position.y <= waveHeight;
 
         if (InWater) {
             float displacementMultiplier = Mathf.Clamp01((waveHeight - transform.position.y) / depthBeforeSubmerged) * displacementAmount;
             rb.AddForceAtPosition(new Vector3(0f, Mathf.Abs(Physics.gravity.y / floaterCount) * displacementMultiplier, 0f), transform.position, ForceMode.Acceleration);
-            rb.AddForce(displacementMultiplier * -rb.velocity * waterDrag * Time.fixedDeltaTime, ForceMode.VelocityChange);
-            rb.AddTorque(displacementMultiplier * -rb.angularVelocity * waterAngularDrag * Time.fixedDeltaTime, ForceMode.VelocityChange);
+            rb.AddForce(displacementMultiplier * Time.fixedDeltaTime * waterDrag * -rb.velocity, ForceMode.VelocityChange);
+            rb.AddTorque(displacementMultiplier * Time.fixedDeltaTime * waterAngularDrag * -rb.angularVelocity, ForceMode.VelocityChange);
         }
     }
 }

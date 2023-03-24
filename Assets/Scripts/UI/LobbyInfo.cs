@@ -2,8 +2,7 @@ using TMPro;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
 
-public class LobbyInfo : MonoBehaviour
-{
+public class LobbyInfo : MonoBehaviour {
     [SerializeField] private TMP_Text nameText;
     [SerializeField] private TMP_Text playersText;
     [SerializeField] private TMP_Text statusText;
@@ -15,6 +14,7 @@ public class LobbyInfo : MonoBehaviour
         joinButton.OnClick += async () => {
             Lobby lobby = await Services.Instance.JoinLobby(lobbyId);
             string relayCode = lobby.Data["RelayCode"].Value;
+            UIManager.Instance.LoadingPanel.OpenJoinLoading($"{lobby.Name}");
             Services.Instance.JoinRelay(relayCode);
         };
     }

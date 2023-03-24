@@ -113,9 +113,9 @@ public class ServerPlayerMovement : NetworkBehaviour {
             _yVelocity = 0;
             _currentSize = groundSize;
         } else {
-            _rb.velocity += _moveDirection.normalized * _currentSpeed * airMultiplier;
+            _rb.velocity += _currentSpeed * airMultiplier * _moveDirection.normalized;
 
-            float waveHeight = WaveManager.Instance.GetWaveHeight(transform.position.x, transform.position.z);
+            float waveHeight = WaterManager.Instance.GetWaveHeight(transform.position);
             float distance = Mathf.Abs(transform.position.y - waveHeight);
             if ((transform.position.y <= waveHeight || distance <= allowedDistanceToWave) && UseFloater && _player.CurrentShip == null) {
                 ApplyGravity = false;

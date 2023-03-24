@@ -9,7 +9,7 @@ public class ProfileOverviewPanel : MonoBehaviour {
 
     private void Awake() {
         usernameText.text = UIManager.Instance.PlayerName;
-        changeUsernameButton.OnClick += () => UIManager.Instance.ChangeNamePanel.Open();
+        changeUsernameButton.OnClick += () => UIManager.Instance.ChangeNamePanel.Panel.Open();
         UIManager.Instance.OnPlayerNameChanged += (username) => usernameText.text = username;
     }
 }

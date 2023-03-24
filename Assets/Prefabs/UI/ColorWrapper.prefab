@@ -144,6 +144,7 @@ MonoBehaviour:
   resetOnDisable: 1
   lockIfParentExists: 1
   IsSelected: 0
+  IsDisabled: 0
 --- !u!114 &2092808848
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -300,6 +301,7 @@ MonoBehaviour:
   resetOnDisable: 1
   lockIfParentExists: 1
   IsSelected: 0
+  IsDisabled: 0
 --- !u!114 &296586113
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -456,6 +458,7 @@ MonoBehaviour:
   resetOnDisable: 1
   lockIfParentExists: 1
   IsSelected: 0
+  IsDisabled: 0
 --- !u!114 &1724325525
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -564,7 +567,7 @@ MonoBehaviour:
   m_ChildAlignment: 0
   fitType: 4
   spacing: {x: 5, y: 5}
-  cellSize: {x: 27.5, y: 27.5}
+  cellSize: {x: -5.5, y: 27.5}
   rows: 2
   columns: 10
   fitX: 1
@@ -713,6 +716,7 @@ MonoBehaviour:
   resetOnDisable: 1
   lockIfParentExists: 1
   IsSelected: 0
+  IsDisabled: 0
 --- !u!114 &594457323
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -950,6 +954,7 @@ MonoBehaviour:
   resetOnDisable: 1
   lockIfParentExists: 1
   IsSelected: 0
+  IsDisabled: 0
 --- !u!114 &481327741
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1048,7 +1053,7 @@ MonoBehaviour:
   onValueChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_IsOn: 1
+  m_IsOn: 0
 --- !u!114 &8897468497097421246
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1289,6 +1294,7 @@ MonoBehaviour:
   resetOnDisable: 1
   lockIfParentExists: 1
   IsSelected: 0
+  IsDisabled: 0
 --- !u!114 &825803950
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1445,6 +1451,7 @@ MonoBehaviour:
   resetOnDisable: 1
   lockIfParentExists: 1
   IsSelected: 0
+  IsDisabled: 0
 --- !u!114 &2028670141
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1601,6 +1608,7 @@ MonoBehaviour:
   resetOnDisable: 1
   lockIfParentExists: 1
   IsSelected: 0
+  IsDisabled: 0
 --- !u!114 &848701405
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1757,6 +1765,7 @@ MonoBehaviour:
   resetOnDisable: 1
   lockIfParentExists: 1
   IsSelected: 0
+  IsDisabled: 0
 --- !u!114 &1916975794
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1913,6 +1922,7 @@ MonoBehaviour:
   resetOnDisable: 1
   lockIfParentExists: 1
   IsSelected: 0
+  IsDisabled: 0
 --- !u!114 &776237275
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2069,6 +2079,7 @@ MonoBehaviour:
   resetOnDisable: 1
   lockIfParentExists: 1
   IsSelected: 0
+  IsDisabled: 0
 --- !u!114 &1269181066
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2381,6 +2392,7 @@ MonoBehaviour:
   resetOnDisable: 1
   lockIfParentExists: 1
   IsSelected: 0
+  IsDisabled: 0
 --- !u!114 &1804081657
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2771,6 +2783,7 @@ MonoBehaviour:
   resetOnDisable: 1
   lockIfParentExists: 1
   IsSelected: 0
+  IsDisabled: 0
 --- !u!114 &1797616070
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2927,6 +2940,7 @@ MonoBehaviour:
   resetOnDisable: 1
   lockIfParentExists: 1
   IsSelected: 0
+  IsDisabled: 0
 --- !u!114 &2067801245
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3083,6 +3097,7 @@ MonoBehaviour:
   resetOnDisable: 1
   lockIfParentExists: 1
   IsSelected: 0
+  IsDisabled: 0
 --- !u!114 &1720401240
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3239,6 +3254,7 @@ MonoBehaviour:
   resetOnDisable: 1
   lockIfParentExists: 1
   IsSelected: 0
+  IsDisabled: 0
 --- !u!114 &153692090
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3551,6 +3567,7 @@ MonoBehaviour:
   resetOnDisable: 1
   lockIfParentExists: 1
   IsSelected: 0
+  IsDisabled: 0
 --- !u!114 &1076530927
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3707,6 +3724,7 @@ MonoBehaviour:
   resetOnDisable: 1
   lockIfParentExists: 1
   IsSelected: 0
+  IsDisabled: 0
 --- !u!114 &514127659
 MonoBehaviour:
   m_ObjectHideFlags: 0

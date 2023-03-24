@@ -7,6 +7,8 @@ public class ChangeNamePanel : MonoBehaviour {
     [SerializeField] private CustomButton saveButton;
     [SerializeField] private TMP_InputField usernameInputField;
 
+    public Panel Panel;
+
     private void OnEnable() {
         usernameInputField.text = UIManager.Instance.PlayerName;
     }
@@ -14,7 +16,14 @@ public class ChangeNamePanel : MonoBehaviour {
     private void Awake() {
         saveButton.OnClick += () => {
             UIManager.Instance.PlayerNameChanged(usernameInputField.text);
-            GetComponent<Panel>().Close();
+            Panel.Close();
         };
+    }
+
+    public void SetFromData(ProfileData profile) {
+        usernameInputField.text = profile.PlayerName;
+        UIManager.Instance.PlayerNameChanged(usernameInputField.text);
+
+        UIManager.Instance.CustomizePanel.SaveToFile();
     }
 }

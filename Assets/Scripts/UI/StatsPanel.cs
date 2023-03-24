@@ -13,11 +13,12 @@ public class StatsPanel : MonoBehaviour {
     private bool _pingVisible = true;
 
     private void Awake() {
-        GameManager.Instance.OnFpsChanged += (fps) => fpsText.text = "FPS:  " + fps;
-        GameManager.Instance.OnPingChanged += (ping) => pingText.text = "LATENCY:  " + ping + " MS";
+        NetworkStats.Instance.OnFpsChanged += (fps) => fpsText.text = "FPS:  " + fps;
+        NetworkStats.Instance.OnPingChanged += (ping) => pingText.text = "LATENCY:  " + ping + " MS";
         GameManager.Instance.OnGameStateChanged += (state) => {
             SetPingVisibility(_pingVisible && state == GameState.InGame);
         };
+        //
 
         fpsText.text = "FPS:  0";
         pingText.text = "LATENCY:  0 MS";

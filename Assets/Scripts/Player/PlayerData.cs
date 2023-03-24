@@ -5,7 +5,7 @@ using Unity.Netcode;
 using Unity.Collections;
 
 public class PlayerData : NetworkBehaviour {
-    public NetworkVariable<PlayerDataInfo> PlayerDataInfo = new NetworkVariable<PlayerDataInfo>();
+    public NetworkVariable<PlayerDataInfo> PlayerDataInfo = new();
 
     private PlayerCustomization _playerCustomization;
     private Player _player;
@@ -28,7 +28,8 @@ public class PlayerData : NetworkBehaviour {
             if (playerData.HasValue)
                 PlayerDataInfo.Value = new PlayerDataInfo(playerData.Value.PlayerName, playerData.Value.PlayerCustomization);
 
-        } else {
+        }
+        else {
             _playerCustomization.UpdatePlayer(PlayerDataInfo.Value.DisplayName.ToString(), PlayerDataInfo.Value.Customization);
             UIManager.Instance.AddPlayerName(transform, PlayerDataInfo.Value.DisplayName.ToString(), _playerCustomization.NameOffset);
         }

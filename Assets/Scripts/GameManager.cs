@@ -13,7 +13,6 @@ public class GameManager : MonoBehaviour {
     public static GameManager Instance;
 
     [Header("Settings")]
-    [SerializeField] private float pingInterval;
     [SerializeField] private float fpsInterval;
     [SerializeField] private InputReader inputReader;
     [SerializeField] private string tempUrl;
@@ -22,8 +21,6 @@ public class GameManager : MonoBehaviour {
 
     public event Action<Player, bool> OnPlayerSpawned;
     public event Action<Player, bool> OnPlayerDespawned;
-    public event Action<int> OnPingChanged;
-    public event Action<int> OnFpsChanged;
     public event Action<string> OnSceneChanged;
     public event Action<GameState> OnGameStateChanged;
     public event Action OnPause;
@@ -35,9 +32,6 @@ public class GameManager : MonoBehaviour {
     public Player PlayerObject;
     public bool IsPlayerSpawned;
     public bool IsPaused;
-
-    public int Ping { get; private set; }
-    public int Fps { get; private set; }
 
     private void OnDestroy() {
         SetInternalEventsState(false);
@@ -58,7 +52,7 @@ public class GameManager : MonoBehaviour {
         SetInternalEventsState(true);
 
         OnSceneChanged += (name) => {
-            if (name == "Water") {
+            if (name == "Game") {
                 GameStateChanged(GameState.InGame);
             }
 
@@ -90,16 +84,6 @@ public class GameManager : MonoBehaviour {
         }
     }
 #endif
-
-    private void Update() {
-        float timelapse = Time.deltaTime;
-        _fpsTimer = _fpsTimer <= 0 ? fpsInterval : _fpsTimer - timelapse;
-
-        if (_fpsTimer <= 0) {
-            Fps = (int)(1f / Time.unscaledDeltaTime);
-            OnFpsChanged?.Invoke(Fps);
-        }
-    }
 
     public void LockCursor() {
         Cursor.lockState = CursorLockMode.Locked;
@@ -144,19 +128,6 @@ public class GameManager : MonoBehaviour {
 
     public PlayerDataInfo GetPlayerDataInfo() => PlayerObject.Data.PlayerDataInfo.Value;
 
-    private IEnumerator CheckPingEnumerator(float intervalSeconds) {
-        // UnityTransport transport = NetworkManager.Singleton.GetComponent<UnityTransport>();
-        while (true) {
-            if (NetworkManager.Singleton != null && NetworkManager.Singleton.NetworkTickSystem != null) {
-                float actualPing = (NetworkManager.Singleton.LocalTime.TimeAsFloat - NetworkManager.Singleton.ServerTime.TimeAsFloat) * 100;
-                actualPing -= 1 / NetworkManager.Singleton.NetworkTickSystem.TickRate;
-                Ping = Mathf.FloorToInt(actualPing);
-                OnPingChanged?.Invoke(Ping);
-            }
-            yield return new WaitForSeconds(intervalSeconds);
-        }
-    }
-
     private void SetInternalEventsState(bool enabled) {
         void PlayerSpawned(Player player, bool isOwner) {
             if (NetworkManager.Singleton.IsServer) {
@@ -169,7 +140,6 @@ public class GameManager : MonoBehaviour {
             IsPlayerSpawned = true;
             PlayerNetworkId = player.OwnerClientId;
             StopAllCoroutines();
-            StartCoroutine(CheckPingEnumerator(pingInterval));
 
             // We need player object so do this on player spawn
             SettingsManager.Instance.CurrentCamera = player.CLCamera.Camera;
@@ -204,5 +174,6 @@ public class GameManager : MonoBehaviour {
 
 public enum GameState {
     InMainMenu,
-    InGame
+    InGame,
+    InStart
 }

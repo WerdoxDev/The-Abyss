@@ -84,6 +84,7 @@ MonoBehaviour:
   resetOnDisable: 0
   lockIfParentExists: 1
   IsSelected: 0
+  IsDisabled: 0
 --- !u!1 &7287911362851004108
 GameObject:
   m_ObjectHideFlags: 0
@@ -168,6 +169,7 @@ MonoBehaviour:
   resetOnDisable: 0
   lockIfParentExists: 1
   IsSelected: 0
+  IsDisabled: 0
 --- !u!1 &7287911363018128057
 GameObject:
   m_ObjectHideFlags: 0
@@ -777,6 +779,8 @@ MonoBehaviour:
   duration: 0.125
   scaleTween: 1
   resetOnDisable: 1
+  IsSelected: 0
+  IsDisabled: 0
 --- !u!114 &2511092821557085914
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -789,20 +793,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab88019d8f8863a42ab8e5bdb8a9c2d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  options:
-  - Text: Low
-    Value: 0
-  - Text: Medium
-    Value: 1
-  - Text: High
-    Value: 2
+  Options: []
+  Description: 
   nextButton: {fileID: 7287911362838717680}
   previousButton: {fileID: 7287911362851004105}
   optionText: {fileID: 7287911364554395605}
   indicatorWrapper: {fileID: 3000220334848651510}
   indicatorPrefab: {fileID: 2955549535488971322, guid: 3b891a9801ab2bb498e90249323d5d30, type: 3}
+  advancedButton: {fileID: 2629044431974307968}
   normalColor: {r: 0.23529412, g: 0.3882353, b: 0.50980395, a: 1}
   selectedColor: {r: 0.21960784, g: 0.6784314, b: 0.6627451, a: 1}
+  disabledColor: {r: 1, g: 1, b: 1, a: 0.2509804}
+  enabledColor: {r: 1, g: 1, b: 1, a: 1}
+  IsDisabled: 0
 --- !u!1 &7287911364453446688
 GameObject:
   m_ObjectHideFlags: 0

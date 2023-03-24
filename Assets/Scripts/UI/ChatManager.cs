@@ -1,13 +1,12 @@
-using System.Collections;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using TMPro;
+using Unity.Collections;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using Unity.Netcode;
-using Unity.Collections;
-using TMPro;
 
 public class ChatManager : NetworkBehaviour {
     public static ChatManager Instance;
@@ -22,6 +21,7 @@ public class ChatManager : NetworkBehaviour {
     private readonly List<ChatMessageInfo> _chatMessages = new();
     private readonly Dictionary<ulong, Color> _playersChatColor = new();
     private float _timeSinceUnselected = -1;
+    private bool _messageSentWhileOpen = false;
 
     public bool IsOpen;
 
@@ -72,6 +72,7 @@ public class ChatManager : NetworkBehaviour {
         else {
             panelOpenMoveTweener.HandleTween();
             panelOpenFadeTweener.HandleTween();
+            _messageSentWhileOpen = false;
         }
 
         if (selectInput) {
@@ -101,19 +102,25 @@ public class ChatManager : NetworkBehaviour {
                 messageInputField.text.Trim(), Color.black));
 
             messageInputField.text = "";
-            messageInputField.ActivateInputField();
+            _messageSentWhileOpen = true;
+            //messageInputField.ActivateInputField();
+            //return;
+            //EventSystem.current.SetSelectedGameObject(null);
+            //GameManager.Instance.PlayerObject.EnableKeybinds();
+            //GameManager.Instance.LockCursor();
+            //_timeSinceUnselected = 0;
+        }
+        else if (!_messageSentWhileOpen) {
+            Close();
             return;
         }
 
-        // if (IsOpen)
-        //     Open(true, true);
-        if (_chatMessages.Count != 0 && _timeSinceUnselected == -1) {
+        if (_timeSinceUnselected == -1) {
             EventSystem.current.SetSelectedGameObject(null);
             GameManager.Instance.PlayerObject.EnableKeybinds();
             GameManager.Instance.LockCursor();
             _timeSinceUnselected = 0;
         }
-        else if (_chatMessages.Count == 0) Close();
         else Open(true, true);
 
         // Close();
@@ -132,7 +139,10 @@ public class ChatManager : NetworkBehaviour {
         message.SetMessage(messageInfo);
         scrollRect.verticalNormalizedPosition = 0;
 
-        if (!IsOpen) Open(false, false);
+        if (!IsOpen) {
+            Open(false, false);
+            _messageSentWhileOpen = true;
+        }
     }
 
     [ServerRpc(RequireOwnership = false)]

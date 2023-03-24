@@ -1,9 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEditor;
 using UnityEngine.UI;
-using UnityEngine.EventSystems;
 
 public class CustomSelectable : Selectable {
     [SerializeField] private Selectable[] selectablesOnUp;
@@ -24,7 +20,7 @@ public class CustomSelectable : Selectable {
     private Selectable GetActiveSelectable(Selectable[] selectables) {
         Selectable activeSelectable = null;
         foreach (Selectable selectable in selectables) {
-            if (selectable.gameObject.activeInHierarchy) {
+            if (selectable.gameObject.activeInHierarchy && selectable.interactable) {
                 activeSelectable = selectable;
                 break;
             }

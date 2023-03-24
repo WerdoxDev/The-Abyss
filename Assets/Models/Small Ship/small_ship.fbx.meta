@@ -1,61 +1,11 @@
 fileFormatVersion: 2
-guid: 4d68cfcd4b59e4c4ebc1d56eed4253e4
+guid: 731ce5abf701cea40ae853252731518f
 ModelImporter:
-  serializedVersion: 22103
+  serializedVersion: 22200
   internalIDToNameTable: []
-  externalObjects:
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: palette
-    second: {fileID: 2100000, guid: 405c2b6544a03544e96eb885b3e5e086, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: palette.001
-    second: {fileID: 2100000, guid: fb7b67e3fe80e9f4892d3fbaaf0ff79f, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: palette.002
-    second: {fileID: 2100000, guid: 9686b1305678a2d44b907177c5a97e88, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: palette.003
-    second: {fileID: 2100000, guid: 3f17e66a36f15b84292b7ffeacbab79e, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: palette.004
-    second: {fileID: 2100000, guid: bb9d4875bdb78eb46b69ee63e73db5e2, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: palette.005
-    second: {fileID: 2100000, guid: 29875679769c0be4a8ebc2bbe23d5773, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: palette.006
-    second: {fileID: 2100000, guid: 4708e61cc77cee849a07f81655061f39, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: palette.007
-    second: {fileID: 2100000, guid: 6b39acfaf41050f42a85d3107855901e, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: palette.008
-    second: {fileID: 2100000, guid: 2af1e0975e6039f4988be48c14dfa2d4, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: palette.009
-    second: {fileID: 2100000, guid: 24ecacb06201a30439e285811ac97d1d, type: 2}
+  externalObjects: {}
   materials:
-    materialImportMode: 0
+    materialImportMode: 2
     materialName: 0
     materialSearch: 1
     materialLocation: 1
@@ -127,7 +77,7 @@ ModelImporter:
     blendShapeNormalImportMode: 1
     normalSmoothingSource: 0
   referencedClips: []
-  importAnimation: 0
+  importAnimation: 1
   humanDescription:
     serializedVersion: 3
     human: []
@@ -142,11 +92,11 @@ ModelImporter:
     globalScale: 1
     rootMotionBoneName: 
     hasTranslationDoF: 0
-    hasExtraRoot: 1
+    hasExtraRoot: 0
     skeletonHasParents: 1
   lastHumanDescriptionAvatarSource: {instanceID: 0}
   autoGenerateAvatarMappingIfUnspecified: 1
-  animationType: 0
+  animationType: 2
   humanoidOversampling: 1
   avatarSetup: 0
   addHumanoidExtraRootOnlyWhenUsingAvatar: 1

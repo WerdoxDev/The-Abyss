@@ -1,10 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
 
 public class SettingsOption : MonoBehaviour {
     [Header("Settings")]
@@ -18,11 +17,15 @@ public class SettingsOption : MonoBehaviour {
     [SerializeField] private GameObject indicatorPrefab;
     [SerializeField] private Color normalColor;
     [SerializeField] private Color selectedColor;
+    [SerializeField] private Color disabledColor;
+    [SerializeField] private Color enabledColor;
     private readonly List<Image> _indicatorImages = new();
     private SettingsPanel _settingsPanel;
     private AdvancedCustomButton _advancedButton;
 
     public int CurrentIndex { get; private set; }
+
+    public bool IsDisabled;
 
     public event Action<Option> OnChanged;
 
@@ -49,13 +52,41 @@ public class SettingsOption : MonoBehaviour {
     }
 
     public void SetOptions(Option[] options) {
-        this.Options = options;
+        Options = options;
         CreateOptionIndicator();
     }
 
     public void SelectOptionByValue(int value) {
-        CurrentIndex = Options.TakeWhile(x => x.Value != value).Count();
+        if (value == -1) {
+            if (!IsDisabled) SetDisabled(true);
+            CurrentIndex = 0;
+        }
+        else {
+            if (IsDisabled) SetDisabled(false);
+            CurrentIndex = Options.TakeWhile(x => x.Value != value).Count();
+        }
+
         ShowSelectedOption();
+    }
+
+    public void SetDisabled(bool disabled) {
+        IsDisabled = disabled;
+        if (IsDisabled) {
+            GetComponent<Image>().color = disabledColor;
+            GetComponent<Selectable>().interactable = false;
+            if (_advancedButton == null) _advancedButton = GetComponent<AdvancedCustomButton>();
+            _advancedButton.IsDisabled = true;
+            nextButton.IsDisabled = true;
+            previousButton.IsDisabled = true;
+        }
+        else {
+            GetComponent<Image>().color = enabledColor;
+            GetComponent<Selectable>().interactable = true;
+            if (_advancedButton == null) _advancedButton = GetComponent<AdvancedCustomButton>();
+            _advancedButton.IsDisabled = false;
+            nextButton.IsDisabled = false;
+            previousButton.IsDisabled = false;
+        }
     }
 
     private void CreateOptionIndicator() {

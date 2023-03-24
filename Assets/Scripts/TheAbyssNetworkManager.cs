@@ -12,7 +12,14 @@ public class TheAbyssNetworkManager : MonoBehaviour {
 
     [SerializeField] private GameObject playerPrefab;
 
-    private Dictionary<ulong, PlayerConnData> clientData;
+    private Dictionary<ulong, PlayerConnData> _clientData;
+
+    public event Action<ulong> OnLocalClientConnected;
+    public event Action OnClientConnectionStarted;
+    public event Action OnHostConnectionStarted;
+    public event Action<bool> OnClientDisconnected;
+
+    private bool _wasConnected;
 
     private void Awake() {
         if (Instance == null) Instance = this;
@@ -32,15 +39,16 @@ public class TheAbyssNetworkManager : MonoBehaviour {
     }
 
     public void Host(PlayerConnData playerData) {
-        clientData = new Dictionary<ulong, PlayerConnData>();
+        _clientData = new Dictionary<ulong, PlayerConnData>();
 
         if (playerData.PlayerCustomization.Equals(default))
             playerData.PlayerCustomization = PlayerCustomizationInfo.Default;
 
         NetworkManager.Singleton.NetworkConfig.ConnectionData = GetConnectionData(playerData);
+        OnHostConnectionStarted?.Invoke();
         NetworkManager.Singleton.StartHost();
         NetworkManager.Singleton.SceneManager.OnLoadComplete += HandleSceneLoadComplete;
-        NetworkManager.Singleton.SceneManager.LoadScene("Water", LoadSceneMode.Single);
+        NetworkManager.Singleton.SceneManager.LoadScene("Game", LoadSceneMode.Single);
     }
 
     public void Client(PlayerConnData playerData) {
@@ -48,6 +56,7 @@ public class TheAbyssNetworkManager : MonoBehaviour {
             playerData.PlayerCustomization = PlayerCustomizationInfo.Default;
 
         NetworkManager.Singleton.NetworkConfig.ConnectionData = GetConnectionData(playerData);
+        OnClientConnectionStarted?.Invoke();
         NetworkManager.Singleton.StartClient();
     }
 
@@ -55,7 +64,8 @@ public class TheAbyssNetworkManager : MonoBehaviour {
         NetworkManager.Singleton.Shutdown();
         NetworkManager.Singleton.SceneManager.OnLoadComplete -= HandleSceneLoadComplete;
 
-        SceneManager.LoadScene("MainMenu", LoadSceneMode.Single);
+        if (_wasConnected) SceneManager.LoadScene("MainMenu", LoadSceneMode.Single);
+        _wasConnected = false;
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode) {
@@ -65,19 +75,22 @@ public class TheAbyssNetworkManager : MonoBehaviour {
     private void HandleClientConnected(ulong clientId) {
         // Are we the client?
         if (clientId == NetworkManager.Singleton.LocalClientId) {
-            //
+            OnLocalClientConnected?.Invoke(clientId);
+            _wasConnected = true;
         }
     }
 
     private void HandleClientDisconnected(ulong clientId) {
-        if (NetworkManager.Singleton.IsServer) clientData.Remove(clientId);
+        if (NetworkManager.Singleton.IsServer) _clientData.Remove(clientId);
         else if (!NetworkManager.Singleton.IsHost) Disconnect();
+
+        OnClientDisconnected?.Invoke(_wasConnected);
+        _wasConnected = false;
     }
 
     private void HandleSceneLoadComplete(ulong clientId, string sceneName, LoadSceneMode loadSceneMode) {
         GameObject player = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity);
         player.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId);
-        // NetworkManager.Singleton.PrefabHandler;?\
     }
 
     private void ApprovalCheck(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response) {
@@ -91,7 +104,7 @@ public class TheAbyssNetworkManager : MonoBehaviour {
 
         if (approveConnection) {
             spawnPos = new Vector3(0, 3, 0);
-            clientData.Add(request.ClientNetworkId, new PlayerConnData(connectionPayload.PlayerName, connectionPayload.PlayerCustomization));
+            _clientData.Add(request.ClientNetworkId, new PlayerConnData(connectionPayload.PlayerName, connectionPayload.PlayerCustomization));
         }
 
         response.CreatePlayerObject = false;
@@ -110,7 +123,7 @@ public class TheAbyssNetworkManager : MonoBehaviour {
     }
 
     public PlayerConnData? GetPlayerData(ulong clientId) {
-        if (clientData.TryGetValue(clientId, out PlayerConnData playerData)) return playerData;
+        if (_clientData.TryGetValue(clientId, out PlayerConnData playerData)) return playerData;
         return null;
     }
 }

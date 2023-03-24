@@ -488,17 +488,6 @@
                     "isPartOfComposite": false
                 },
                 {
-                    "name": "",
-                    "id": "9a96a654-40a8-44cc-8487-9782e30a7087",
-                    "path": "<Keyboard>/space",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Submit",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
                     "name": "Keyboard",
                     "id": "b1053b26-1a91-463d-aea4-f19a3cc82961",
                     "path": "1DAxis",

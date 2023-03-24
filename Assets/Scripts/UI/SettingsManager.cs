@@ -1,10 +1,9 @@
-using System.Collections.Generic;
-using UnityEngine;
 using System;
+using System.Collections.Generic;
 using System.Linq;
-using UnityEngine.Rendering.HighDefinition;
+using UnityEngine;
 using UnityEngine.Rendering;
-using JetBrains.Annotations;
+using UnityEngine.Rendering.HighDefinition;
 
 public class SettingsManager : MonoBehaviour {
     public static SettingsManager Instance;
@@ -16,6 +15,7 @@ public class SettingsManager : MonoBehaviour {
     [SerializeField] private VolumeProfile gameVolumeProfile;
     [SerializeField] private VolumeProfile menuSkyProfile;
     [SerializeField] private VolumeProfile gameSkyProfile;
+    [SerializeField] private int defaultPreset = 1;
 
     public WaterGenerator CurrentWaterGenerator;
     public Camera CurrentCamera;
@@ -36,8 +36,6 @@ public class SettingsManager : MonoBehaviour {
         }
 
         SupportedResolutions = Screen.resolutions.Select(resolution => new Resolution { width = resolution.width, height = resolution.height }).Distinct().ToList();
-
-        ApplyDefaultSettings();
     }
 
     public bool IsDirty() => !CurrentSettings.Equals(LastSettings);
@@ -48,7 +46,6 @@ public class SettingsManager : MonoBehaviour {
         if (preset == 0) {
             CurrentSettings.BloomQuality = 0;
             CurrentSettings.AntiAliasingQuality = 0;
-            CurrentSettings.WaterQuality = 0;
             CurrentSettings.ShadowsQuality = 0;
             CurrentSettings.VolumetricFogQuality = 0;
             CurrentSettings.VolumetricCloudQuality = 0;
@@ -59,7 +56,6 @@ public class SettingsManager : MonoBehaviour {
         else if (preset == 1) {
             CurrentSettings.BloomQuality = 2;
             CurrentSettings.AntiAliasingQuality = 2;
-            CurrentSettings.WaterQuality = 2;
             CurrentSettings.ShadowsQuality = 2;
             CurrentSettings.VolumetricFogQuality = 1;
             CurrentSettings.VolumetricCloudQuality = 2;
@@ -70,7 +66,6 @@ public class SettingsManager : MonoBehaviour {
         else if (preset == 2) {
             CurrentSettings.BloomQuality = 3;
             CurrentSettings.AntiAliasingQuality = 3;
-            CurrentSettings.WaterQuality = 2;
             CurrentSettings.ShadowsQuality = 3;
             CurrentSettings.VolumetricFogQuality = 2;
             CurrentSettings.VolumetricCloudQuality = 3;
@@ -81,7 +76,6 @@ public class SettingsManager : MonoBehaviour {
         else if (preset == 3) {
             CurrentSettings.BloomQuality = 3;
             CurrentSettings.AntiAliasingQuality = 3;
-            CurrentSettings.WaterQuality = 2;
             CurrentSettings.ShadowsQuality = 3;
             CurrentSettings.VolumetricFogQuality = 3;
             CurrentSettings.VolumetricCloudQuality = 3;
@@ -133,7 +127,6 @@ public class SettingsManager : MonoBehaviour {
         SettingsChanged();
     }
 
-
     public void SetBloomQuality(int bloomQuality) {
         CurrentSettings.BloomQuality = bloomQuality;
         SettingsChanged();
@@ -146,11 +139,8 @@ public class SettingsManager : MonoBehaviour {
 
     public void SetDLSSQuality(int dlssQuality) {
         CurrentSettings.DLSSQuality = dlssQuality;
-        SettingsChanged();
-    }
-
-    public void SetWaterQuality(int waterQuality) {
-        CurrentSettings.WaterQuality = waterQuality;
+        if (dlssQuality != 0) CurrentSettings.AntiAliasingQuality = -1;
+        else CurrentSettings.AntiAliasingQuality = 0;
         SettingsChanged();
     }
 
@@ -164,8 +154,11 @@ public class SettingsManager : MonoBehaviour {
         SettingsChanged();
     }
 
-    public void SetRaytracingEnabled(bool raytracing) {
-        CurrentSettings.RaytracingSettings.Enabled = raytracing;
+    public void SetRaytracingState(int state) {
+        CurrentSettings.RaytracingSettings.State = state;
+
+        if (state == 0 && CurrentSettings.ShadowsQuality == -1) CurrentSettings.ShadowsQuality = 0;
+        else if (state == 1 && CurrentSettings.RaytracingSettings.Shadows) CurrentSettings.ShadowsQuality = -1;
         SettingsChanged();
     }
 
@@ -189,7 +182,9 @@ public class SettingsManager : MonoBehaviour {
 
     public void SetShadowsQuality(int shadowsQuality, bool raytracing) {
         CurrentSettings.RaytracingSettings.Shadows = raytracing;
-        CurrentSettings.ShadowsQuality = shadowsQuality;
+
+        if (raytracing) CurrentSettings.ShadowsQuality = -1;
+        else CurrentSettings.ShadowsQuality = shadowsQuality == -1 ? 0 : shadowsQuality;
         SettingsChanged();
     }
 
@@ -198,7 +193,21 @@ public class SettingsManager : MonoBehaviour {
         SettingsChanged();
     }
 
+    public void SetSettings(Settings settings) {
+        Debug.Log("Loaded");
+        CurrentSettings = settings;
+        ApplyChanges();
+    }
+
     public void ApplyChanges() {
+        if (!SystemInfo.supportsRayTracing)
+            CurrentSettings.RaytracingSettings.State = -1;
+        else if (CurrentSettings.RaytracingSettings.State == -1) CurrentSettings.RaytracingSettings.State = 0;
+
+        if (!HDDynamicResolutionPlatformCapabilities.DLSSDetected)
+            CurrentSettings.DLSSQuality = -1;
+        else if (CurrentSettings.DLSSQuality == -1) CurrentSettings.DLSSQuality = 0;
+
         Screen.SetResolution(CurrentSettings.ScreenResolution.x, CurrentSettings.ScreenResolution.y, CurrentSettings.FullScreenMode);
 
         if (CurrentCamera?.targetTexture != null) CurrentCamera.targetTexture.Release();
@@ -212,7 +221,7 @@ public class SettingsManager : MonoBehaviour {
 
         if (CurrentSettings.Vsync) CurrentSettings.MaxFps = 0;
         QualitySettings.vSyncCount = CurrentSettings.Vsync ? 1 : 0;
-        // Max fps option has a off that feeds -1 which is basically no fps limit
+        // Max fps option has a off that needs -1 which is basically no fps limit
         Application.targetFrameRate = CurrentSettings.MaxFps;
 
         UIManager.Instance.StatsPanel.SetFpsVisibility(CurrentSettings.Stats.ShowFps);
@@ -242,30 +251,16 @@ public class SettingsManager : MonoBehaviour {
         else if (CurrentSettings.DLSSQuality == 3) cameraData.deepLearningSuperSamplingQuality = 2;
         else if (CurrentSettings.DLSSQuality == 4) cameraData.deepLearningSuperSamplingQuality = 3;
 
-        if (GameManager.Instance.GameState == GameState.InMainMenu) {
-            CurrentWaterGenerator.WaterMeshes = new() { new(0, 0) };
-            if (CurrentSettings.WaterQuality == 0) CurrentWaterGenerator.WaterMeshes[0].Resolution = 25;
-            else if (CurrentSettings.WaterQuality == 1) CurrentWaterGenerator.WaterMeshes[0].Resolution = 35;
-            else if (CurrentSettings.WaterQuality == 2) CurrentWaterGenerator.WaterMeshes[0].Resolution = 50;
-        }
-        else {
-            if (CurrentSettings.WaterQuality == 0)
-                CurrentWaterGenerator.WaterMeshes = new() { new(15, 0.3f), new(5, 0.15f), new(1, 0) };
-            else if (CurrentSettings.WaterQuality == 1)
-                CurrentWaterGenerator.WaterMeshes = new() { new(25, 0.3f), new(15, 0.15f), new(5, 0.0375f), new(1, 0) };
-            else if (CurrentSettings.WaterQuality == 2)
-                CurrentWaterGenerator.WaterMeshes = new() { new(35, 0.3f), new(25, 0.15f), new(15, 0.0375f), new(5, 0.01875f), new(1, 0) };
-        }
-
-        CurrentWaterGenerator.GenerateWater();
-
         foreach (HDAdditionalLightData lightData in FindObjectsOfType<HDAdditionalLightData>()) {
-            lightData.useRayTracedShadows = CurrentSettings.RaytracingSettings.Enabled && CurrentSettings.RaytracingSettings.Shadows;
-            lightData.rayTraceContactShadow = CurrentSettings.RaytracingSettings.Enabled && CurrentSettings.RaytracingSettings.Shadows;
+            lightData.useRayTracedShadows = CurrentSettings.RaytracingSettings.State == 1 && CurrentSettings.RaytracingSettings.Shadows;
+            lightData.rayTraceContactShadow = CurrentSettings.RaytracingSettings.State == 1 && CurrentSettings.RaytracingSettings.Shadows;
             lightData.numRayTracingSamples = 6;
 
-            if (!CurrentSettings.RaytracingSettings.Enabled || !CurrentSettings.RaytracingSettings.Shadows) {
-                lightData.EnableShadows(CurrentSettings.ShadowsQuality != 0);
+            lightData.EnableShadows(CurrentSettings.ShadowsQuality != 0 ||
+                (CurrentSettings.RaytracingSettings.State == 1 && CurrentSettings.RaytracingSettings.Shadows));
+
+            if (CurrentSettings.RaytracingSettings.State == 1 || !CurrentSettings.RaytracingSettings.Shadows) {
+                lightData.useContactShadow.level = CurrentSettings.ShadowsQuality == 0 ? 0 : 2;
                 lightData.SetShadowResolutionOverride(true);
                 if (CurrentSettings.ShadowsQuality == 1) lightData.SetShadowResolution(256);
                 else if (CurrentSettings.ShadowsQuality == 2) lightData.SetShadowResolution(1024);
@@ -301,7 +296,7 @@ public class SettingsManager : MonoBehaviour {
 
         menuGl.tracing.value = gameGl.tracing.value =
             CurrentSettings.RaytracingSettings.GlobalIllumination &&
-            CurrentSettings.RaytracingSettings.Enabled ? RayCastingMode.RayTracing : RayCastingMode.RayMarching;
+            CurrentSettings.RaytracingSettings.State == 1 ? RayCastingMode.RayTracing : RayCastingMode.RayMarching;
 
         menuGl.mode.value = gameGl.mode.value = RayTracingMode.Performance;
 
@@ -315,12 +310,11 @@ public class SettingsManager : MonoBehaviour {
         menuAmbient.active = gameAmbient.active = CurrentSettings.AmbientOcclusionQuality != 0;
 
         menuAmbient.rayTracing.value = gameAmbient.rayTracing.value =
-            CurrentSettings.RaytracingSettings.AmbientOcclusion && CurrentSettings.RaytracingSettings.Enabled;
+            CurrentSettings.RaytracingSettings.AmbientOcclusion && CurrentSettings.RaytracingSettings.State == 1;
 
         if (CurrentSettings.AmbientOcclusionQuality == 1) menuAmbient.quality.value = gameAmbient.quality.value = 0;
         else if (CurrentSettings.AmbientOcclusionQuality == 2) menuAmbient.quality.value = gameAmbient.quality.value = 1;
         else if (CurrentSettings.AmbientOcclusionQuality == 3) menuAmbient.quality.value = gameAmbient.quality.value = 2;
-
 
         menuSkyProfile.TryGet<ScreenSpaceReflection>(out var menuReflection);
         gameSkyProfile.TryGet<ScreenSpaceReflection>(out var gameReflection);
@@ -330,7 +324,7 @@ public class SettingsManager : MonoBehaviour {
 
         menuReflection.tracing.value = gameReflection.tracing.value =
             CurrentSettings.RaytracingSettings.Reflection &&
-            CurrentSettings.RaytracingSettings.Enabled ? RayCastingMode.RayTracing : RayCastingMode.RayMarching;
+            CurrentSettings.RaytracingSettings.State == 1 ? RayCastingMode.RayTracing : RayCastingMode.RayMarching;
 
         menuReflection.mode.value = gameReflection.mode.value = RayTracingMode.Performance;
 
@@ -340,6 +334,8 @@ public class SettingsManager : MonoBehaviour {
 
         LastSettings = CurrentSettings;
         SettingsChanged();
+
+        SaveManager.SaveSettings(CurrentSettings);
     }
 
     public void RevertChanges() {
@@ -351,16 +347,16 @@ public class SettingsManager : MonoBehaviour {
         OnSettingsChanged?.Invoke(CurrentSettings, !CurrentSettings.Equals(LastSettings));
     }
 
-    private void ApplyDefaultSettings() {
+    public void ApplyDefaultSettings() {
         Resolution highestResolution = SupportedResolutions.OrderBy(x => x.width).Last();
         CurrentSettings.ScreenResolution = new Vector2Int(highestResolution.width, highestResolution.height);
         CurrentSettings.RenderResolution = new Vector2Int(highestResolution.width, highestResolution.height);
-        CurrentSettings.FullScreenMode = FullScreenMode.Windowed;
-        CurrentSettings.Vsync = true;
+        CurrentSettings.FullScreenMode = FullScreenMode.ExclusiveFullScreen;
+        CurrentSettings.Vsync = false;
         CurrentSettings.MaxFps = 0;
         CurrentSettings.DLSSQuality = 0;
-        SetPreset(1);
-        CurrentSettings.RaytracingSettings = new(false, false, false, false, false);
+        SetPreset(defaultPreset);
+        CurrentSettings.RaytracingSettings = new(0, false, false, false, false);
         CurrentSettings.Stats = new(false, false);
 
         ApplyChanges();
@@ -378,7 +374,6 @@ public struct Settings : IEquatable<Settings> {
     public int BloomQuality;
     public int AntiAliasingQuality;
     public int DLSSQuality;
-    public int WaterQuality;
     public int ShadowsQuality;
     public int VolumetricFogQuality;
     public int VolumetricCloudQuality;
@@ -398,7 +393,6 @@ public struct Settings : IEquatable<Settings> {
         other.BloomQuality == BloomQuality &&
         other.AntiAliasingQuality == AntiAliasingQuality &&
         other.DLSSQuality == DLSSQuality &&
-        other.WaterQuality == WaterQuality &&
         other.ShadowsQuality == ShadowsQuality &&
         other.VolumetricFogQuality == VolumetricFogQuality &&
         other.VolumetricCloudQuality == VolumetricCloudQuality &&
@@ -409,6 +403,7 @@ public struct Settings : IEquatable<Settings> {
         other.Stats.Equals(Stats);
 }
 
+[Serializable]
 public struct StatSettings : IEquatable<StatSettings> {
     public bool ShowFps;
     public bool ShowPing;
@@ -422,15 +417,16 @@ public struct StatSettings : IEquatable<StatSettings> {
         other.ShowFps == ShowFps && other.ShowPing == ShowPing;
 }
 
+[Serializable]
 public struct RaytracingSettings : IEquatable<RaytracingSettings> {
-    public bool Enabled;
+    public int State;
     public bool AmbientOcclusion;
     public bool GlobalIllumination;
     public bool Reflection;
     public bool Shadows;
 
-    public RaytracingSettings(bool raytracingEnabled, bool ambientOcclusion, bool globalIllumination, bool reflection, bool shadows) {
-        Enabled = raytracingEnabled;
+    public RaytracingSettings(int raytracingState, bool ambientOcclusion, bool globalIllumination, bool reflection, bool shadows) {
+        State = raytracingState;
         AmbientOcclusion = ambientOcclusion;
         GlobalIllumination = globalIllumination;
         Reflection = reflection;
@@ -438,7 +434,7 @@ public struct RaytracingSettings : IEquatable<RaytracingSettings> {
     }
 
     public bool Equals(RaytracingSettings other) =>
-        other.Enabled == Enabled &&
+        other.State == State &&
         other.AmbientOcclusion == AmbientOcclusion &&
         other.GlobalIllumination == GlobalIllumination &&
         other.Reflection == Reflection &&

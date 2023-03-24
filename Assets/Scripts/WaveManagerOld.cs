@@ -3,8 +3,8 @@ using System;
 using Unity.Netcode;
 
 [ExecuteAlways]
-public class WaveManager : MonoBehaviour {
-    public static WaveManager Instance;
+public class WaveManagerOld : MonoBehaviour {
+    public static WaveManagerOld Instance;
 
     [Header("Wave Settings")]
     [SerializeField] private GerstnerWave waveA;

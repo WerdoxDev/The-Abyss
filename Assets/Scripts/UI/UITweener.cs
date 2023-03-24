@@ -58,10 +58,10 @@ public class UITweener : MonoBehaviour {
                 break;
         }
 
-        Action onComplete = () => {
+        void onComplete() {
             if (disableOnComplete) objectToTween.SetActive(false);
             OnTweenFinished?.Invoke();
-        };
+        }
 
         if (instant) {
             onComplete();

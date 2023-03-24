@@ -1,10 +1,8 @@
-using System.Collections;
-using UnityEngine;
-using Unity.Netcode;
-using Unity.Collections;
-using Unity.Netcode.Transports.UTP;
-using UnityEngine.InputSystem;
 using System;
+using System.Collections;
+using Unity.Netcode;
+using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class Player : NetworkBehaviour {
     [Header("Settings")]
@@ -13,7 +11,7 @@ public class Player : NetworkBehaviour {
 
     public InputReader InputReader;
     public Vector3 PlayerSize;
-    public Vector3 OffsetVector = new Vector3(0, 2, 0);
+    public Vector3 OffsetVector = new(0, 2, 0);
     public float Offset = 2;
 
     [Header("Autoset Fields")]
@@ -97,7 +95,8 @@ public class Player : NetworkBehaviour {
                 ResetRotationTarget();
                 _lastShip = CurrentShip.gameObject;
             }
-        } else if (CurrentShip != null && SRCamera.Target.gameObject == CurrentShip.gameObject) {
+        }
+        else if (CurrentShip != null && SRCamera.Target.gameObject == CurrentShip.gameObject) {
             CurrentShip.PlayerAnchor.Players.Remove(this);
             CurrentShip = null;
             SetRotationTarget(null);

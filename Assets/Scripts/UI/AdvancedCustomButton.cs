@@ -1,9 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class AdvancedCustomButton : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler, ISelectHandler, IDeselectHandler {
     [SerializeField] private Graphic[] graphics;
@@ -14,11 +13,12 @@ public class AdvancedCustomButton : MonoBehaviour, IPointerClickHandler, IPointe
     [SerializeField] private float duration;
     [SerializeField] private bool scaleTween = true;
     [SerializeField] private bool resetOnDisable = true;
-    private List<int> _lockedIndexes = new List<int>();
+    private readonly List<int> _lockedIndexes = new();
     private bool _hasTweener = true;
     private UITweener _tweener;
 
     public bool IsSelected;
+    public bool IsDisabled;
 
     public event Action OnClick;
     public event Action OnEnter;
@@ -30,9 +30,15 @@ public class AdvancedCustomButton : MonoBehaviour, IPointerClickHandler, IPointe
         }
     }
 
-    public void Submit() => OnClick?.Invoke();
+    public void Submit() {
+        if (IsDisabled) return;
+
+        OnClick?.Invoke();
+    }
 
     public void Cancel() {
+        if (IsDisabled) return;
+
         IsSelected = false;
         Exit();
     }
@@ -48,7 +54,9 @@ public class AdvancedCustomButton : MonoBehaviour, IPointerClickHandler, IPointe
     }
 
     public void Enter(bool setSelected = false) {
-        if (_tweener == null && _hasTweener) _hasTweener = TryGetComponent<UITweener>(out _tweener);
+        if (IsDisabled) return;
+
+        if (_tweener == null && _hasTweener) _hasTweener = TryGetComponent(out _tweener);
 
         if (setSelected) IsSelected = true;
 
@@ -68,7 +76,7 @@ public class AdvancedCustomButton : MonoBehaviour, IPointerClickHandler, IPointe
     }
 
     public void Exit() {
-        if (IsSelected) return;
+        if (IsSelected || IsDisabled) return;
 
         if (_tweener != null) _tweener.Unlock();
 

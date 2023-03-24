@@ -32,9 +32,7 @@ public class ServerPlayerInteract : NetworkBehaviour {
             _client.UnbusyClientRpc(_clientRpcParams);
             return;
         }
-
-        InteractHandler handler = null;
-        handler = interactObj.GetComponent<Interactable>().GetHandler(handlerData);
+        InteractHandler handler = interactObj.GetComponent<Interactable>().GetHandler(handlerData);
 
         if (handler == null) {
             Debug.LogError("InteractHanlder was not found");

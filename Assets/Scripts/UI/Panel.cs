@@ -17,6 +17,9 @@ public class Panel : MonoBehaviour {
 
     [SerializeField] private bool addPanelToManager = true;
 
+    [Tooltip("If the panel is opened or closed faster than tweens can finish, enable this option to allow that")]
+    [SerializeField] private bool disableTweenCheck;
+
     public bool CloseOnDisable;
     public bool CloseOnCancel = true;
     public bool FullyOpened { get; private set; }
@@ -75,7 +78,7 @@ public class Panel : MonoBehaviour {
     }
 
     public void Open(bool instant = false) {
-        if (IsOpen || !FullyClosed) return;
+        if (IsOpen || (!FullyClosed && !disableTweenCheck)) return;
 
         UIManager.Instance.PanelChangeStateAttempt(this, true, () => _isCancelled = true);
         if (_isCancelled) {
@@ -104,7 +107,7 @@ public class Panel : MonoBehaviour {
     }
 
     public void Close(bool instant = false, bool parentCalling = false) {
-        if (!IsOpen || !FullyOpened) return;
+        if (!IsOpen || (!FullyOpened && !disableTweenCheck)) return;
 
         UIManager.Instance.PanelChangeStateAttempt(this, false, () => _isCancelled = true);
         if (_isCancelled) {
@@ -144,5 +147,7 @@ public enum PanelType {
     Host,
     ChangeName,
     InGameSettings,
-    InGameMenu
+    InGameMenu,
+    Loading,
+    Start
 }

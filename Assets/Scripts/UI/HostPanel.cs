@@ -19,6 +19,8 @@ public class HostPanel : MonoBehaviour {
         maxPlayersText.text = maxPlayers.ToString();
         lobbyCreateButton.OnClick += async () => {
             if (lobbyNameInputField.text == "") return;
+
+            UIManager.Instance.LoadingPanel.OpenLobbyLoading(lobbyNameInputField.text);
             (Allocation, string) relay = await Services.Instance.CreateRelay();
 
             await Services.Instance.CreateLobby(lobbyNameInputField.text, maxPlayers, relay.Item1.Region, relay.Item2);
@@ -28,6 +30,7 @@ public class HostPanel : MonoBehaviour {
             string[] split = ipAddressInputField.text.Split(":");
             if (split.Length != 2) return;
 
+            UIManager.Instance.LoadingPanel.OpenHostLoading();
             GameManager.Instance.SetConnectionData(split[0], ushort.Parse(split[1]));
             TheAbyssNetworkManager.Instance.Host(
                 new PlayerConnData(UIManager.Instance.PlayerName, UIManager.Instance.CustomizePanel.PlayerCustomization));

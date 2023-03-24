@@ -1,9 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
 using System;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class CustomButton : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler {
     [SerializeField] private Graphic graphic;
@@ -23,6 +21,8 @@ public class CustomButton : MonoBehaviour, IPointerClickHandler, IPointerEnterHa
     private UITweener _tweener;
 
     public bool IsSelected;
+    public bool IsDisabled;
+
     public event Action OnClick;
 
     private void Awake() {
@@ -37,14 +37,22 @@ public class CustomButton : MonoBehaviour, IPointerClickHandler, IPointerEnterHa
         };
     }
 
-    public void Submit() => OnClick?.Invoke();
+    public void Submit() {
+        if (IsDisabled) return;
+
+        OnClick?.Invoke();
+    }
 
     public void Cancel() {
+        if (IsDisabled) return;
+
         IsSelected = false;
         Exit();
     }
 
     public void Enter(bool setSelected = false) {
+        if (IsDisabled) return;
+
         if (_tweener == null && _hasTweener) _hasTweener = TryGetComponent<UITweener>(out _tweener);
 
         if (setSelected) IsSelected = true;
@@ -69,7 +77,7 @@ public class CustomButton : MonoBehaviour, IPointerClickHandler, IPointerEnterHa
     }
 
     public void Exit() {
-        if (IsSelected) return;
+        if (IsSelected || IsDisabled) return;
 
         if (_tweener != null) _tweener.Unlock();
         if (_parentButton != null && lockIfParentExists) _parentButton.UnlockGraphic(graphic.gameObject);
