@@ -62,12 +62,14 @@ public class Panel : MonoBehaviour {
                 OnFullyOpened?.Invoke();
                 FullyOpened = true;
             };
+        else OnFullyOpened?.Invoke();
 
         if (longestCloseTween != null)
             longestCloseTween.OnTweenFinished += () => {
                 OnFullyClosed?.Invoke();
                 FullyClosed = true;
             };
+        else OnFullyClosed?.Invoke();
     }
 
     public void Submit() => submitButtons.FirstOrDefault(x => x.gameObject.activeInHierarchy)?.Submit();

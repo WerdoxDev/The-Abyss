@@ -3,53 +3,56 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using System;
+using UnityEngine.UIElements;
 
 public class ServerTransform : NetworkBehaviour {
 
-    public NetworkVariable<float> PositionX;
-    public NetworkVariable<float> PositionY;
-    public NetworkVariable<float> PositionZ;
+    [HideInInspector] public NetworkVariable<float> PositionX;
+    [HideInInspector] public NetworkVariable<float> PositionY;
+    [HideInInspector] public NetworkVariable<float> PositionZ;
 
-    public NetworkVariable<float> RotationX;
-    public NetworkVariable<float> RotationY;
-    public NetworkVariable<float> RotationZ;
+    [HideInInspector] public NetworkVariable<float> RotationX;
+    [HideInInspector] public NetworkVariable<float> RotationY;
+    [HideInInspector] public NetworkVariable<float> RotationZ;
 
-    public NetworkVariable<BetterSyncInfo> BetterSyncInfo;
+    [HideInInspector] public NetworkVariable<BetterSyncInfo> BetterSyncInfo;
 
-    public UpdateCycle cycle;
+    public NetworkVariable<LerpInfo> LerpInfo;
 
-    public bool SyncPositionX;
-    public bool SyncPositionY;
-    public bool SyncPositionZ;
+    [Header("Settings")]
+    [SerializeField] private UpdateCycle cycle;
 
-    public bool SyncRotationX;
-    public bool SyncRotationY;
-    public bool SyncRotationZ;
+    [SerializeField] private bool syncPositionX;
+    [SerializeField] private bool syncPositionY;
+    [SerializeField] private bool syncPositionZ;
 
-    public float PositionThreshold = 0.001f;
-    public float RotationThreshold = 0.01f;
+    [SerializeField] private bool syncRotationX;
+    [SerializeField] private bool syncRotationY;
+    [SerializeField] private bool syncRotationZ;
+
+    [SerializeField] private float positionThreshold = 0.001f;
+    [SerializeField] private float rotationThreshold = 0.01f;
+    [SerializeField] private float lerpMultiplier;
 
     [Tooltip("Syncs position and rotation at the same time but increases payload size")]
-    public bool IsBetterSync;
+    [SerializeField] private bool isBetterSync;
 
-    public bool IsLocalSpace;
+    [SerializeField] private bool isLocalSpace;
 
     private Vector3 _lastPosition;
     private Quaternion _lastRotation;
 
     private void Awake() {
-        if (SyncPositionX) PositionX = new NetworkVariable<float>();
-        if (SyncPositionY) PositionY = new NetworkVariable<float>();
-        if (SyncPositionZ) PositionZ = new NetworkVariable<float>();
-        if (SyncRotationX) RotationX = new NetworkVariable<float>();
-        if (SyncRotationY) RotationY = new NetworkVariable<float>();
-        if (SyncRotationZ) RotationZ = new NetworkVariable<float>();
+        if (syncPositionX) PositionX = new NetworkVariable<float>();
+        if (syncPositionY) PositionY = new NetworkVariable<float>();
+        if (syncPositionZ) PositionZ = new NetworkVariable<float>();
+        if (syncRotationX) RotationX = new NetworkVariable<float>();
+        if (syncRotationY) RotationY = new NetworkVariable<float>();
+        if (syncRotationZ) RotationZ = new NetworkVariable<float>();
     }
 
     public override void OnNetworkSpawn() {
         if (!IsServer) {
-            enabled = false;
-
             PositionX.OnValueChanged += (float oldX, float newX) => SetPosition(newX, null, null);
             PositionY.OnValueChanged += (float oldY, float newY) => SetPosition(null, newY, null);
             PositionZ.OnValueChanged += (float oldZ, float newZ) => SetPosition(null, null, newZ);
@@ -59,30 +62,57 @@ public class ServerTransform : NetworkBehaviour {
             RotationZ.OnValueChanged += (float oldZ, float newZ) => SetRotation(null, null, newZ);
 
             BetterSyncInfo.OnValueChanged += (BetterSyncInfo oldInfo, BetterSyncInfo newInfo) => {
-                if (IsLocalSpace) {
-                    transform.localPosition = newInfo.Position;
-                    transform.localRotation = Quaternion.Euler(newInfo.Rotation);
+                if (isLocalSpace) {
+                    transform.SetLocalPositionAndRotation(newInfo.Position, Quaternion.Euler(newInfo.Rotation));
                     return;
                 }
-                transform.position = newInfo.Position;
-                transform.rotation = Quaternion.Euler(newInfo.Rotation);
+                transform.SetPositionAndRotation(newInfo.Position, Quaternion.Euler(newInfo.Rotation));
             };
         }
     }
 
     private void Update() {
-        if (cycle == UpdateCycle.Update) Sync();
+        if (cycle != UpdateCycle.Update) return;
+        if (IsServer) Sync();
+        LerpPositionAndRotation(Time.deltaTime);
     }
 
     private void FixedUpdate() {
-        if (cycle == UpdateCycle.FixedUpdate) Sync();
+        if (cycle != UpdateCycle.FixedUpdate) return;
+        if (IsServer) Sync();
+        LerpPositionAndRotation(Time.fixedDeltaTime);
     }
 
-    public void Sync() {
-        Vector3 position = IsLocalSpace ? transform.localPosition : transform.position;
-        Vector3 rotation = IsLocalSpace ? transform.localEulerAngles : transform.eulerAngles;
+    public void SetLerpInfo(bool lerpPosition, bool lerpRotation) {
+        LerpInfo.Value = new LerpInfo(lerpPosition, lerpRotation);
+    }
 
-        if (IsBetterSync) {
+    private void LerpPositionAndRotation(float time) {
+        if (!LerpInfo.Value.LerpPosition && !LerpInfo.Value.LerpRotation) return;
+
+        Vector3 newPosition = isBetterSync
+            ? BetterSyncInfo.Value.Position
+            : new(PositionX.Value, PositionY.Value, PositionZ.Value);
+
+        Quaternion newRotation = isBetterSync
+            ? Quaternion.Euler(BetterSyncInfo.Value.Rotation)
+            : Quaternion.Euler(RotationX.Value, RotationY.Value, RotationZ.Value);
+
+        if (isLocalSpace) {
+            if (LerpInfo.Value.LerpPosition) transform.localPosition = Vector3.Lerp(transform.localPosition, newPosition, time * lerpMultiplier);
+            if (LerpInfo.Value.LerpRotation) transform.localRotation = Quaternion.Lerp(transform.localRotation, newRotation, time * lerpMultiplier);
+        }
+        else {
+            if (LerpInfo.Value.LerpPosition) transform.position = Vector3.Lerp(transform.position, newPosition, time * lerpMultiplier);
+            if (LerpInfo.Value.LerpRotation) transform.rotation = Quaternion.Lerp(transform.rotation, newRotation, time * lerpMultiplier);
+        }
+    }
+
+    private void Sync() {
+        Vector3 position = isLocalSpace ? transform.localPosition : transform.position;
+        Vector3 rotation = isLocalSpace ? transform.localEulerAngles : transform.eulerAngles;
+
+        if (isBetterSync) {
             if (!ShouldUpdatePosition(position, true, true, true) && !ShouldUpdateRotation(rotation, true, true, true)) return;
             // Debug.Log($"Pos {position}, {_lastPosition}, {position == _lastPosition}");
             // Debug.Log($"Rot {rotation}, {_lastRotation}, {rotation == _lastRotation}");
@@ -90,42 +120,44 @@ public class ServerTransform : NetworkBehaviour {
             return;
         }
 
-        if (ShouldUpdatePosition(position, SyncPositionX, SyncPositionY, SyncPositionZ)) {
-            if (SyncPositionX) PositionX.Value = position.x;
-            if (SyncPositionY) PositionY.Value = position.y;
-            if (SyncPositionZ) PositionZ.Value = position.z;
+        if (ShouldUpdatePosition(position, syncPositionX, syncPositionY, syncPositionZ)) {
+            if (syncPositionX) PositionX.Value = position.x;
+            if (syncPositionY) PositionY.Value = position.y;
+            if (syncPositionZ) PositionZ.Value = position.z;
         }
 
-        if (ShouldUpdateRotation(rotation, SyncRotationX, SyncRotationY, SyncRotationZ)) {
-            if (SyncRotationX) RotationX.Value = rotation.x;
-            if (SyncRotationY) RotationY.Value = rotation.y;
-            if (SyncRotationZ) RotationZ.Value = rotation.z;
+        if (ShouldUpdateRotation(rotation, syncRotationX, syncRotationY, syncRotationZ)) {
+            if (syncRotationX) RotationX.Value = rotation.x;
+            if (syncRotationY) RotationY.Value = rotation.y;
+            if (syncRotationZ) RotationZ.Value = rotation.z;
         }
     }
 
     private void SetPosition(float? x, float? y, float? z) {
-        Vector3 position = IsLocalSpace ? transform.localPosition : transform.position;
+        if (LerpInfo.Value.LerpPosition) return;
+        Vector3 position = isLocalSpace ? transform.localPosition : transform.position;
         if (x != null) position.x = x ?? 0;
         if (y != null) position.y = y ?? 0;
         if (z != null) position.z = z ?? 0;
-        if (IsLocalSpace) transform.localPosition = position;
+        if (isLocalSpace) transform.localPosition = position;
         else transform.position = position;
     }
 
     private void SetRotation(float? x, float? y, float? z) {
-        Vector3 rotation = IsLocalSpace ? transform.localEulerAngles : transform.eulerAngles;
+        if (LerpInfo.Value.LerpRotation) return;
+        Vector3 rotation = isLocalSpace ? transform.localEulerAngles : transform.eulerAngles;
         if (x != null) rotation.x = x ?? 0;
         if (y != null) rotation.y = y ?? 0;
         if (z != null) rotation.z = z ?? 0;
-        if (IsLocalSpace) transform.localRotation = Quaternion.Euler(rotation);
+        if (isLocalSpace) transform.localRotation = Quaternion.Euler(rotation);
         else transform.rotation = Quaternion.Euler(rotation);
     }
 
     private bool ShouldUpdatePosition(Vector3 position, bool syncX, bool syncY, bool syncZ) {
         bool shouldUpdate = false;
-        if (syncX && Mathf.Abs(position.x - _lastPosition.x) >= PositionThreshold) shouldUpdate = true;
-        if (syncY && Mathf.Abs(position.y - _lastPosition.y) >= PositionThreshold) shouldUpdate = true;
-        if (syncZ && Mathf.Abs(position.z - _lastPosition.z) >= PositionThreshold) shouldUpdate = true;
+        if (syncX && Mathf.Abs(position.x - _lastPosition.x) >= positionThreshold) shouldUpdate = true;
+        if (syncY && Mathf.Abs(position.y - _lastPosition.y) >= positionThreshold) shouldUpdate = true;
+        if (syncZ && Mathf.Abs(position.z - _lastPosition.z) >= positionThreshold) shouldUpdate = true;
         if (shouldUpdate) _lastPosition = position;
         return shouldUpdate;
     }
@@ -133,12 +165,12 @@ public class ServerTransform : NetworkBehaviour {
     private bool ShouldUpdateRotation(Vector3 rotation, bool syncX, bool syncY, bool syncZ) {
         bool shouldUpdate = false;
         Vector3 lastEuler = _lastRotation.eulerAngles;
-        if (syncX && Mathf.Abs(Mathf.DeltaAngle(rotation.x, lastEuler.x)) >= RotationThreshold) shouldUpdate = true;
-        if (syncY && Mathf.Abs(Mathf.DeltaAngle(rotation.y, lastEuler.y)) >= RotationThreshold) shouldUpdate = true;
-        if (syncZ && Mathf.Abs(Mathf.DeltaAngle(rotation.z, lastEuler.z)) >= RotationThreshold) shouldUpdate = true;
+        if (syncX && Mathf.Abs(Mathf.DeltaAngle(rotation.x, lastEuler.x)) >= rotationThreshold) shouldUpdate = true;
+        if (syncY && Mathf.Abs(Mathf.DeltaAngle(rotation.y, lastEuler.y)) >= rotationThreshold) shouldUpdate = true;
+        if (syncZ && Mathf.Abs(Mathf.DeltaAngle(rotation.z, lastEuler.z)) >= rotationThreshold) shouldUpdate = true;
         if (shouldUpdate) _lastRotation = Quaternion.Euler(rotation);
         return shouldUpdate;
-    }
+    }    
 }
 
 public struct BetterSyncInfo : INetworkSerializable {
@@ -153,6 +185,21 @@ public struct BetterSyncInfo : INetworkSerializable {
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter {
         serializer.SerializeValue(ref Position);
         serializer.SerializeValue(ref Rotation);
+    }
+}
+
+public struct LerpInfo : INetworkSerializable {
+    public bool LerpPosition;
+    public bool LerpRotation;
+
+    public LerpInfo(bool lerpPosition, bool lerpRotation) {
+        LerpPosition = lerpPosition;
+        LerpRotation = lerpRotation;
+    }
+
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter {
+        serializer.SerializeValue(ref LerpPosition);
+        serializer.SerializeValue(ref LerpRotation);
     }
 }
 

@@ -176,7 +176,7 @@ public class ServerPlayerMovement : NetworkBehaviour {
         Gizmos.DrawWireCube(new Vector3(0, -(_player.PlayerSize.y * 0.5f + _currentSize), 0), new Vector3(1.8f, (_currentSize) * 2, 1.8f));
     }
 
-    [ServerRpc]
+    [ServerRpc(Delivery = RpcDelivery.Unreliable)]
     public void SetMovementInputServerRpc(Vector2 input) => _movementInput = input;
     [ServerRpc]
     public void SetJumpingStateServerRpc(bool isJumping) => _isJumping = isJumping;

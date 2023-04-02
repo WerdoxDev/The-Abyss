@@ -4,6 +4,7 @@ using UnityEngine;
 using Unity.Netcode.Transports.UTP;
 using Unity.Netcode;
 using System;
+using Netcode.Transports.Ruffles;
 
 #if UNITY_EDITOR
 using ParrelSync;
@@ -121,7 +122,10 @@ public class GameManager : MonoBehaviour {
     }
 
     public void SetConnectionData(string address, ushort port) {
+        //RufflesTransport transport = NetworkManager.S+ingleton.GetComponent<RufflesTransport>();
         UnityTransport transport = NetworkManager.Singleton.GetComponent<UnityTransport>();
+        //transport.ConnectAddress = address;
+        //transport.Port = port;
         transport.ConnectionData.Address = address;
         transport.ConnectionData.Port = port;
     }

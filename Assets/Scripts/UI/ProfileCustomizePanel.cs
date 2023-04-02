@@ -51,8 +51,6 @@ public class ProfileCustomizePanel : MonoBehaviour {
         headColor.SetRgb(profile.IsHeadRgb);
         leftEyeColor.SetRgb(profile.IsLeftEyeRgb);
         rightEyeColor.SetRgb(profile.IsRightEyeRgb);
-
-        UIManager.Instance.PlayerCustomization.UpdatePlayer(UIManager.Instance.PlayerName, PlayerCustomization);
     }
 
     public void SaveToFile() {

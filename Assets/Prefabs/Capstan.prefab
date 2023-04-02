@@ -171,16 +171,19 @@ MonoBehaviour:
   RotationZ:
     m_InternalValue: 0
   cycle: 0
-  SyncPositionX: 0
-  SyncPositionY: 1
-  SyncPositionZ: 0
-  SyncRotationX: 0
-  SyncRotationY: 0
-  SyncRotationZ: 0
-  PositionThreshold: 0.001
-  RotationThreshold: 0.01
-  IsBetterSync: 0
-  IsLocalSpace: 1
+  syncPositionX: 0
+  syncPositionY: 1
+  syncPositionZ: 0
+  syncRotationX: 0
+  syncRotationY: 0
+  syncRotationZ: 0
+  positionThreshold: 0.001
+  rotationThreshold: 0.01
+  lerpMultiplier: 0
+  lerpPosition: 0
+  lerpRotation: 0
+  isBetterSync: 0
+  isLocalSpace: 1
 --- !u!1 &2551716486640257338
 GameObject:
   m_ObjectHideFlags: 0
@@ -689,16 +692,19 @@ MonoBehaviour:
   RotationZ:
     m_InternalValue: 0
   cycle: 0
-  SyncPositionX: 0
-  SyncPositionY: 0
-  SyncPositionZ: 0
-  SyncRotationX: 0
-  SyncRotationY: 1
-  SyncRotationZ: 0
-  PositionThreshold: 0.001
-  RotationThreshold: 0.01
-  IsBetterSync: 0
-  IsLocalSpace: 1
+  syncPositionX: 0
+  syncPositionY: 0
+  syncPositionZ: 0
+  syncRotationX: 0
+  syncRotationY: 1
+  syncRotationZ: 0
+  positionThreshold: 0.001
+  rotationThreshold: 0.01
+  lerpMultiplier: 0
+  lerpPosition: 0
+  lerpRotation: 0
+  isBetterSync: 0
+  isLocalSpace: 1
 --- !u!1 &8754532553857626369
 GameObject:
   m_ObjectHideFlags: 0

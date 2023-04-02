@@ -33,7 +33,8 @@ public class ServerPlayerAttachable : NetworkBehaviour {
         if (_attachable.Capstan != null) {
             if (!_attachable.Capstan.IsDown.Value) Detach();
             else _attachable.Capstan.Raise(_movementInput.y);
-        } else if (_attachable.Steering != null)
+        }
+        else if (_attachable.Steering != null)
             _attachable.Steering.Turn(_movementInput.x);
 
         else if (_attachable.SailControl != null)
@@ -50,7 +51,8 @@ public class ServerPlayerAttachable : NetworkBehaviour {
             if (localPos.y - _player.Offset > Ladder.TopInteract.LocalStandPos.y) {
                 transform.position = Ladder.LandPos + _player.OffsetVector;
                 Detach();
-            } else if (localPos.y < Ladder.BottomInteract.LocalStandPos.y) Detach();
+            }
+            else if (localPos.y < Ladder.BottomInteract.LocalStandPos.y) Detach();
         }
 
         if (Handler != null) {
@@ -74,7 +76,8 @@ public class ServerPlayerAttachable : NetworkBehaviour {
             _attachable.Capstan.PlayerNum++;
 
             _standTransform = Handler.StandTransform;
-        } else if (Handler.Type == InteractType.Ladder) {
+        }
+        else if (Handler.Type == InteractType.Ladder) {
             Ladder Ladder = (Ladder)Handler.interactable;
 
             Vector3 localPos = Ladder.transform.InverseTransformPoint(transform.position);
@@ -88,7 +91,9 @@ public class ServerPlayerAttachable : NetworkBehaviour {
 
             // Just to avoid long lines
             _attachable.Ladder = Ladder;
-        } else if (Handler.Type == InteractType.Steering) _attachable.Steering = (Steering)Handler.interactable;
+            _player.ServerTransform.SetLerpInfo(false, false);
+        }
+        else if (Handler.Type == InteractType.Steering) _attachable.Steering = (Steering)Handler.interactable;
         else if (Handler.Type == InteractType.SailControl) _attachable.SailControl = (SailControlHandle)Handler.interactable;
 
         _standTransform = Handler.StandTransform;

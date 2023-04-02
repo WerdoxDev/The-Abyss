@@ -21,6 +21,7 @@ public class Player : NetworkBehaviour {
     public ServerPlayerMovement Movement;
     public ServerPlayerAttachable Attachable;
     public ServerPlayerInteract Interact;
+    public ServerTransform ServerTransform;
     public Rigidbody Rb;
     public Ship CurrentShip;
 
@@ -51,6 +52,7 @@ public class Player : NetworkBehaviour {
         Attachable = GetComponent<ServerPlayerAttachable>();
         Interact = GetComponent<ServerPlayerInteract>();
         Movement = GetComponent<ServerPlayerMovement>();
+        ServerTransform = GetComponent<ServerTransform>();
         Data = GetComponent<PlayerData>();
     }
 
@@ -89,9 +91,10 @@ public class Player : NetworkBehaviour {
         }
 
         if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, Mathf.Infinity, shipLayer)) {
-            if (CurrentShip == null || CurrentShip.gameObject != _lastShip.gameObject) {
+            if (CurrentShip == null || CurrentShip.gameObject != _lastShip) {
                 CurrentShip = hit.collider.transform.GetComponentInParent<Ship>();
                 CurrentShip.PlayerAnchor.Players.Add(this);
+                ServerTransform.SetLerpInfo(false, false);
                 ResetRotationTarget();
                 _lastShip = CurrentShip.gameObject;
             }
@@ -99,6 +102,7 @@ public class Player : NetworkBehaviour {
         else if (CurrentShip != null && SRCamera.Target.gameObject == CurrentShip.gameObject) {
             CurrentShip.PlayerAnchor.Players.Remove(this);
             CurrentShip = null;
+            ServerTransform.SetLerpInfo(true, false);
             SetRotationTarget(null);
         }
     }

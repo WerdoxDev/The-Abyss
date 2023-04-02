@@ -10,6 +10,7 @@ using Unity.Services.Lobbies.Models;
 using Unity.Services.Relay;
 using Unity.Services.Relay.Models;
 using UnityEngine;
+using System;
 
 #if UNITY_EDITOR
 using ParrelSync;
@@ -17,6 +18,11 @@ using ParrelSync;
 
 public class Services : MonoBehaviour {
     public static Services Instance;
+
+    public event Action<bool> OnInitializeFinished;
+
+    public bool IsSignedIn { get; private set; }
+    public bool OfflineMode { get; private set; }
 
     private void Awake() {
         if (Instance == null) Instance = this;
@@ -43,7 +49,16 @@ public class Services : MonoBehaviour {
 
         await AuthenticationService.Instance.SignInAnonymouslyAsync();
 
+        IsSignedIn = true;
+        OfflineMode = false;
+        OnInitializeFinished?.Invoke(true);
+
         return AuthenticationService.Instance.IsAuthorized;
+    }
+
+    public void InitializeOffline() {
+        OfflineMode = true;
+        OnInitializeFinished?.Invoke(false);
     }
 
     public async Task<Lobby> CreateLobby(string lobbyName, int maxPlayers, string region, string relayCode) {
@@ -97,14 +112,14 @@ public class Services : MonoBehaviour {
     }
 
     public async Task<Lobby> JoinLobby(string lobbyId) {
-        try {
+        //try {
             Lobby lobby = await LobbyService.Instance.JoinLobbyByIdAsync(lobbyId);
             return lobby;
-        }
-        catch (LobbyServiceException e) {
-            Debug.Log(e);
-            return null;
-        }
+        //}
+        //catch (LobbyServiceException e) {
+        //    Debug.Log(e);
+        //    return null;
+        //}
     }
 
     public async void JoinRelay(string joinCode) {

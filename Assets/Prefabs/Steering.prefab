@@ -285,13 +285,16 @@ MonoBehaviour:
   RotationZ:
     m_InternalValue: 0
   cycle: 0
-  SyncPositionX: 0
-  SyncPositionY: 0
-  SyncPositionZ: 0
-  SyncRotationX: 0
-  SyncRotationY: 0
-  SyncRotationZ: 1
-  PositionThreshold: 0.001
-  RotationThreshold: 0.01
-  IsBetterSync: 0
-  IsLocalSpace: 1
+  syncPositionX: 0
+  syncPositionY: 0
+  syncPositionZ: 0
+  syncRotationX: 0
+  syncRotationY: 0
+  syncRotationZ: 1
+  positionThreshold: 0.001
+  rotationThreshold: 0.01
+  lerpMultiplier: 0
+  lerpPosition: 0
+  lerpRotation: 0
+  isBetterSync: 0
+  isLocalSpace: 1
