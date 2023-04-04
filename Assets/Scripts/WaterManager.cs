@@ -22,14 +22,14 @@ public class WaterManager : MonoBehaviour {
     }
 
     public float GetWaveHeight(Vector3 position) {
-        _searchParameters.startPosition = _searchResult.candidateLocation;
-        _searchParameters.targetPosition = position;
+        _searchParameters.startPositionWS = _searchResult.candidateLocationWS;
+        _searchParameters.targetPositionWS = position;
         _searchParameters.error = 0.01f;
         _searchParameters.maxIterations = 8;
 
         // Do the search
-        if (Surface.FindWaterSurfaceHeight(_searchParameters, out _searchResult))
-            return _searchResult.height;
+        if (Surface.ProjectPointOnWaterSurface(_searchParameters, out _searchResult))
+            return _searchResult.projectedPositionWS.y;
 
         return 0;
     }

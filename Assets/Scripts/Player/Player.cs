@@ -70,11 +70,11 @@ public class Player : NetworkBehaviour {
         // ChatManager.Instance.OnOpened += () => DisableKeybinds();
         // ChatManager.Instance.OnClosed += () => EnableKeybinds();
 
-#if UNITY_EDITOR
-        if (!IsServer) return;
-        Ship ship = ShipSpawner.Instance.SpawnShip(new Vector3(0, -25, -25), Quaternion.Euler(-10, 0, 0));
-        ship.Rb.constraints = RigidbodyConstraints.FreezeAll;
-#endif
+//#if UNITY_EDITOR
+//        if (!IsServer) return;
+//        Ship ship = ShipSpawner.Instance.SpawnShip(new Vector3(0, -25, -25), Quaternion.Euler(-10, 0, 0));
+//        ship.Rb.constraints = RigidbodyConstraints.FreezeAll;
+//#endif
     }
 
     public override void OnDestroy() {

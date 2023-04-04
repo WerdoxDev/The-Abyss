@@ -100,17 +100,12 @@ public class TheAbyssNetworkManager : MonoBehaviour {
         // For later use cases
         bool approveConnection = true;
 
-        Vector3 spawnPos = Vector3.zero;
-
         if (approveConnection) {
-            spawnPos = new Vector3(0, 3, 0);
             _clientData.Add(request.ClientNetworkId, new PlayerConnData(connectionPayload.PlayerName, connectionPayload.PlayerCustomization));
         }
 
         response.CreatePlayerObject = false;
         response.Approved = approveConnection;
-        response.Position = spawnPos;
-        response.Rotation = Quaternion.identity;
     }
 
     private byte[] GetConnectionData(PlayerConnData playerData) {

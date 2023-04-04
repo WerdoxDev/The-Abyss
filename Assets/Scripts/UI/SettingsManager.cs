@@ -251,7 +251,7 @@ public class SettingsManager : MonoBehaviour {
         else if (CurrentSettings.DLSSQuality == 3) cameraData.deepLearningSuperSamplingQuality = 2;
         else if (CurrentSettings.DLSSQuality == 4) cameraData.deepLearningSuperSamplingQuality = 3;
 
-        foreach (HDAdditionalLightData lightData in FindObjectsOfType<HDAdditionalLightData>()) {
+        foreach (HDAdditionalLightData lightData in FindObjectsByType<HDAdditionalLightData>(FindObjectsSortMode.None)) {
             lightData.useRayTracedShadows = CurrentSettings.RaytracingSettings.State == 1 && CurrentSettings.RaytracingSettings.Shadows;
             lightData.rayTraceContactShadow = CurrentSettings.RaytracingSettings.State == 1 && CurrentSettings.RaytracingSettings.Shadows;
             lightData.numRayTracingSamples = 6;

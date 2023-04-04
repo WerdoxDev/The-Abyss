@@ -61,7 +61,7 @@ public class GameManager : MonoBehaviour {
             else if (name == "MainMenu") {
                 GameStateChanged(GameState.InMainMenu);
                 SettingsManager.Instance.CurrentCamera = Camera.main;
-                SettingsManager.Instance.CurrentWaterGenerator = FindObjectOfType<WaterGenerator>();
+                SettingsManager.Instance.CurrentWaterGenerator = FindFirstObjectByType<WaterGenerator>();
                 SettingsManager.Instance.ApplyChanges();
             }
         };
@@ -147,7 +147,7 @@ public class GameManager : MonoBehaviour {
 
             // We need player object so do this on player spawn
             SettingsManager.Instance.CurrentCamera = player.CLCamera.Camera;
-            SettingsManager.Instance.CurrentWaterGenerator = FindObjectOfType<WaterGenerator>();
+            SettingsManager.Instance.CurrentWaterGenerator = FindFirstObjectByType<WaterGenerator>();
             SettingsManager.Instance.ApplyChanges();
         }
 

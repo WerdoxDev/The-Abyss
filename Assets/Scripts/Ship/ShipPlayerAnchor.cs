@@ -14,14 +14,8 @@ public class ShipPlayerAnchor : NetworkBehaviour {
     [SerializeField] private Transform dummyHolder;
     [SerializeField] private Vector3 sizeOffset;
 
-    public List<Player> Players = new List<Player>();
-    private List<GameObject> dummyObjects = new List<GameObject>();
-
-    private Ship _ship;
-
-    private void Awake() {
-        _ship = GetComponent<Ship>();
-    }
+    public List<Player> Players = new();
+    private readonly List<GameObject> _dummyObjects = new();
 
     public override void OnNetworkSpawn() {
         if (!IsOwner) {
@@ -31,19 +25,19 @@ public class ShipPlayerAnchor : NetworkBehaviour {
     }
 
     private void FixedUpdate() {
-        if (dummyObjects.Count != Players.Count) {
-            foreach (GameObject dummy in dummyObjects) Destroy(dummy);
-            dummyObjects.Clear();
+        if (_dummyObjects.Count != Players.Count) {
+            foreach (GameObject dummy in _dummyObjects) Destroy(dummy);
+            _dummyObjects.Clear();
             for (int i = 0; i < Players.Count; i++) {
                 if (Players[i] == null) Players.RemoveAt(i);
-                dummyObjects.Add(Instantiate(dummyPrefab, Vector3.zero, Quaternion.identity, dummyHolder));
+                _dummyObjects.Add(Instantiate(dummyPrefab, Vector3.zero, Quaternion.identity, dummyHolder));
             }
         }
 
         int index = 0;
         foreach (Player player in Players) {
             if (player == null) return;
-            Transform dummyTransform = dummyObjects[index].transform;
+            Transform dummyTransform = _dummyObjects[index].transform;
             Vector3 playerSize = player.PlayerSize - sizeOffset;
             Vector3 playerPos = player.transform.position;
             dummyTransform.position = new Vector3(playerPos.x, dummyTransform.position.y, playerPos.z);
@@ -87,10 +81,10 @@ public class ShipPlayerAnchor : NetworkBehaviour {
     }
 
     private void OnDrawGizmos() {
-        if (dummyObjects.Count == 0) return;
-        for (int i = 0; i < dummyObjects.Count; i++) {
+        if (_dummyObjects.Count == 0) return;
+        for (int i = 0; i < _dummyObjects.Count; i++) {
             // Gizmos.matrix = dummyObjects[index].localToWorldMatrix;
-            Transform dummyTransform = dummyObjects[i].transform;
+            Transform dummyTransform = _dummyObjects[i].transform;
             Gizmos.DrawRay(dummyTransform.position + dummyTransform.up * 1, -dummyTransform.up * 2);
         }
     }

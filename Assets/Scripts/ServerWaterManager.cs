@@ -21,7 +21,7 @@ public class ServerWaveManager : NetworkBehaviour {
                 _client.Surface.repetitionSize = newInfo.RepetitionSize;
                 _client.Surface.largeWindSpeed = newInfo.WindSpeed;
                 _client.Surface.largeCurrentSpeedValue = newInfo.CurrentSpeed;
-                _client.Surface.largeCurrentOrientationValue = newInfo.CurrentOrientation;
+                _client.Surface.largeOrientationValue = newInfo.CurrentOrientation;
             };
         }
     }
@@ -32,7 +32,7 @@ public class ServerWaveManager : NetworkBehaviour {
             RepetitionSize = _client.Surface.repetitionSize,
             WindSpeed = _client.Surface.largeWindSpeed,
             CurrentSpeed = _client.Surface.largeCurrentSpeedValue,
-            CurrentOrientation = _client.Surface.largeCurrentOrientationValue
+            CurrentOrientation = _client.Surface.largeOrientationValue
         };
     }
 }
