@@ -9,8 +9,10 @@ public class ClientPlayerCamera : NetworkBehaviour {
     [SerializeField] private float normalFOV;
     [SerializeField] private float sprintFOV;
     [SerializeField] private float fovChangeDuration;
+    [SerializeField] private float sendOrientationInterval;
     private bool _lastSprinting;
     private float _lastCameraRotation;
+    private float _orientationTimer;
 
     private Player _player;
     private InputReader _inputReader;
@@ -68,6 +70,13 @@ public class ClientPlayerCamera : NetworkBehaviour {
 
     private void Update() {
         HandleFOV();
+
+        if (_orientationTimer < sendOrientationInterval) _orientationTimer += Time.deltaTime;
+        else if (Camera.transform.localEulerAngles.y != _lastCameraRotation) {
+            _server.SetOrientationServerRpc(Camera.transform.localEulerAngles);
+            _lastCameraRotation = Camera.transform.localEulerAngles.y;
+            _orientationTimer = 0;
+        }
     }
 
     private void FixedUpdate() {
@@ -133,11 +142,6 @@ public class ClientPlayerCamera : NetworkBehaviour {
         if (_yClamp != Vector2.zero) _rotation.y = Mathf.Clamp(_rotation.y, _yClamp.x, _yClamp.y);
 
         RotateCamera(target);
-
-        if (Camera.transform.localEulerAngles.y != _lastCameraRotation) {
-            _server.SetOrientationServerRpc(Camera.transform.localEulerAngles);
-            _lastCameraRotation = Camera.transform.localEulerAngles.y;
-        }
     }
 
     private void RotateCamera(Vector2 target) {

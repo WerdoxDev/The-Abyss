@@ -231,7 +231,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6299022033431183179}
-  - component: {fileID: 2501795316038320552}
   m_Layer: 3
   m_Name: Head
   m_TagString: Untagged
@@ -255,44 +254,6 @@ Transform:
   m_Father: {fileID: 3217660694112433193}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2501795316038320552
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2269351218719057554}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b49c1082f4093814d8da434ca2e9bc21, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  PositionX:
-    m_InternalValue: 0
-  PositionY:
-    m_InternalValue: 0
-  PositionZ:
-    m_InternalValue: 0
-  RotationX:
-    m_InternalValue: 0
-  RotationY:
-    m_InternalValue: 0
-  RotationZ:
-    m_InternalValue: 0
-  cycle: 0
-  syncPositionX: 0
-  syncPositionY: 0
-  syncPositionZ: 0
-  syncRotationX: 0
-  syncRotationY: 0
-  syncRotationZ: 0
-  positionThreshold: 0.001
-  rotationThreshold: 0.01
-  lerpMultiplier: 0
-  lerpPosition: 0
-  lerpRotation: 0
-  isBetterSync: 0
-  isLocalSpace: 0
 --- !u!1 &2969385282303044985
 GameObject:
   m_ObjectHideFlags: 0
@@ -479,6 +440,7 @@ MonoBehaviour:
   Movement: {fileID: 0}
   Attachable: {fileID: 0}
   Interact: {fileID: 0}
+  ServerTransform: {fileID: 0}
   Rb: {fileID: 0}
   CurrentShip: {fileID: 0}
   CanMove: 1
@@ -593,6 +555,8 @@ MonoBehaviour:
   orientation: {fileID: 3217660694112433193}
   head: {fileID: 6299022033431183179}
   Target: {fileID: 0}
+  OrientationRotation:
+    m_InternalValue: {x: 0, y: 0}
 --- !u!114 &2574748171929005398
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -680,6 +644,7 @@ MonoBehaviour:
   normalFOV: 60
   sprintFOV: 70
   fovChangeDuration: 0.125
+  sendOrientationInterval: 0.1
   Camera: {fileID: 415252595}
   CanSetTarget: 1
 --- !u!114 &2358588550936283245
@@ -716,8 +681,6 @@ MonoBehaviour:
   positionThreshold: 0.001
   rotationThreshold: 0.01
   lerpMultiplier: 10
-  lerpPosition: 1
-  lerpRotation: 0
   isBetterSync: 0
   isLocalSpace: 0
 --- !u!136 &3217660693235410460
@@ -909,8 +872,6 @@ MonoBehaviour:
   positionThreshold: 0.001
   rotationThreshold: 0.01
   lerpMultiplier: 0
-  lerpPosition: 0
-  lerpRotation: 0
   isBetterSync: 0
   isLocalSpace: 0
 --- !u!1 &3245797858201706703

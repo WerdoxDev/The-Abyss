@@ -71,7 +71,6 @@ public class NetworkStats : NetworkBehaviour {
     [ClientRpc]
     private void PongClientRpc(ClientRpcParams rpcParams = default) {
         TimeSpan timeSpan = DateTime.Now - _timeBeforePing;
-        Debug.Log(timeSpan);
         int latency = Mathf.FloorToInt((float)timeSpan.TotalMilliseconds);
 
         _pingAverageList.Add(latency);

@@ -13,9 +13,15 @@ public class ServerPlayerCamera : NetworkBehaviour {
     private bool _newInfoConfirmed;
 
     [HideInInspector] public Transform Target;
-    public NetworkVariable<CameraTargetInfo> TargetInfo = new NetworkVariable<CameraTargetInfo>();
+    public NetworkVariable<CameraTargetInfo> TargetInfo = new();
+    public NetworkVariable<Vector2> OrientationRotation = new();
 
     public override void OnNetworkSpawn() {
+        OrientationRotation.OnValueChanged += (Vector2 oldValue, Vector2 newValue) => {
+            orientation.localRotation = Quaternion.Euler(orientation.localEulerAngles.x, newValue.y, orientation.localEulerAngles.z);
+            head.localRotation = Quaternion.Euler(newValue.x, head.localEulerAngles.y, head.localEulerAngles.z);
+        };
+
         if (!IsServer) {
             enabled = false;
             return;
@@ -30,7 +36,8 @@ public class ServerPlayerCamera : NetworkBehaviour {
             _newInfoConfirmed = false;
             TargetInfo.Value = new CameraTargetInfo(targetEuler, Target != null, true);
             _lastTarget = Target;
-        } else if (Target != null && _newInfoConfirmed)
+        }
+        else if (Target != null && _newInfoConfirmed)
             TargetInfo.Value = new CameraTargetInfo(targetEuler, false, false);
     }
 
@@ -38,8 +45,7 @@ public class ServerPlayerCamera : NetworkBehaviour {
 
     [ServerRpc]
     public void SetOrientationServerRpc(Vector2 rotation) {
-        orientation.localRotation = Quaternion.Euler(orientation.localEulerAngles.x, rotation.y, orientation.localEulerAngles.z);
-        head.localRotation = Quaternion.Euler(rotation.x, head.localEulerAngles.y, head.localEulerAngles.z);
+        OrientationRotation.Value = rotation;        
     }
 
     [ServerRpc]
