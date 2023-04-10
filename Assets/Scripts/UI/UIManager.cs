@@ -25,6 +25,7 @@ public class UIManager : MonoBehaviour {
     public GameObject ChatPanel;
     public GameObject KeybindLegendGO;
     public GameObject MainPanel;
+    public GameObject HUDPanel;
 
     [Header("Settings")]
     [SerializeField] private GameObject eventSystem;
@@ -83,12 +84,14 @@ public class UIManager : MonoBehaviour {
         };
 
         GameManager.Instance.OnPause += () => {
+            HUDPanel.SetActive(false);
             PausePanel.Panel.Open();
             KeybindLegendGO.SetActive(true);
             GameManager.Instance.FreeCursor();
         };
 
         GameManager.Instance.OnResume += () => {
+            HUDPanel.SetActive(true);
             PausePanel.Panel.Close();
             KeybindLegendGO.SetActive(false);
             GameManager.Instance.LockCursor();
@@ -97,6 +100,7 @@ public class UIManager : MonoBehaviour {
         void OnStartState() {
             StartPanel.Panel.Open();
             MainPanel.SetActive(false);
+            HUDPanel.SetActive(false);
             ChatPanel.SetActive(false);
             KeybindLegendGO.SetActive(false);
             InfoPanel.SetActive(false);
@@ -104,6 +108,7 @@ public class UIManager : MonoBehaviour {
 
         void OnMainMenuState() {
             MainPanel.SetActive(true);
+            HUDPanel.SetActive(false);
             KeybindLegendGO.SetActive(true);
             StatsPanel.gameObject.SetActive(true);
             JoinPanel.Close(true);
@@ -134,6 +139,7 @@ public class UIManager : MonoBehaviour {
 
         GameManager.Instance.OnGameStateChanged += (state) => {
             if (state == GameState.InGame) {
+                HUDPanel.SetActive(true);
                 MainPanel.SetActive(false);
                 KeybindLegendGO.SetActive(false);
                 JoinPanel.Close(true);

@@ -64,10 +64,6 @@ public class ClientPlayerAttachable : NetworkBehaviour {
 
     public AttachableSetting GetAttachableSetting(InteractType type, byte handlerData) {
         AttachableSettingType attachableType = AttachableSettingType.None;
-        if (type == InteractType.Capstan) attachableType = AttachableSettingType.Capstan;
-        if (type == InteractType.Steering) attachableType = AttachableSettingType.Steering;
-        if (type == InteractType.Ladder) attachableType = AttachableSettingType.Ladder;
-        if (type == InteractType.SailControl) attachableType = AttachableSettingType.SailControl;
         return attachableSettings.FirstOrDefault(x => x.type == attachableType);
     }
 

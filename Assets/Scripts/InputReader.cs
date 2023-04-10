@@ -38,6 +38,7 @@ public class InputReader : ScriptableObject, InputControls.IPlayerActions {
     public void OnSprint(InputAction.CallbackContext context) => SendButtonEvent(context, ButtonType.Sprint);
     public void OnPause(InputAction.CallbackContext context) => SendButtonEvent(context, ButtonType.Pause);
     public void OnChat(InputAction.CallbackContext context) => SendButtonEvent(context, ButtonType.Chat);
+    public void OnDrag(InputAction.CallbackContext context) => SendButtonEvent(context, ButtonType.Drag);
 
     // public void OnNavigate(InputAction.CallbackContext context) => UIMoveEvent?.Invoke(context.ReadValue<Vector2>());
     // public void OnPoint(InputAction.CallbackContext context) { }
@@ -74,7 +75,8 @@ public enum ButtonType {
     Interact,
     Sprint,
     Pause,
-    Chat
+    Chat,
+    Drag,
 }
 
 public enum UIButtonType {

@@ -25,12 +25,10 @@ public class ShipSpawner : NetworkBehaviour {
         Ship ship = shipObj.GetComponent<Ship>();
         SpawnerSettings settings = assetHolder.GetComponent<SpawnerSettings>();
 
-        Capstan capstan = SpawnCapstan(assetHolder, settings.CapstanProperties);
-        Steering steering = SpawnSteering(assetHolder, settings.SteeringProperties);
         SpawnLadders(assetHolder, settings.LadderProperties);
         SpawnSailControls(assetHolder, settings.SailControlProperties);
 
-        ship.SetSpawnables(capstan, steering);
+        ship.SetSpawnables();
 
         shipObj.transform.rotation = rotation;
 
@@ -41,18 +39,6 @@ public class ShipSpawner : NetworkBehaviour {
         GameObject spawnablesObj = Instantiate(smallShipAssetHolderPrefab, position, Quaternion.identity);
         SpawnObjInNet(spawnablesObj, shipObj);
         return spawnablesObj;
-    }
-
-    private Capstan SpawnCapstan(GameObject assetHolder, SpawnProperties properties) {
-        GameObject capstanObj = SpawnObj(properties);
-        SpawnObjInNet(capstanObj, assetHolder);
-        return capstanObj.GetComponent<Capstan>();
-    }
-
-    private Steering SpawnSteering(GameObject assetHolder, SpawnProperties properties) {
-        GameObject steeringObj = SpawnObj(properties);
-        SpawnObjInNet(steeringObj, assetHolder);
-        return steeringObj.GetComponent<Steering>();
     }
 
     private void SpawnLadders(GameObject assetHolder, SpawnProperties[] properties) {

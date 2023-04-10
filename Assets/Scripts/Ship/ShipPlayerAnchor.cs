@@ -65,7 +65,7 @@ public class ShipPlayerAnchor : NetworkBehaviour {
 
             float playerDistance = (playerPos.y - dummyTransform.position.y) - player.Offset;
 
-            bool canAnchor = player.IsGrounded && !player.IsOnAttachable(InteractType.Ladder);
+            bool canAnchor = player.IsGrounded /*&& !player.IsOnAttachable(InteractType.Ladder)*/;
             if (canAnchor && playerDistance > allowedDistance) {
                 dummyTransform.position = playerPos - new Vector3(0, (playerSize.y / 2), 0);
                 canAnchor = false;

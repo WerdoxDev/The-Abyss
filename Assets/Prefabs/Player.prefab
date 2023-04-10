@@ -118,6 +118,8 @@ MonoBehaviour:
   stopNaNs: 0
   taaSharpenStrength: 0.5
   TAAQuality: 1
+  taaSharpenMode: 0
+  taaRingingReduction: 0
   taaHistorySharpening: 0.35
   taaAntiFlicker: 0.5
   taaMotionVectorRejection: 0
@@ -168,6 +170,7 @@ MonoBehaviour:
     sssQualityMode: 0
     sssQualityLevel: 0
     sssCustomSampleBudget: 20
+    sssCustomDownsampleSteps: 0
     msaaMode: 1
     materialQuality: 0
   renderingPathCustomFrameSettingsOverrideMask:
@@ -353,10 +356,12 @@ GameObject:
   - component: {fileID: 3217660693235410433}
   - component: {fileID: 4094227060990229941}
   - component: {fileID: 3217660693235410436}
+  - component: {fileID: 6217924040919533833}
   - component: {fileID: 7914262004716620025}
   - component: {fileID: 2574748171929005398}
   - component: {fileID: 3217660693235410437}
   - component: {fileID: -1551906205096340494}
+  - component: {fileID: 4851747059964975840}
   - component: {fileID: 8593892023922776769}
   - component: {fileID: 2358588550936283245}
   - component: {fileID: 3217660693235410460}
@@ -439,6 +444,7 @@ MonoBehaviour:
   CLCamera: {fileID: 0}
   Movement: {fileID: 0}
   Attachable: {fileID: 0}
+  DragHandler: {fileID: 0}
   Interact: {fileID: 0}
   ServerTransform: {fileID: 0}
   Rb: {fileID: 0}
@@ -449,6 +455,7 @@ MonoBehaviour:
   CanSprint: 1
   CanLook: 1
   CanInteract: 1
+  CanDrag: 1
 --- !u!114 &2346856012485075061
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -540,6 +547,20 @@ MonoBehaviour:
   Handler: {fileID: 0}
   IsAttached:
     m_InternalValue: 0
+--- !u!114 &6217924040919533833
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3217660693235410454}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 99cc01f809dabbb429c95d9613277fa7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IsDragging:
+    m_InternalValue: 0
 --- !u!114 &7914262004716620025
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -585,7 +606,7 @@ MonoBehaviour:
   interactCooldown: 0.25
   intercatableLayer:
     serializedVersion: 2
-    m_Bits: 7424
+    m_Bits: 65792
 --- !u!114 &-1551906205096340494
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -627,6 +648,19 @@ MonoBehaviour:
     setDefaultRotation: 1
     resetRotationTarget: 1
     resetRotation: 1
+--- !u!114 &4851747059964975840
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3217660693235410454}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1bdacc4365c269c418ad6ae223541848, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sendRayPositionInterval: 0.1
 --- !u!114 &8593892023922776769
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -42,6 +42,15 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "Drag",
+                    "type": "Button",
+                    "id": "250dc53e-ffda-45c6-bb8c-a51de9c0485f",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "Sprint",
                     "type": "Button",
                     "id": "19cec088-de35-4840-bb8f-6dcc6ae0996e",
@@ -188,6 +197,17 @@
                     "processors": "",
                     "groups": "Keyboard & Mouse",
                     "action": "Chat",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "c0ce3502-cc38-4ce7-b31d-f96cc86571f5",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Drag",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

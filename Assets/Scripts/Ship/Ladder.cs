@@ -25,8 +25,8 @@ public class Ladder : NetworkBehaviour, Interactable
 
     public override void OnNetworkSpawn()
     {
-        TopInteract.interactable = this;
-        BottomInteract.interactable = this;
+        TopInteract.Interactable = this;
+        BottomInteract.Interactable = this;
     }
 
     public InteractHandler GetHandler(byte handlerData)

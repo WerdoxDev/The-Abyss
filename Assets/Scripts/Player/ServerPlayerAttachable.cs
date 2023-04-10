@@ -5,7 +5,7 @@ using Unity.Netcode;
 public class ServerPlayerAttachable : NetworkBehaviour {
     public InteractHandler Handler;
 
-    public NetworkVariable<bool> IsAttached = new NetworkVariable<bool>(false);
+    public NetworkVariable<bool> IsAttached = new(false);
 
     private Player _player;
     private Vector2 _movementInput;
@@ -30,94 +30,64 @@ public class ServerPlayerAttachable : NetworkBehaviour {
     private void FixedUpdate() {
         if (!IsAttached.Value) return;
 
-        if (_attachable.Capstan != null) {
-            if (!_attachable.Capstan.IsDown.Value) Detach();
-            else _attachable.Capstan.Raise(_movementInput.y);
-        }
-        else if (_attachable.Steering != null)
-            _attachable.Steering.Turn(_movementInput.x);
+        //else if (_attachable.Ladder != null) {
+        //    Ladder Ladder = _attachable.Ladder;
+        //    Vector3 upVector = Ladder.MidPos + Ladder.MidTransform.up * Ladder.PlayerOffset;
+        //    Ladder.PlayerOffset += _movementInput.y * 0.1f * Ladder.climbSpeed;
 
-        else if (_attachable.SailControl != null)
-            _attachable.SailControl.ConnectedShip.SailControl.SetSails(_movementInput);
+        //    transform.position = upVector;
+        //    Vector3 localPos = Ladder.transform.InverseTransformPoint(transform.position);
 
-        else if (_attachable.Ladder != null) {
-            Ladder Ladder = _attachable.Ladder;
-            Vector3 upVector = Ladder.MidPos + Ladder.MidTransform.up * Ladder.PlayerOffset;
-            Ladder.PlayerOffset += _movementInput.y * 0.1f * Ladder.climbSpeed;
+        //    if (localPos.y - _player.Offset > Ladder.TopInteract.LocalStandPos.y) {
+        //        transform.position = Ladder.LandPos + _player.OffsetVector;
+        //        Detach();
+        //    }
+        //    else if (localPos.y < Ladder.BottomInteract.LocalStandPos.y) Detach();
+        //}
 
-            transform.position = upVector;
-            Vector3 localPos = Ladder.transform.InverseTransformPoint(transform.position);
-
-            if (localPos.y - _player.Offset > Ladder.TopInteract.LocalStandPos.y) {
-                transform.position = Ladder.LandPos + _player.OffsetVector;
-                Detach();
-            }
-            else if (localPos.y < Ladder.BottomInteract.LocalStandPos.y) Detach();
-        }
-
-        if (Handler != null) {
-            if (Handler.Type != InteractType.Ladder) transform.position = _standTransform.position + _standTransform.up * _player.Offset;
-            transform.rotation = _standTransform.rotation;
-        }
+        //if (Handler != null) {
+        //    if (Handler.Type != InteractType.Ladder) transform.position = _standTransform.position + _standTransform.up * _player.Offset;
+        //    transform.rotation = _standTransform.rotation;
+        //}
     }
 
     public void Attach() {
         if (Handler == null) return;
 
         _attachable.Reset();
+        
+        //if (Handler.Type == InteractType.Ladder) {
+        //    Ladder Ladder = (Ladder)Handler.interactable;
 
-        if (Handler.Type == InteractType.Capstan) {
-            _attachable.Capstan = (Capstan)Handler.interactable;
-            if (!_attachable.Capstan.IsDown.Value) {
-                _attachable.Capstan.Lower();
-                return;
-            }
+        //    Vector3 localPos = Ladder.transform.InverseTransformPoint(transform.position);
+        //    Ladder.PlayerOffset = Handler.Data == 0 ? localPos.y - 1 : localPos.y;
+        //    Ladder.PlayerOffset = Mathf.Clamp(Ladder.PlayerOffset, Ladder.BottomInteract.LocalStandPos.y + 0.5f, Ladder.TopInteract.LocalStandPos.y);
+        //    Vector3 position = Ladder.MidPos;
+        //    position.y = Ladder.MidPos.y + Ladder.PlayerOffset;
+        //    transform.position = position;
 
-            _attachable.Capstan.PlayerNum++;
+        //    _standTransform = Ladder.transform;
 
-            _standTransform = Handler.StandTransform;
-        }
-        else if (Handler.Type == InteractType.Ladder) {
-            Ladder Ladder = (Ladder)Handler.interactable;
+        //    // Just to avoid long lines
+        //    _attachable.Ladder = Ladder;
+        //    _player.ServerTransform.SetLerpInfo(false, false);
+        //}        
 
-            Vector3 localPos = Ladder.transform.InverseTransformPoint(transform.position);
-            Ladder.PlayerOffset = Handler.Data == 0 ? localPos.y - 1 : localPos.y;
-            Ladder.PlayerOffset = Mathf.Clamp(Ladder.PlayerOffset, Ladder.BottomInteract.LocalStandPos.y + 0.5f, Ladder.TopInteract.LocalStandPos.y);
-            Vector3 position = Ladder.MidPos;
-            position.y = Ladder.MidPos.y + Ladder.PlayerOffset;
-            transform.position = position;
+        //_standTransform = Handler.StandTransform;
 
-            _standTransform = Ladder.transform;
-
-            // Just to avoid long lines
-            _attachable.Ladder = Ladder;
-            _player.ServerTransform.SetLerpInfo(false, false);
-        }
-        else if (Handler.Type == InteractType.Steering) _attachable.Steering = (Steering)Handler.interactable;
-        else if (Handler.Type == InteractType.SailControl) _attachable.SailControl = (SailControlHandle)Handler.interactable;
-
-        _standTransform = Handler.StandTransform;
-
-        _player.SetRotationTarget(Handler.StandTransform);
-        _client.SetAttachableSettingsClientRpc(Handler.interactable.NetworkObjectId, true, Handler.Type, Handler.Data, _player.ClientRpcParams);
-        _player.SetMovementState(false);
-        Handler.Occupied.Value = true;
-        IsAttached.Value = true;
+        //_player.SetRotationTarget(Handler.StandTransform);
+        //_client.SetAttachableSettingsClientRpc(Handler.interactable.NetworkObjectId, true, Handler.Type, Handler.Data, _player.ClientRpcParams);
+        //_player.SetMovementState(false);
+        //Handler.Occupied.Value = true;
+        //IsAttached.Value = true;
     }
 
     public void Detach() {
-        switch (Handler.Type) {
-            case InteractType.Capstan:
-                Capstan Capstan = (Capstan)Handler.interactable;
-                Capstan.PlayerNum--;
-                break;
-        }
-
         AttachableSetting settings = _client.GetAttachableSetting(Handler.Type, Handler.Data);
         if (settings.resetRotationTarget) _player.ResetRotationTarget();
         if (settings.resetRotation) _player.transform.rotation = Quaternion.identity;
 
-        _client.SetAttachableSettingsClientRpc(Handler.interactable.NetworkObjectId, false, Handler.Type, Handler.Data, _player.ClientRpcParams);
+        _client.SetAttachableSettingsClientRpc(Handler.Interactable.NetworkObjectId, false, Handler.Type, Handler.Data, _player.ClientRpcParams);
         _player.SetMovementState(true);
         Handler.Occupied.Value = false;
         IsAttached.Value = false;
@@ -131,10 +101,10 @@ public class ServerPlayerAttachable : NetworkBehaviour {
             this.Handler = null;
             return;
         }
-        if (Handler.Type == InteractType.Capstan ||
-            Handler.Type == InteractType.Ladder ||
-            Handler.Type == InteractType.SailControl ||
-            Handler.Type == InteractType.Steering) this.Handler = Handler;
+        //if (Handler.Type == InteractType.Capstan ||
+        //    Handler.Type == InteractType.Ladder ||
+        //    Handler.Type == InteractType.SailControl ||
+        //    Handler.Type == InteractType.Steering) this.Handler = Handler;
     }
 
     [ServerRpc]
@@ -142,16 +112,9 @@ public class ServerPlayerAttachable : NetworkBehaviour {
 }
 
 public struct Attachable {
-    public Capstan Capstan;
-    public Steering Steering;
-    public SailControlHandle SailControl;
     public Ladder Ladder;
 
-    public void Reset() {
-        Capstan = null;
-        Steering = null;
-        SailControl = null;
+    public void Reset() {        
         Ladder = null;
     }
 }
-//(ladderLayer.value & (1 << col.gameObject.layer)) > 0

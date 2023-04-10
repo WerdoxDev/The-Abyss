@@ -20,6 +20,8 @@ public class Player : NetworkBehaviour {
     public ClientPlayerCamera CLCamera;
     public ServerPlayerMovement Movement;
     public ServerPlayerAttachable Attachable;
+    public ServerPlayerDrag SDragHandler;
+    public ClientPlayerDrag CDragHandler;
     public ServerPlayerInteract Interact;
     public ServerTransform ServerTransform;
     public Rigidbody Rb;
@@ -41,6 +43,7 @@ public class Player : NetworkBehaviour {
     public bool CanSprint = true;
     public bool CanLook = true;
     public bool CanInteract = true;
+    public bool CanDrag = true;
 
     public bool IsGrounded { get => Movement.IsGrounded; }
     public bool IsSprinting { get => Movement.IsSprinting.Value; }
@@ -50,6 +53,8 @@ public class Player : NetworkBehaviour {
         SRCamera = GetComponent<ServerPlayerCamera>();
         CLCamera = GetComponent<ClientPlayerCamera>();
         Attachable = GetComponent<ServerPlayerAttachable>();
+        SDragHandler = GetComponent<ServerPlayerDrag>();
+        CDragHandler = GetComponent<ClientPlayerDrag>();
         Interact = GetComponent<ServerPlayerInteract>();
         Movement = GetComponent<ServerPlayerMovement>();
         ServerTransform = GetComponent<ServerTransform>();
@@ -64,17 +69,18 @@ public class Player : NetworkBehaviour {
 
         ClientRpcParams = new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new[] { OwnerClientId } } };
 
+        Debug.Log(OwnerClientId + " Player");
         GameManager.Instance.OnPause += () => DisableKeybinds();
         GameManager.Instance.OnResume += () => EnableKeybinds();
 
         // ChatManager.Instance.OnOpened += () => DisableKeybinds();
         // ChatManager.Instance.OnClosed += () => EnableKeybinds();
 
-//#if UNITY_EDITOR
-//        if (!IsServer) return;
-//        Ship ship = ShipSpawner.Instance.SpawnShip(new Vector3(0, -25, -25), Quaternion.Euler(-10, 0, 0));
-//        ship.Rb.constraints = RigidbodyConstraints.FreezeAll;
-//#endif
+        //#if UNITY_EDITOR
+        //        if (!IsServer) return;
+        //        Ship ship = ShipSpawner.Instance.SpawnShip(new Vector3(0, -25, -25), Quaternion.Euler(-10, 0, 0));
+        //        ship.Rb.constraints = RigidbodyConstraints.FreezeAll;
+        //#endif
     }
 
     public override void OnDestroy() {
@@ -150,6 +156,7 @@ public class Player : NetworkBehaviour {
         CanInteract = false;
         CanJump = false;
         CanSprint = false;
+        CanDrag = false;
     }
 
     public void EnableKeybinds() {
@@ -159,6 +166,7 @@ public class Player : NetworkBehaviour {
         CanInteract = true;
         CanJump = true;
         CanSprint = true;
+        CanDrag = true;
     }
 
     public void ChangeFOVLerp(float startFOV, float endFOV, float duration) => StartCoroutine(ChangeFOV(startFOV, endFOV, duration));

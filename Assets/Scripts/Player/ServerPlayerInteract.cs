@@ -1,11 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using Unity.Netcode;
+using UnityEngine;
 
 public class ServerPlayerInteract : NetworkBehaviour {
     private Player _player;
-    private ClientRpcParams _clientRpcParams;
 
     private ClientPlayerInteract _client;
 
@@ -19,8 +16,6 @@ public class ServerPlayerInteract : NetworkBehaviour {
             enabled = false;
             return;
         }
-
-        _clientRpcParams = new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new[] { OwnerClientId } } };
     }
 
     [ServerRpc]
@@ -29,24 +24,56 @@ public class ServerPlayerInteract : NetworkBehaviour {
 
         NetworkManager.SpawnManager.SpawnedObjects.TryGetValue(interactObjId, out var interactObj);
         if (interactObj == null) {
-            _client.UnbusyClientRpc(_clientRpcParams);
+            _client.UnbusyClientRpc(_player.ClientRpcParams);
             return;
         }
+
         InteractHandler handler = interactObj.GetComponent<Interactable>().GetHandler(handlerData);
 
         if (handler == null) {
-            Debug.LogError("InteractHanlder was not found");
-            _client.UnbusyClientRpc(_clientRpcParams);
+            Debug.LogError("InteractHandler was not found");
+            _client.UnbusyClientRpc(_player.ClientRpcParams);
             return;
         }
 
-        handler?.Interact();
+        handler.Interact();
 
-        _player.Attachable.SetHandler(handler);
-        if (_player.Attachable.Handler != null) {
-            if (!_player.Attachable.IsAttached.Value) _player.Attachable.Attach();
-            else _player.Attachable.Detach();
+        //_player.Attachable.SetHandler(handler);
+        //if (_player.Attachable.Handler != null) {
+        //    if (!_player.Attachable.IsAttached.Value) _player.Attachable.Attach();
+        //    else _player.Attachable.Detach();
+        //}
+        _client.UnbusyClientRpc(_player.ClientRpcParams);
+    }
+
+    [ServerRpc]
+    public void StartDragServerRpc(ulong interactObjId, InteractType type, byte handlerData, Vector3 initPosition, Vector3 initNormal) {
+        if (!_player.CanInteract) return;
+
+        NetworkManager.SpawnManager.SpawnedObjects.TryGetValue(interactObjId, out var interactObj);
+        if (interactObj == null) {
+            _client.UnbusyClientRpc(_player.ClientRpcParams);
+            return;
         }
-        _client.UnbusyClientRpc(_clientRpcParams);
+
+        InteractHandler handler = interactObj.GetComponent<Interactable>().GetHandler(handlerData);
+
+        if (handler == null) {
+            Debug.LogError("InteractHandler was not found");
+            _client.UnbusyClientRpc(_player.ClientRpcParams);
+            return;
+        }
+
+        if (type == InteractType.Wheel) {
+            _player.SDragHandler.SetHandler(handler);
+            _player.SDragHandler.StartDrag(initPosition, initNormal);
+        }
+
+        _client.UnbusyClientRpc(_player.ClientRpcParams);
+    }
+
+    [ServerRpc]
+    public void StopDragServerRpc(InteractType type, byte handlerData) {
+        _player.SDragHandler.StopDrag();
     }
 }

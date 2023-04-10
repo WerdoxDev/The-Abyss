@@ -31,37 +31,6 @@ Transform:
   m_Father: {fileID: 6629661507407408663}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
---- !u!1 &1839071213026214508
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1649434893407150237}
-  m_Layer: 13
-  m_Name: SailControlPos L
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1649434893407150237
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1839071213026214508}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -7.75, y: 19.25, z: -21.75}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 6629661507407408663}
-  m_RootOrder: -1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2535227774748050634
 GameObject:
   m_ObjectHideFlags: 0
@@ -123,12 +92,8 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1704660497465582353}
-  - {fileID: 8495799855620222701}
   - {fileID: 6941933563218924922}
   - {fileID: 703822798338756234}
-  - {fileID: 1649434893407150237}
-  - {fileID: 8016862850308076406}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -161,123 +126,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   CapstanProperties:
-    Prefab: {fileID: 8754532553857626369, guid: f9637da121f8d5c408676e83df73240a,
-      type: 3}
-    SpawnTransform: {fileID: 8495799855620222701}
+    Prefab: {fileID: 8754532553857626369, guid: f9637da121f8d5c408676e83df73240a, type: 3}
+    SpawnTransform: {fileID: 0}
     Direction: 2
   SteeringProperties:
-    Prefab: {fileID: 5837413835250122392, guid: f05f2960e38e06844b72cc9d8c2a74da,
-      type: 3}
-    SpawnTransform: {fileID: 1704660497465582353}
+    Prefab: {fileID: 5837413835250122392, guid: f05f2960e38e06844b72cc9d8c2a74da, type: 3}
+    SpawnTransform: {fileID: 0}
     Direction: 2
   LadderProperties:
-  - Prefab: {fileID: 2507409136286295134, guid: 929984f3e7606c34984f2e6c0d9afc23,
-      type: 3}
+  - Prefab: {fileID: 2507409136286295134, guid: 929984f3e7606c34984f2e6c0d9afc23, type: 3}
     SpawnTransform: {fileID: 6941933563218924922}
     Direction: 0
-  - Prefab: {fileID: 2507409136286295134, guid: 929984f3e7606c34984f2e6c0d9afc23,
-      type: 3}
+  - Prefab: {fileID: 2507409136286295134, guid: 929984f3e7606c34984f2e6c0d9afc23, type: 3}
     SpawnTransform: {fileID: 703822798338756234}
     Direction: 1
   SailControlProperties:
-  - Prefab: {fileID: 7399524886506075687, guid: 18843f8724e1d9f4c97d451d5f1c87b5,
-      type: 3}
-    SpawnTransform: {fileID: 1649434893407150237}
+  - Prefab: {fileID: 7399524886506075687, guid: 18843f8724e1d9f4c97d451d5f1c87b5, type: 3}
+    SpawnTransform: {fileID: 0}
     Direction: 0
-  - Prefab: {fileID: 7399524886506075687, guid: 18843f8724e1d9f4c97d451d5f1c87b5,
-      type: 3}
-    SpawnTransform: {fileID: 8016862850308076406}
+  - Prefab: {fileID: 7399524886506075687, guid: 18843f8724e1d9f4c97d451d5f1c87b5, type: 3}
+    SpawnTransform: {fileID: 0}
     Direction: 1
---- !u!1 &6431307863429855910
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 8495799855620222701}
-  m_Layer: 13
-  m_Name: CapstanPos
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &8495799855620222701
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6431307863429855910}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 17, z: -22.25}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 6629661507407408663}
-  m_RootOrder: -1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &7763578439722522482
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1704660497465582353}
-  m_Layer: 13
-  m_Name: SteeringPos
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1704660497465582353
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7763578439722522482}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 18.75, z: -16.5}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 6629661507407408663}
-  m_RootOrder: -1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &8051537144413791653
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 8016862850308076406}
-  m_Layer: 13
-  m_Name: SailControlPos R
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &8016862850308076406
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8051537144413791653}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 7.75, y: 19.25, z: -21.75}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 6629661507407408663}
-  m_RootOrder: -1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
