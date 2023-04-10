@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-5332529930519961616
+--- !u!114 &-6732536948054274838
 MonoBehaviour:
   m_ObjectHideFlags: 3
   m_CorrespondingSourceObject: {fileID: 0}
@@ -9,58 +9,70 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aaa3b8214f75b354e9ba2caadd022259, type: 3}
-  m_Name: DepthOfField
+  m_Script: {fileID: 11500000, guid: 15cc4c5fcb677014ebdc0d8be227b40c, type: 3}
+  m_Name: ScreenSpaceLensFlare
   m_EditorClassIdentifier: 
-  active: 0
-  quality:
+  active: 1
+  intensity:
+    m_OverrideState: 1
+    m_Value: 0.1
+  tintColor:
+    m_OverrideState: 0
+    m_Value: {r: 1, g: 1, b: 1, a: 1}
+  bloomMip:
+    m_OverrideState: 0
+    m_Value: 1
+  firstFlareIntensity:
+    m_OverrideState: 0
+    m_Value: 1
+  secondaryFlareIntensity:
+    m_OverrideState: 0
+    m_Value: 1
+  warpedFlareIntensity:
+    m_OverrideState: 0
+    m_Value: 1
+  warpedFlareScale:
+    m_OverrideState: 0
+    m_Value: {x: 1, y: 1}
+  samples:
     m_OverrideState: 1
     m_Value: 3
-  focusMode:
-    m_OverrideState: 1
-    m_Value: 2
-  focusDistance:
-    m_OverrideState: 1
-    m_Value: 0.4
-  focusDistanceMode:
-    m_OverrideState: 1
+  sampleDimmer:
+    m_OverrideState: 0
+    m_Value: 0.5
+  vignetteEffect:
+    m_OverrideState: 0
+    m_Value: 1
+  startingPosition:
+    m_OverrideState: 0
+    m_Value: 1.25
+  scale:
+    m_OverrideState: 0
+    m_Value: 1.5
+  streaksIntensity:
+    m_OverrideState: 0
+    m_Value: 1
+  streaksLength:
+    m_OverrideState: 0
+    m_Value: 0.5
+  streaksOrientation:
+    m_OverrideState: 0
     m_Value: 0
-  nearFocusStart:
-    m_OverrideState: 1
-    m_Value: 0
-  nearFocusEnd:
-    m_OverrideState: 1
-    m_Value: 0.00001
-  farFocusStart:
-    m_OverrideState: 1
-    m_Value: 300
-  farFocusEnd:
-    m_OverrideState: 1
-    m_Value: 500
-  m_NearSampleCount:
-    m_OverrideState: 1
-    m_Value: 8
-  m_NearMaxBlur:
-    m_OverrideState: 1
-    m_Value: 8
-  m_FarSampleCount:
-    m_OverrideState: 1
-    m_Value: 16
-  m_FarMaxBlur:
-    m_OverrideState: 1
-    m_Value: 16
-  m_Resolution:
-    m_OverrideState: 1
+  streaksThreshold:
+    m_OverrideState: 0
+    m_Value: 0.25
+  resolution:
+    m_OverrideState: 0
     m_Value: 4
-  m_HighQualityFiltering:
-    m_OverrideState: 1
-    m_Value: 0
-  m_PhysicallyBased:
-    m_OverrideState: 1
-    m_Value: 0
-  m_LimitManualRangeNearBlur:
-    m_OverrideState: 1
-    m_Value: 0
+  spectralLut:
+    m_OverrideState: 0
+    m_Value: {fileID: 0}
+  chromaticAbberationIntensity:
+    m_OverrideState: 0
+    m_Value: 0.5
+  chromaticAbberationSampleCount:
+    m_OverrideState: 0
+    m_Value: 3
 --- !u!114 &-3972624062383287088
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -192,7 +204,7 @@ MonoBehaviour:
   active: 1
   quality:
     m_OverrideState: 1
-    m_Value: 2
+    m_Value: 1
   threshold:
     m_OverrideState: 1
     m_Value: 0.5
@@ -219,7 +231,7 @@ MonoBehaviour:
     m_Value: 2
   m_HighQualityPrefiltering:
     m_OverrideState: 1
-    m_Value: 1
+    m_Value: 0
   m_HighQualityFiltering:
     m_OverrideState: 1
     m_Value: 1
@@ -427,7 +439,10 @@ MonoBehaviour:
   components:
   - {fileID: -1378616974565687095}
   - {fileID: 7577204457177902586}
-  - {fileID: -5332529930519961616}
+  - {fileID: 6255904101153899236}
+  - {fileID: 4759312457397274140}
+  - {fileID: 1793968286026969540}
+  - {fileID: -6732536948054274838}
 --- !u!114 &659554325047699962
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -497,6 +512,46 @@ MonoBehaviour:
   cropToFit:
     m_OverrideState: 1
     m_Value: 1
+--- !u!114 &1793968286026969540
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c1be1b6c95cd2e41b27903b9270817f, type: 3}
+  m_Name: Vignette
+  m_EditorClassIdentifier: 
+  active: 1
+  mode:
+    m_OverrideState: 1
+    m_Value: 0
+  color:
+    m_OverrideState: 0
+    m_Value: {r: 0, g: 0, b: 0, a: 1}
+  center:
+    m_OverrideState: 0
+    m_Value: {x: 0.5, y: 0.5}
+  intensity:
+    m_OverrideState: 1
+    m_Value: 0.3
+  smoothness:
+    m_OverrideState: 0
+    m_Value: 0.055
+  roundness:
+    m_OverrideState: 0
+    m_Value: 1
+  rounded:
+    m_OverrideState: 0
+    m_Value: 0
+  mask:
+    m_OverrideState: 0
+    m_Value: {fileID: 0}
+  opacity:
+    m_OverrideState: 0
+    m_Value: 1
 --- !u!114 &1982489133330754864
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -535,6 +590,25 @@ MonoBehaviour:
   intensity:
     m_OverrideState: 0
     m_Value: 0
+--- !u!114 &4759312457397274140
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b51a78e223a2e504bb88a059b55229ea, type: 3}
+  m_Name: WhiteBalance
+  m_EditorClassIdentifier: 
+  active: 1
+  temperature:
+    m_OverrideState: 1
+    m_Value: -25
+  tint:
+    m_OverrideState: 1
+    m_Value: -15
 --- !u!114 &4988293974612045188
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -650,6 +724,34 @@ MonoBehaviour:
   contribution:
     m_OverrideState: 1
     m_Value: 0.4
+--- !u!114 &6255904101153899236
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b8bcdf71d7fafa419fca1ed162f5fc9, type: 3}
+  m_Name: ColorAdjustments
+  m_EditorClassIdentifier: 
+  active: 1
+  postExposure:
+    m_OverrideState: 0
+    m_Value: 1.28
+  contrast:
+    m_OverrideState: 0
+    m_Value: -91.2
+  colorFilter:
+    m_OverrideState: 0
+    m_Value: {r: 1, g: 1, b: 1, a: 1}
+  hueShift:
+    m_OverrideState: 0
+    m_Value: -9
+  saturation:
+    m_OverrideState: 1
+    m_Value: 30
 --- !u!114 &7500515415605365092
 MonoBehaviour:
   m_ObjectHideFlags: 3

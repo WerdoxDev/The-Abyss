@@ -29,10 +29,11 @@ public class ClientPlayerDrag : NetworkBehaviour {
     }
 
     private void FixedUpdate() {
-        if (!_player.SDragHandler.IsDragging.Value || Handler == null) return;
+        if (!_player.SRDragHandler.IsDragging.Value || Handler == null) return;
 
         if (Handler.Type == InteractType.Wheel) {
             Transform camTransform = _player.CLCamera.Camera.transform;
+            if (_player.CLInteract.StopDragIfOutOfRange(_initPosition)) return;
             _draggable.Wheel.CalculateAndSendForce(_initPosition, _initNormal, camTransform.position, camTransform.forward);
         }
     }

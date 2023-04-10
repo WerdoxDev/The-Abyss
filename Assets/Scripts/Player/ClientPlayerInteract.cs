@@ -46,7 +46,7 @@ public class ClientPlayerInteract : NetworkBehaviour {
         else {
             if (_currentHandler != null && _currentHandler.Type == InteractType.Wheel && !_currentHandler.Occupied.Value) {
                 _currentHandler = null;
-                _player.SDragHandler.StopDrag();
+                _player.SRDragHandler.StopDrag();
             }
         }
 
@@ -59,6 +59,16 @@ public class ClientPlayerInteract : NetworkBehaviour {
         //}
         //else if (_player.Attachable.IsAttached.Value && _currentHandler != null)
         //    UIManager.Instance.InteractionPanel.ClearTarget();
+    }
+
+    public bool StopDragIfOutOfRange(Vector3 initPosition) {
+        if (Vector3.Distance(initPosition, _player.CLCamera.Camera.transform.position) >= interactRange) {
+            _server.StopDragServerRpc(_currentHandler.Type, _currentHandler.Data);
+            _player.CLDragHandler.StopDrag();
+            return true;
+        }
+
+        return false;
     }
 
     [ClientRpc]
@@ -85,7 +95,7 @@ public class ClientPlayerInteract : NetworkBehaviour {
             if (type == ButtonType.Drag) {
                 if (!performed && _currentHandler != null) {
                     _server.StopDragServerRpc(_currentHandler.Type, _currentHandler.Data);
-                    _player.CDragHandler.StopDrag();
+                    _player.CLDragHandler.StopDrag();
                     return;
                 }
 
@@ -97,8 +107,8 @@ public class ClientPlayerInteract : NetworkBehaviour {
                 if (Physics.Raycast(camTransform.position, camTransform.forward, out RaycastHit hit, Mathf.Infinity)) {
                     _server.StartDragServerRpc(_currentHandler.Interactable.NetworkObjectId, _currentHandler.Type, _currentHandler.Data, hit.point, hit.normal);
 
-                    _player.CDragHandler.SetHandler(_currentHandler);
-                    _player.CDragHandler.StartDrag(hit.point, hit.normal);
+                    _player.CLDragHandler.SetHandler(_currentHandler);
+                    _player.CLDragHandler.StartDrag(hit.point, hit.normal);
                 }
             }
         }

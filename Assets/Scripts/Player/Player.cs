@@ -20,9 +20,10 @@ public class Player : NetworkBehaviour {
     public ClientPlayerCamera CLCamera;
     public ServerPlayerMovement Movement;
     public ServerPlayerAttachable Attachable;
-    public ServerPlayerDrag SDragHandler;
-    public ClientPlayerDrag CDragHandler;
-    public ServerPlayerInteract Interact;
+    public ServerPlayerDrag SRDragHandler;
+    public ClientPlayerDrag CLDragHandler;
+    public ServerPlayerInteract SRInteract;
+    public ClientPlayerInteract CLInteract;
     public ServerTransform ServerTransform;
     public Rigidbody Rb;
     public Ship CurrentShip;
@@ -53,9 +54,10 @@ public class Player : NetworkBehaviour {
         SRCamera = GetComponent<ServerPlayerCamera>();
         CLCamera = GetComponent<ClientPlayerCamera>();
         Attachable = GetComponent<ServerPlayerAttachable>();
-        SDragHandler = GetComponent<ServerPlayerDrag>();
-        CDragHandler = GetComponent<ClientPlayerDrag>();
-        Interact = GetComponent<ServerPlayerInteract>();
+        SRDragHandler = GetComponent<ServerPlayerDrag>();
+        CLDragHandler = GetComponent<ClientPlayerDrag>();
+        SRInteract = GetComponent<ServerPlayerInteract>();
+        CLInteract = GetComponent<ClientPlayerInteract>();
         Movement = GetComponent<ServerPlayerMovement>();
         ServerTransform = GetComponent<ServerTransform>();
         Data = GetComponent<PlayerData>();

@@ -22,6 +22,7 @@ public class WaterManager : MonoBehaviour {
     }
 
     public float GetWaveHeight(Vector3 position) {
+        if (!Surface.cpuSimulation) return Surface.transform.position.y;
         _searchParameters.startPositionWS = _searchResult.candidateLocationWS;
         _searchParameters.targetPositionWS = position;
         _searchParameters.error = 0.01f;

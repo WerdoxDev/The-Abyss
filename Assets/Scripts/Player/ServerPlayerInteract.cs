@@ -65,8 +65,8 @@ public class ServerPlayerInteract : NetworkBehaviour {
         }
 
         if (type == InteractType.Wheel) {
-            _player.SDragHandler.SetHandler(handler);
-            _player.SDragHandler.StartDrag(initPosition, initNormal);
+            _player.SRDragHandler.SetHandler(handler);
+            _player.SRDragHandler.StartDrag(initPosition, initNormal);
         }
 
         _client.UnbusyClientRpc(_player.ClientRpcParams);
@@ -74,6 +74,6 @@ public class ServerPlayerInteract : NetworkBehaviour {
 
     [ServerRpc]
     public void StopDragServerRpc(InteractType type, byte handlerData) {
-        _player.SDragHandler.StopDrag();
+        _player.SRDragHandler.StopDrag();
     }
 }
