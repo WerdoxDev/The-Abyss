@@ -9,8 +9,8 @@ public class ClientPlayerDrag : NetworkBehaviour {
 
     private Player _player;
     private Draggable _draggable;
-    private Vector3 _initPosition;
-    private Vector3 _initNormal;
+    private InputReader _inputReader;
+    private Vector2 _lastSentInput;
 
     private float _timer;
 
@@ -26,43 +26,45 @@ public class ClientPlayerDrag : NetworkBehaviour {
             enabled = false;
             return;
         }
+
+        _inputReader = _player.InputReader;
+        SetInputState(true);
     }
 
-    private void FixedUpdate() {
-        if (!_player.SRDragHandler.IsDragging.Value || Handler == null) return;
-
-        if (Handler.Type == InteractType.Wheel) {
-            Transform camTransform = _player.CLCamera.Camera.transform;
-            if (_player.CLInteract.StopDragIfOutOfRange(_initPosition)) return;
-            _draggable.Wheel.CalculateAndSendForce(_initPosition, _initNormal, camTransform.position, camTransform.forward);
-        }
-    }
-
-    public void StartDrag(Vector3 initPosition, Vector3 initNormal) {
+    public void StartDrag() {
         if (Handler == null) return;
 
         _draggable.Reset();
 
-        if (Handler.Type == InteractType.Wheel) {
-            _draggable.Wheel = (Wheel)Handler.Interactable;
-            _draggable.Wheel.SpawnInitial(initPosition, true);
-        }
+        if (Handler.Type == InteractType.Handle) _draggable.Handle = (Handle)Handler.Interactable;
 
-        _initPosition = initPosition;
-        _initNormal = initNormal;
+        _player.CanLook = false;
     }
 
     public void StopDrag() {
         if (Handler == null) return;
 
-        if (Handler.Type == InteractType.Wheel) {
-            _draggable.Wheel.ResetWheel();
-        }
-
         _draggable.Reset();
 
+        _player.CanLook = true;
         Handler = null;
     }
 
     public void SetHandler(InteractHandler handler) => Handler = handler;
+
+    private void SetInputState(bool enabled) {
+        if (!IsOwner) return;
+
+        void OnLook(Vector2 rotation) {
+            if (rotation == _lastSentInput) return;
+
+            if (Handler != null && Handler.Occupied.Value) _server.SetMouseInputServerRpc(rotation);
+            else _server.SetMouseInputServerRpc(Vector2.zero);
+
+            _lastSentInput = rotation;
+        }
+
+        if (enabled) _inputReader.LookEvent += OnLook;
+        else _inputReader.LookEvent -= OnLook;
+    }
 }

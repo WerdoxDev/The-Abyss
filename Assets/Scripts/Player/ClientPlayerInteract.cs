@@ -6,12 +6,12 @@ public class ClientPlayerInteract : NetworkBehaviour {
     [SerializeField] private float interactRange;
     [SerializeField] private float interactCooldown;
     [SerializeField] private LayerMask intercatableLayer;
-    private bool _interactCooldownFinished = true;
 
     private Player _player;
     private InputReader _inputReader;
     private InteractHandler _currentHandler;
     private bool _busy;
+    private bool _interactCooldownFinished = true;
 
     private ServerPlayerInteract _server;
 
@@ -36,17 +36,22 @@ public class ClientPlayerInteract : NetworkBehaviour {
         if (_busy) return;
         Transform camTransform = _player.CLCamera.Camera.transform;
         if (Physics.Raycast(camTransform.position, camTransform.forward, out RaycastHit interactHit, interactRange, intercatableLayer)) {
-            if (_currentHandler == null)
+            if (_currentHandler == null) {
                 _currentHandler = interactHit.collider.gameObject.GetComponent<InteractHandler>();
+                CrosshairManager.Instance.SetState(CrosshairState.Interact);
+            }
             //if (_currentHandler.Occupied.Value || !_currentHandler.Active) {
             //    UIManager.Instance.InteractionPanel.ClearTarget();
             //    return;
             //};
         }
         else {
-            if (_currentHandler != null && _currentHandler.Type == InteractType.Wheel && !_currentHandler.Occupied.Value) {
+            if (_currentHandler != null &&
+                (_currentHandler.Type == InteractType.Handle) &&
+                !_currentHandler.Occupied.Value) {
+
                 _currentHandler = null;
-                _player.SRDragHandler.StopDrag();
+                CrosshairManager.Instance.SetState(CrosshairState.Neutral);
             }
         }
 
@@ -59,16 +64,6 @@ public class ClientPlayerInteract : NetworkBehaviour {
         //}
         //else if (_player.Attachable.IsAttached.Value && _currentHandler != null)
         //    UIManager.Instance.InteractionPanel.ClearTarget();
-    }
-
-    public bool StopDragIfOutOfRange(Vector3 initPosition) {
-        if (Vector3.Distance(initPosition, _player.CLCamera.Camera.transform.position) >= interactRange) {
-            _server.StopDragServerRpc(_currentHandler.Type, _currentHandler.Data);
-            _player.CLDragHandler.StopDrag();
-            return true;
-        }
-
-        return false;
     }
 
     [ClientRpc]
@@ -88,30 +83,24 @@ public class ClientPlayerInteract : NetworkBehaviour {
                 _busy = true;
                 _server.InteractServerRpc(_currentHandler.Interactable.NetworkObjectId, _currentHandler.Type, _currentHandler.Data);
 
+                if (_currentHandler.Type == InteractType.Handle) {
+                    _player.CLDragHandler.SetHandler(_currentHandler);
+                    _player.CLDragHandler.StartDrag();
+                }
+
                 _interactCooldownFinished = false;
                 Invoke(nameof(ResetInteractCooldown), interactCooldown);
             }
+            else if (type == ButtonType.Interact && !performed) {
+                if (_currentHandler == null) return;
 
-            if (type == ButtonType.Drag) {
-                if (!performed && _currentHandler != null) {
+                if (_currentHandler.Type == InteractType.Handle) {
                     _server.StopDragServerRpc(_currentHandler.Type, _currentHandler.Data);
                     _player.CLDragHandler.StopDrag();
-                    return;
-                }
-
-                if (_currentHandler == null || _busy || !_player.CanInteract) return;
-
-                _busy = true;
-
-                Transform camTransform = _player.CLCamera.Camera.transform;
-                if (Physics.Raycast(camTransform.position, camTransform.forward, out RaycastHit hit, Mathf.Infinity)) {
-                    _server.StartDragServerRpc(_currentHandler.Interactable.NetworkObjectId, _currentHandler.Type, _currentHandler.Data, hit.point, hit.normal);
-
-                    _player.CLDragHandler.SetHandler(_currentHandler);
-                    _player.CLDragHandler.StartDrag(hit.point, hit.normal);
                 }
             }
         }
+
         if (enabled) _inputReader.ButtonEvent += OnButtonEvent;
         else _inputReader.ButtonEvent -= OnButtonEvent;
     }

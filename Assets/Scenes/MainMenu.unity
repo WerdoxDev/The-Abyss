@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 5995.151, g: 4234.7974, b: 4193.641, a: 1}
+  m_IndirectSpecularColor: {r: 7649.334, g: 4940.868, b: 3619.6177, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -10825,8 +10825,9 @@ GameObject:
   - component: {fileID: 469631282}
   - component: {fileID: 469631284}
   - component: {fileID: 469631283}
+  - component: {fileID: 469631285}
   m_Layer: 5
-  m_Name: Image
+  m_Name: Crosshair
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10890,6 +10891,27 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 469631281}
   m_CullTransparentMesh: 1
+--- !u!114 &469631285
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 469631281}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9968c079417fbff49b860ad91c216f64, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  crosshairGraphic: {fileID: 469631283}
+  crosshairVariants:
+  - State: 1
+    Sprite: {fileID: 21300000, guid: bec0cacc23556a543ac7daa072739cc5, type: 3}
+    Color: {r: 1, g: 1, b: 1, a: 0.5019608}
+  - State: 2
+    Sprite: {fileID: 21300000, guid: bec0cacc23556a543ac7daa072739cc5, type: 3}
+    Color: {r: 0.47058824, g: 0.8784314, b: 0.56078434, a: 1}
+  CurrentState: 0
 --- !u!114 &476342649
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -20867,6 +20889,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 921895449}
+  - component: {fileID: 921895450}
   m_Layer: 5
   m_Name: HUDPanel
   m_TagString: Untagged
@@ -20895,6 +20918,18 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &921895450
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 921895448}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fbfe203cf044cac43bf19e49df610e41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &926897102
 GameObject:
   m_ObjectHideFlags: 0
@@ -37664,11 +37699,11 @@ MonoBehaviour:
   StatsPanel: {fileID: 2039945775}
   CustomizePanel: {fileID: 1207677258}
   InteractionPanel: {fileID: 385547425}
+  HUDPanel: {fileID: 921895450}
+  MainPanel: {fileID: 953671770}
   InfoPanel: {fileID: 985347438}
   ChatPanel: {fileID: 514822990}
   KeybindLegendGO: {fileID: 782843163}
-  MainPanel: {fileID: 953671770}
-  HUDPanel: {fileID: 921895448}
   eventSystem: {fileID: 1225739580}
   playerNamePrefab: {fileID: 6044947104386283808, guid: a0ccf2c1bd3c85e42ac757910853fb0b, type: 3}
   disableOnStart: []
@@ -40698,7 +40733,7 @@ MonoBehaviour:
   fpsInterval: 0.25
   inputReader: {fileID: 11400000, guid: 4b73ed459fcdc384a9f735c33615d532, type: 2}
   tempUrl: 127.0.0.1:7777
-  autoSpawn: 0
+  autoSpawn: 1
   SystemMessageColor: {r: 0.9647059, g: 0.7254902, b: 0.23137255, a: 1}
   GameState: 2
   PlayerNetworkId: 0

@@ -73,7 +73,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 81399
+    m_Bits: 212471
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -444,8 +444,10 @@ MonoBehaviour:
   CLCamera: {fileID: 0}
   Movement: {fileID: 0}
   Attachable: {fileID: 0}
-  DragHandler: {fileID: 0}
-  Interact: {fileID: 0}
+  SRDragHandler: {fileID: 0}
+  CLDragHandler: {fileID: 0}
+  SRInteract: {fileID: 0}
+  CLInteract: {fileID: 0}
   ServerTransform: {fileID: 0}
   Rb: {fileID: 0}
   CurrentShip: {fileID: 0}
@@ -606,7 +608,7 @@ MonoBehaviour:
   interactCooldown: 0.25
   intercatableLayer:
     serializedVersion: 2
-    m_Bits: 65792
+    m_Bits: 196864
 --- !u!114 &-1551906205096340494
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -660,7 +662,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1bdacc4365c269c418ad6ae223541848, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sendRayPositionInterval: 0.1
 --- !u!114 &8593892023922776769
 MonoBehaviour:
   m_ObjectHideFlags: 0

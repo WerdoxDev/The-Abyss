@@ -16,10 +16,12 @@ public class InteractHandler : NetworkBehaviour {
     public bool Active = true;
 
     public UnityEvent<byte> InteractEvent;
+    public UnityEvent<byte> DisconnectEvent;
 
     public void Interact() => InteractEvent?.Invoke(Data);
+    public void Disconnect() => DisconnectEvent?.Invoke(Data);
 }
 
 public enum InteractType {
-    Wheel
+    Handle
 }

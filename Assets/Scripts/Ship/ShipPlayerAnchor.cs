@@ -43,7 +43,7 @@ public class ShipPlayerAnchor : NetworkBehaviour {
             dummyTransform.position = new Vector3(playerPos.x, dummyTransform.position.y, playerPos.z);
             dummyTransform.rotation = player.transform.rotation;
 
-            List<Vector3> positions = new List<Vector3>();
+            List<Vector3> positions = new();
             if (Physics.Raycast(dummyTransform.position + new Vector3(playerSize.x, 1f, playerSize.z), Vector3.down, out RaycastHit hit1, 3, groundLayer)) positions.Add(hit1.point);
             if (Physics.Raycast(dummyTransform.position + new Vector3(playerSize.x, 1f, -playerSize.z), Vector3.down, out RaycastHit hit2, 2, groundLayer)) positions.Add(hit2.point);
             if (Physics.Raycast(dummyTransform.position + new Vector3(-playerSize.x, 1f, -playerSize.z), Vector3.down, out RaycastHit hit3, 2, groundLayer)) positions.Add(hit3.point);

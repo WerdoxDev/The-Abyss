@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 4796874784997734305}
   - component: {fileID: 2303998124441622778}
   m_Layer: 0
-  m_Name: WheelIndicator
+  m_Name: LocalWheelIndicator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -31,7 +31,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 13
+  m_RootOrder: 14
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &4796874784997734305
 MeshFilter:
@@ -61,7 +61,7 @@ MeshRenderer:
   m_RenderingLayerMask: 257
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 23045338bb336e349ba63c33a10e9363, type: 2}
+  - {fileID: 2100000, guid: e04e2fc67baba0c4b93d4a3cee2097ba, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

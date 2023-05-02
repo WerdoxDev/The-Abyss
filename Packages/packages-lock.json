@@ -1,12 +1,5 @@
 {
   "dependencies": {
-    "com.community.netcode.transport.ruffles": {
-      "version": "https://github.com/Unity-Technologies/multiplayer-community-contributions.git?path=/Transports/com.community.netcode.transport.ruffles",
-      "depth": 0,
-      "source": "git",
-      "dependencies": {},
-      "hash": "1d9378ac50eb870e275505da86439fbd327318b9"
-    },
     "com.unity.2d.sprite": {
       "version": "1.0.0",
       "depth": 0,
@@ -23,7 +16,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.collab-proxy": {
-      "version": "2.0.1",
+      "version": "2.0.4",
       "depth": 0,
       "source": "registry",
       "dependencies": {},
@@ -41,13 +34,6 @@
       },
       "url": "https://packages.unity.com"
     },
-    "com.unity.editorcoroutines": {
-      "version": "1.0.0",
-      "depth": 2,
-      "source": "registry",
-      "dependencies": {},
-      "url": "https://packages.unity.com"
-    },
     "com.unity.ext.nunit": {
       "version": "2.0.3",
       "depth": 1,
@@ -56,7 +42,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.ide.visualstudio": {
-      "version": "2.0.17",
+      "version": "2.0.18",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -73,34 +59,12 @@
       },
       "url": "https://packages.unity.com"
     },
-    "com.unity.learn.iet-framework": {
-      "version": "3.1.3",
-      "depth": 1,
-      "source": "registry",
-      "dependencies": {
-        "com.unity.editorcoroutines": "1.0.0",
-        "com.unity.settings-manager": "1.0.3"
-      },
-      "url": "https://packages.unity.com"
-    },
     "com.unity.mathematics": {
       "version": "1.2.6",
       "depth": 1,
       "source": "registry",
       "dependencies": {},
       "url": "https://packages.unity.com"
-    },
-    "com.unity.multiplayer.samples.coop": {
-      "version": "https://github.com/Unity-Technologies/com.unity.multiplayer.samples.coop.git?path=/Packages/com.unity.multiplayer.samples.coop#main",
-      "depth": 0,
-      "source": "git",
-      "dependencies": {
-        "com.unity.learn.iet-framework": "1.2.1",
-        "com.unity.multiplayer.tools": "1.1.0",
-        "com.unity.netcode.gameobjects": "1.1.0",
-        "com.unity.services.relay": "1.0.3"
-      },
-      "hash": "eeba9a2afa61b5822ce285fe3a772da4e5430b52"
     },
     "com.unity.multiplayer.tools": {
       "version": "1.1.0",
@@ -116,12 +80,12 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.netcode.gameobjects": {
-      "version": "1.2.0",
+      "version": "1.3.1",
       "depth": 0,
       "source": "registry",
       "dependencies": {
         "com.unity.nuget.mono-cecil": "1.10.1",
-        "com.unity.transport": "1.3.0"
+        "com.unity.transport": "1.3.3"
       },
       "url": "https://packages.unity.com"
     },
@@ -147,7 +111,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.render-pipelines.core": {
-      "version": "15.0.4",
+      "version": "15.0.5",
       "depth": 1,
       "source": "builtin",
       "dependencies": {
@@ -159,7 +123,7 @@
       }
     },
     "com.unity.render-pipelines.high-definition": {
-      "version": "15.0.4",
+      "version": "15.0.5",
       "depth": 0,
       "source": "builtin",
       "dependencies": {
@@ -170,18 +134,18 @@
         "com.unity.modules.animation": "1.0.0",
         "com.unity.modules.imageconversion": "1.0.0",
         "com.unity.modules.terrain": "1.0.0",
-        "com.unity.render-pipelines.core": "15.0.4",
-        "com.unity.shadergraph": "15.0.4",
-        "com.unity.visualeffectgraph": "15.0.4",
-        "com.unity.render-pipelines.high-definition-config": "15.0.4"
+        "com.unity.render-pipelines.core": "15.0.5",
+        "com.unity.shadergraph": "15.0.5",
+        "com.unity.visualeffectgraph": "15.0.5",
+        "com.unity.render-pipelines.high-definition-config": "15.0.5"
       }
     },
     "com.unity.render-pipelines.high-definition-config": {
-      "version": "15.0.4",
+      "version": "15.0.5",
       "depth": 1,
       "source": "builtin",
       "dependencies": {
-        "com.unity.render-pipelines.core": "15.0.4"
+        "com.unity.render-pipelines.core": "15.0.5"
       }
     },
     "com.unity.rendering.denoising": {
@@ -210,7 +174,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.services.core": {
-      "version": "1.8.1",
+      "version": "1.8.2",
       "depth": 1,
       "source": "registry",
       "dependencies": {
@@ -237,8 +201,8 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.services.qos": {
-      "version": "1.1.0",
-      "depth": 2,
+      "version": "1.2.0",
+      "depth": 1,
       "source": "registry",
       "dependencies": {
         "com.unity.services.core": "1.4.0",
@@ -251,7 +215,7 @@
     },
     "com.unity.services.relay": {
       "version": "1.0.5",
-      "depth": 1,
+      "depth": 0,
       "source": "registry",
       "dependencies": {
         "com.unity.services.core": "1.4.0",
@@ -267,24 +231,17 @@
       },
       "url": "https://packages.unity.com"
     },
-    "com.unity.settings-manager": {
-      "version": "2.0.1",
-      "depth": 2,
-      "source": "registry",
-      "dependencies": {},
-      "url": "https://packages.unity.com"
-    },
     "com.unity.shadergraph": {
-      "version": "15.0.4",
+      "version": "15.0.5",
       "depth": 1,
       "source": "builtin",
       "dependencies": {
-        "com.unity.render-pipelines.core": "15.0.4",
+        "com.unity.render-pipelines.core": "15.0.5",
         "com.unity.searcher": "4.9.2"
       }
     },
     "com.unity.test-framework": {
-      "version": "1.3.3",
+      "version": "1.3.4",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -336,12 +293,12 @@
       }
     },
     "com.unity.visualeffectgraph": {
-      "version": "15.0.4",
+      "version": "15.0.5",
       "depth": 1,
       "source": "builtin",
       "dependencies": {
-        "com.unity.shadergraph": "15.0.4",
-        "com.unity.render-pipelines.core": "15.0.4"
+        "com.unity.shadergraph": "15.0.5",
+        "com.unity.render-pipelines.core": "15.0.5"
       }
     },
     "com.veriorpies.parrelsync": {
@@ -349,7 +306,7 @@
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "f45424822189ebd875d864a17d7f03b72eafbff7"
+      "hash": "141b4e1e31966242a6fb7c495b52ac3d1221bc75"
     },
     "com.unity.modules.ai": {
       "version": "1.0.0",

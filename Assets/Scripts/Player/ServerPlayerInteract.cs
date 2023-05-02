@@ -38,37 +38,16 @@ public class ServerPlayerInteract : NetworkBehaviour {
 
         handler.Interact();
 
+        if (type == InteractType.Handle) {
+            _player.SRDragHandler.SetHandler(handler);
+            _player.SRDragHandler.StartDrag();
+        }
+
         //_player.Attachable.SetHandler(handler);
         //if (_player.Attachable.Handler != null) {
         //    if (!_player.Attachable.IsAttached.Value) _player.Attachable.Attach();
         //    else _player.Attachable.Detach();
         //}
-        _client.UnbusyClientRpc(_player.ClientRpcParams);
-    }
-
-    [ServerRpc]
-    public void StartDragServerRpc(ulong interactObjId, InteractType type, byte handlerData, Vector3 initPosition, Vector3 initNormal) {
-        if (!_player.CanInteract) return;
-
-        NetworkManager.SpawnManager.SpawnedObjects.TryGetValue(interactObjId, out var interactObj);
-        if (interactObj == null) {
-            _client.UnbusyClientRpc(_player.ClientRpcParams);
-            return;
-        }
-
-        InteractHandler handler = interactObj.GetComponent<Interactable>().GetHandler(handlerData);
-
-        if (handler == null) {
-            Debug.LogError("InteractHandler was not found");
-            _client.UnbusyClientRpc(_player.ClientRpcParams);
-            return;
-        }
-
-        if (type == InteractType.Wheel) {
-            _player.SRDragHandler.SetHandler(handler);
-            _player.SRDragHandler.StartDrag(initPosition, initNormal);
-        }
-
         _client.UnbusyClientRpc(_player.ClientRpcParams);
     }
 

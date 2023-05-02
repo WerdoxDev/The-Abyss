@@ -21,11 +21,11 @@ public class UIManager : MonoBehaviour {
     public StatsPanel StatsPanel;
     public ProfileCustomizePanel CustomizePanel;
     public InteractionPanel InteractionPanel;
+    public HUDPanel HUDPanel;
+    public GameObject MainPanel;
     public GameObject InfoPanel;
     public GameObject ChatPanel;
     public GameObject KeybindLegendGO;
-    public GameObject MainPanel;
-    public GameObject HUDPanel;
 
     [Header("Settings")]
     [SerializeField] private GameObject eventSystem;
@@ -84,14 +84,14 @@ public class UIManager : MonoBehaviour {
         };
 
         GameManager.Instance.OnPause += () => {
-            HUDPanel.SetActive(false);
+            HUDPanel.Hide();
             PausePanel.Panel.Open();
             KeybindLegendGO.SetActive(true);
             GameManager.Instance.FreeCursor();
         };
 
         GameManager.Instance.OnResume += () => {
-            HUDPanel.SetActive(true);
+            HUDPanel.Show();
             PausePanel.Panel.Close();
             KeybindLegendGO.SetActive(false);
             GameManager.Instance.LockCursor();
@@ -100,7 +100,7 @@ public class UIManager : MonoBehaviour {
         void OnStartState() {
             StartPanel.Panel.Open();
             MainPanel.SetActive(false);
-            HUDPanel.SetActive(false);
+            HUDPanel.Hide();
             ChatPanel.SetActive(false);
             KeybindLegendGO.SetActive(false);
             InfoPanel.SetActive(false);
@@ -108,7 +108,7 @@ public class UIManager : MonoBehaviour {
 
         void OnMainMenuState() {
             MainPanel.SetActive(true);
-            HUDPanel.SetActive(false);
+            HUDPanel.Hide();
             KeybindLegendGO.SetActive(true);
             StatsPanel.gameObject.SetActive(true);
             JoinPanel.Close(true);
@@ -139,14 +139,16 @@ public class UIManager : MonoBehaviour {
 
         GameManager.Instance.OnGameStateChanged += (state) => {
             if (state == GameState.InGame) {
-                HUDPanel.SetActive(true);
+                HUDPanel.Show();
                 MainPanel.SetActive(false);
                 KeybindLegendGO.SetActive(false);
                 JoinPanel.Close(true);
                 HostPanel.Close(true);
                 InfoPanel.SetActive(false);
                 PausePanel.Panel.Close(true);
+
                 ChatManager.Instance.ClearChat();
+                CrosshairManager.Instance.SetState(CrosshairState.Neutral);
             }
             if (state == GameState.InMainMenu) {
                 OnMainMenuState();

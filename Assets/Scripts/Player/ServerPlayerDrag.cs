@@ -12,8 +12,7 @@ public class ServerPlayerDrag : NetworkBehaviour {
 
     private Player _player;
     private Draggable _draggable;
-    private Vector3 _initPosition;
-    private Vector3 _initNormal;
+    private Vector2 _mouseInput;
 
     private ClientPlayerDrag _client;
 
@@ -32,26 +31,20 @@ public class ServerPlayerDrag : NetworkBehaviour {
     private void FixedUpdate() {
         if (!IsDragging.Value) return;
 
-        //if (Handler.Type == InteractType.Wheel) {
-        //    Transform camTransform = _player.CLCamera.Camera.transform;
-        //    //Quaternion camRotation = Quaternion.Euler(cam, _player.SRCamera.OrientationRotation.Value.y, 0);
-        //    _draggable.Wheel.Drag(_initPosition, _initNormal, camTransform.position, camTransform.forward);
-        //}
+        if (Handler.Type == InteractType.Handle) {
+            _draggable.Handle.Turn(_mouseInput);
+        }
     }
 
-    public void StartDrag(Vector3 initPosition, Vector3 initNormal) {
+    public void StartDrag() {
         if (Handler == null) return;
 
         _draggable.Reset();
 
-        if (Handler.Type == InteractType.Wheel) {
-            _draggable.Wheel = (Wheel)Handler.Interactable;
-            _draggable.Wheel.SpawnInitial(initPosition, false);
-            _draggable.Wheel.SetHeldBy(_player.OwnerClientId);
+        if (Handler.Type == InteractType.Handle) {
+            _draggable.Handle = (Handle)Handler.Interactable;
+            _draggable.Handle.SetHeldBy(_player.OwnerClientId);
         }
-
-        _initPosition = initPosition;
-        _initNormal = initNormal;
 
         Handler.Occupied.Value = true;
         IsDragging.Value = true;
@@ -59,10 +52,6 @@ public class ServerPlayerDrag : NetworkBehaviour {
 
     public void StopDrag() {
         if (Handler == null) return;
-
-        //if (Handler.Type == InteractType.Wheel) {
-        //    _draggable.Wheel.ResetWheel();
-        //}
 
         _draggable.Reset();
 
@@ -72,12 +61,15 @@ public class ServerPlayerDrag : NetworkBehaviour {
     }
 
     public void SetHandler(InteractHandler handler) => Handler = handler;
+
+    [ServerRpc]
+    public void SetMouseInputServerRpc(Vector2 input) => _mouseInput = input;
 }
 
 public struct Draggable {
-    public Wheel Wheel;
+    public Handle Handle;
 
     public void Reset() {
-        Wheel = null;
+        Handle = null;
     }
 }

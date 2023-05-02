@@ -23,7 +23,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: WheelIndicator
+  m_Name: LocalWheelIndicator
   m_Shader: {fileID: 4800000, guid: 6e4ae4064600d784cac1e41a9e6f2e59, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -260,14 +260,14 @@ Material:
     - _ZTestTransparent: 4
     - _ZWrite: 0
     m_Colors:
-    - _BaseColor: {r: 0.50980395, g: 0.8, b: 0.8666667, a: 1}
+    - _BaseColor: {r: 0.47058824, g: 0.8784314, b: 0.56078434, a: 1}
     - _BaseColorMap_MipInfo: {r: 0, g: 0, b: 0, a: 0}
-    - _Color: {r: 0.5098039, g: 0.8, b: 0.8666667, a: 1}
+    - _Color: {r: 0.47058815, g: 0.8784314, b: 0.5607843, a: 1}
     - _DiffusionProfileAsset: {r: 0, g: 0, b: 0, a: 0}
     - _DoubleSidedConstants: {r: 1, g: 1, b: -1, a: 0}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
-    - _EmissiveColor: {r: 11.161396, g: 30.19137, b: 36.152763, a: 50}
-    - _EmissiveColorLDR: {r: 0.50980395, g: 0.8, b: 0.8666667, a: 1}
+    - _EmissiveColor: {r: 9.436573, g: 37.450977, b: 13.80047, a: 50}
+    - _EmissiveColorLDR: {r: 0.47164863, g: 0.88031507, b: 0.56202686, a: 1}
     - _InvPrimScale: {r: 1, g: 1, b: 0, a: 0}
     - _IridescenceThicknessRemap: {r: 0, g: 1, b: 0, a: 0}
     - _SpecularColor: {r: 1, g: 1, b: 1, a: 1}
