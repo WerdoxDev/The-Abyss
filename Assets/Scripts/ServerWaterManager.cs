@@ -1,9 +1,11 @@
 using System;
 using Unity.Netcode;
+using UnityEngine;
 
 public class ServerWaveManager : NetworkBehaviour {
 
     public NetworkVariable<WaterInfo> WaterInfo = new();
+    public NetworkVariable<DateTime> SimulationStart = new();
 
     private WaterManager _client;
 
@@ -15,6 +17,7 @@ public class ServerWaveManager : NetworkBehaviour {
         if (!IsServer) {
             enabled = false;
             _client.Surface.cpuSimulation = false;
+            _client.Surface.simulationStart = SimulationStart.Value;
 
             WaterInfo.OnValueChanged += (WaterInfo oldInfo, WaterInfo newInfo) => {
                 _client.Surface.timeMultiplier = newInfo.TimeMultiplier;
@@ -23,6 +26,13 @@ public class ServerWaveManager : NetworkBehaviour {
                 _client.Surface.largeCurrentSpeedValue = newInfo.CurrentSpeed;
                 _client.Surface.largeOrientationValue = newInfo.CurrentOrientation;
             };
+
+            SimulationStart.OnValueChanged += (DateTime oldTime, DateTime newTime) => {
+                _client.Surface.simulationStart = newTime;
+            };
+        }
+        else {
+            SimulationStart.Value = _client.Surface.simulationStart;
         }
     }
 

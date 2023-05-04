@@ -32,7 +32,7 @@ public class ServerPlayerDrag : NetworkBehaviour {
         if (!IsDragging.Value) return;
 
         if (Handler.Type == InteractType.Handle) {
-            _draggable.Handle.Turn(_mouseInput);
+            _draggable.Handle.Interact(_mouseInput);
         }
     }
 
